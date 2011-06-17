@@ -1,0 +1,65 @@
+README for the python-rhnapi module.
+
+This is a python module (for python 2.4+) that abstracts the RHN Satellite XMLRPC API for use in python scripts.
+
+It is almost complete at the time of writing.
+namespaces have been collapsed for ease of import (and shorter function calls). For example, the system namespace also contains the 'system.config' namespace with some methods renamed to make them unique
+
+USAGE:
+create an instance of the rhnapi.rhnSession class, then import the bits of the rest of the namespace that you require, passing them the rhnSession object.
+
+basic example:
+
+# ------------------------ #
+import rhnapi
+from rhnapi import system
+
+RHN = rhnapi.rhnSession('localhost', 'user', 'password')
+system.listSystems(RHN)
+
+# ----------------------- #
+
+There are utility functions within the rhnapi module to allow the use of a config file for per-server credentials
+by default this is '~/.rhninfo' and looks like this. This can be 400 you:you (or 600 if you want to be able to save credentials)
+(yes, the API module can do that too)
+
+[DEFAULT]
+login = None
+password = None
+
+[satellite.hostname]
+login = yourlogin
+password = yourpassword
+
+To use the module like that you can pass a config= parameter to the rhnSession instance
+RHN = rhnapi.rhnSession('localhost', config = '~/.rhninfo')
+
+EXAMPLE SCRIPTS
+There are template files in /usr/share/doc/python-rhnapi-$version for rhninfo and API scripts.
+API scripts using this will be packaged in the satellite-scripts RPM. Eventually.
+
+MODULE CONTENTS
+__init__.py           - the basic classes
+activationkey.py      - activationkey namespace
+api.py                - api namespace
+channel.py            - channel, channel.software, channel.access, channel.org
+configchannel.py      - configchannel
+distchannel.py        - distchannel
+errata.py             - errata
+kickstart.py          - kickstart, kickstart.filepreservation, kickstart.keys
+                        kickstart.profile.keys, kickstart.profile.software,
+                        kickstart.profile.system, kickstart.snippet, kickstart.tree
+org.py                - org, org.trusts
+packages.py           - packages, packages.provider, packages.search
+preferences.py        - preferences.locale
+proxy.py              - proxy
+satellite.py          - satellite
+schedule.py           - schedule
+systemgroup.py        - systemgroup
+system.py             - system, system.config**
+user.py               - user
+
+** the system namespace is currently missing
+   system.custominfo, system.search, system.provisioning.snapshot
+utils.py
+

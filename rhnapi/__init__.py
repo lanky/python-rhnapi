@@ -52,14 +52,16 @@ __all__ =     [
             'distchannel',
             'errata',
             'kickstart',
+            'org',
             'packages',
             'preferences',
             'proxy',
             'satellite',
+            'schedule',
             'system',
-            'systemconfig',
             'systemgroup',
             'user',
+            'utils',
             ]
 
 import xmlrpclib

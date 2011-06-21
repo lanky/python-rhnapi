@@ -3198,7 +3198,7 @@ def deleteSnapshots(rhn, **kwargs):
     if kwargs.has_key('endDate'):
         kwargs['endDate'] = rhn.encodeDate(kwargs['endDate'])
     try:
-        return rhn.session.system.provisioning.deleteSnapshots(rhn.key, kwargs) == 1
+        return rhn.session.system.provisioning.snapshot.deleteSnapshots(rhn.key, kwargs) == 1
     except Exception, E:
         return rhn.fail(E,  'delete system snapshots')
 
@@ -3275,7 +3275,7 @@ def listSnapshots(rhn, server_id, **kwargs):
     if kwargs.has_key('endDate'):
         kwargs['endDate'] = rhn.encodeDate(kwargs['endDate'])
     try:
-        return rhn.session.system.provisioning.listSnapshots(rhn.key, server_id, kwargs) == 1
+        return rhn.session.system.provisioning.snapshot.listSnapshots(rhn.key, server_id, kwargs) == 1
     except Exception, E:
         return rhn.fail(E,  'list system snapshots for server %s' % getServerName(rhn, server_id))
 

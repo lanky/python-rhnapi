@@ -34,8 +34,6 @@ def addChildChannels(rhn, keyid, chan_labels):
     keyid (str)             - the key identifier (long hex or human-readable name)
     chan_labels (list/str)  - a list of child channel labels to add to the key
     """
-    if type(chan_labels) is not list:
-        chan_labels = [chan_labels]
     try:
         return rhn.session.activationkey.addChildChannels(rhn.key, keyid, chan_labels) == 1
     except Exception, E:
@@ -59,8 +57,6 @@ def addConfigChannels(rhn, keyids, config_labels, addToTop = False):
     config_labels(list/str)    - a list of configuration channel labels
     addToTop(bool)             - add this list to the top [false]
     """
-    if type(keyids) is not list:
-        keyids = [keyids]
     try:
         return rhn.session.activationkey.addConfigChannels(rhn.key, keyids, config_labels, addToTop) == 1
     except Exception, E:
@@ -134,8 +130,6 @@ def addGroupsByName(rhn, keyid, groupnames):
     groupnames (list/str)  - a list of system group names to add.
     """
     # handle being given a single groupname, too
-    if type(groupnames) is not list:
-        groupnames = [groupnames]
     # import our local systemgroup module
     import systemgroup
     allgroups = systemgroup.listAllGroups(rhn)
@@ -344,8 +338,6 @@ def removeConfigChannels(rhn, keyids, channels):
     keyid (list(str))     - the key identifier (long hex or human-readable name)
     channels (list(str))  - a list of config channel labels to remove from the key.
     """
-    if not isinstance(keyids, list):
-        keyids = [ keyids ]
     try:
         return rhn.session.activationkey.removeChildChannels(rhn.key, keyid, channels) == 1
     except Exception, E:
@@ -429,8 +421,6 @@ def setConfigChannels(rhn, keyids, channels):
     keyids (list/str)      - the key identifier (long hex or human-readable name)
     channels (list/str)    - a list of group names to remove.
     """
-    if type(keyids) is not list:
-        keyids = [keyids]
     try:
         return rhn.session.activationkey.setConfigChannels(rhn.key, keyids, channels) == 1
     except Exception, E:

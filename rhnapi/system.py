@@ -3220,13 +3220,13 @@ def listSnapshotConfigFiles(rhn, snapshot_id):
     snapshot_id(int)         - the snapshot ID
     """
     try:
-        return rhn.sessions.system.provisioning.snapshot.listSnapshotConfigFiles(rhn.key, snapshot_id)
+        return rhn.session.system.provisioning.snapshot.listSnapshotConfigFiles(rhn.key, snapshot_id)
     except Exception, E:
         return rhn.fail(E, 'list config files for snapshot ID %d' % snapshot_id)
 
 # --------------------------------------------------------------------------------- #
 
-def listSnapshotPackags(rhn, snapshot_id):
+def listSnapshotPackages(rhn, snapshot_id):
     """
     API: system.provisioning.snapshot.listSnapshotPackages
 
@@ -3270,12 +3270,13 @@ def listSnapshots(rhn, server_id, **kwargs):
     *endDate(str)            - iso8601 format date string
     """
     # let's encode our date strings appropriately for XMLRPC
+    dates = {}
     if kwargs.has_key('startDate'):
-        kwargs['startDate'] = rhn.encodeDate(kwargs['startDate'])
+        dates['startDate'] = rhn.encodeDate(kwargs['startDate'])
     if kwargs.has_key('endDate'):
-        kwargs['endDate'] = rhn.encodeDate(kwargs['endDate'])
+        dates['endDate'] = rhn.encodeDate(kwargs['endDate'])
     try:
-        return rhn.session.system.provisioning.snapshot.listSnapshots(rhn.key, server_id, kwargs) == 1
+        return rhn.session.system.provisioning.snapshot.listSnapshots(rhn.key, server_id, dates) == 1
     except Exception, E:
         return rhn.fail(E,  'list system snapshots for server %s' % getServerName(rhn, server_id))
 

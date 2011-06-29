@@ -53,7 +53,7 @@ def addConfigChannels(rhn, keyids, config_labels, addToTop = False):
     
     parameters:
     rhn                        - an authenticated rhn session
-    keyids (list/              - the key identifier (long hex or human-readable name)
+    keyids (list/str)          - the key identifier (long hex or human-readable name)
     config_labels(list/str)    - a list of configuration channel labels
     addToTop(bool)             - add this list to the top [false]
     """

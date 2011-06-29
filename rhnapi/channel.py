@@ -381,7 +381,7 @@ def createChannel(rhn, label, name, summary, arch, **kwargs):
     If gpgkey is provided, checksum is also required. Sorry, but that's just how it is.
     """
     try:
-        return rhn.session.channel.software.create(rhn.key, label, name, summary, arch, **kwargs) == 1
+        return rhn.session.channel.software.create(rhn.key, label, name, summary, archLabel='channel-%s' % arch, **kwargs) == 1
     except Exception, E:
         return rhn.fail(E, 'create software channel %s' % name)
 # --------------------------------------------------------------------------------- #

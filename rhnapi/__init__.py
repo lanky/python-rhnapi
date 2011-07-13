@@ -264,6 +264,8 @@ class rhnSession:
         # for config passing we require the hostname, let's clean up whatever we've been given:
         self.hostname = getHostname(url)
         self.rhnurl = rhnifyURL(url)
+        self.login = rhnlogin
+        self._password = rhnpassword
 
         self.debug = debug
         # in case we need it:

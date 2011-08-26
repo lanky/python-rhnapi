@@ -271,8 +271,9 @@ class rhnSession:
         # in case we need it:
         self.configfile = config
 
-        # first, did we specify a configuration file for credentials?
-        if self.configfile != None:
+        # If login and password are specified explicitly they override the config file
+        # otherwise we read credentials from the config file, unless none was specified
+        if self.login == None and self._password == None and self.configfile != None:
             self.login, self._password = fetchCreds(self.configfile, self.hostname, self.debug)
 
         # see what we got back and prompt if required:

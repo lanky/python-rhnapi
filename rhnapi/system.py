@@ -387,6 +387,28 @@ def downloadSystemId(rhn, server_id):
 
 # --------------------------------------------------------------------------------- #
 
+def getChildChannels(rhn, server_id):
+    """
+    API: none, special case of system.listSubscribedChildChannels
+
+    usage: getChildChannels(rhn, server_id)
+    
+    description:
+    returns a list of labels of the system subscribed child channels
+    
+    params:
+    rhn                      - an authenticated RHN session
+    server_id(int)            - server ID number
+    """
+    try:
+        print "Determining child channels subscribed for server %d" % server_id
+        ccarray = rhn.session.system.listSubscribedChildChannels(rhn.key, server_id)
+        return [ x['label'] for x in ccarray ]
+    except Exception, E:
+        return rhn.fail(E, "retrieve Subscribed Child Channel information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+
+# --------------------------------------------------------------------------------- #
+
 def getBaseChannel(rhn, server_id):
     """
     API: none, special case of system.getSubscribedBaseChannel

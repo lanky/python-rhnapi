@@ -213,7 +213,7 @@ def getOrgSharing(rhn, chanlabel):
 # --------------------------------------------------------------------------------- #
 def setOrgSharing(rhn, chanlabel, access):
     """
-    usage: setOrgSharing(rhn, chanlabel)
+    usage: setOrgSharing(rhn, chanlabel, access)
 
     Set organization sharing access control. 
 
@@ -223,7 +223,7 @@ def setOrgSharing(rhn, chanlabel, access):
     access(str)             - access setting ('public', 'private', or 'protected')
     """
     try:
-        return rhn.session.channel.access.setOrgSharing(rhn.key, chanlabel)
+        return rhn.session.channel.access.setOrgSharing(rhn.key, chanlabel, access)
     except Exception, E:
         return rhn.fail(E,'set Org sharing info for channel %s' % chanlabel)
 

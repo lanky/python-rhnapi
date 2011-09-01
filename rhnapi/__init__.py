@@ -267,6 +267,8 @@ class rhnSession:
         self.login = rhnlogin
         self._password = rhnpassword
 
+        self.login = rhnlogin
+        self._password = rhnpassword
         self.debug = debug
         # in case we need it:
         self.configfile = config
@@ -364,6 +366,12 @@ class rhnSession:
         disable debug output
         """
         self.debug = False
+
+    def renewSession(self):
+        """
+        Renews an expired session
+        """
+        self.key = self.session.auth.login(self.login, self._password)
 
     def logout(self):
         """

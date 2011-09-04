@@ -997,8 +997,8 @@ def listBaseChannels(rhn, regex=None):
     regex(str)              - optional regular expression to match against labels
     """
     try:
-        # Note we cannot use listSoftwareChannels here or it wont see channels shared by·
-        # multi-org-trusts, ref unresolved BZ655056, therefore it's neccesary to get all·
+        # Note we cannot use listSoftwareChannels here or it wont see channels shared by 
+        # multi-org-trusts, ref unresolved BZ655056, therefore it's neccesary to get all 
         # Channels, then see if they have a parent_label via channel.software.getDetails()
         # because, stupidly listAllChannels doesn't return parent_label, ref BZ500690
         allchannels = sorted(rhn.session.channel.listAllChannels(rhn.key), key=itemgetter('label'))

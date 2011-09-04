@@ -458,9 +458,21 @@ def cloneChannel(rhn, chanlabel, noerrata = False, **kwargs):
     """
     try:
         res = rhn.session.channel.software.clone(rhn.key, chanlabel, kwargs, noerrata)
-        return isinstance(res, int)
     except Exception, E:
         return rhn.fail(E, "clone channel %s as %s" %(chanlabel, kwargs['label']))
+
+    # SH : For 5.4 just cloning via channel.software.clone is not enough apparently, see :
+    # https://access.redhat.com/kb/docs/DOC-55475
+    # Without this logic, kicstart profiles fail to find some packages in child channels,
+    # meaning things basically don't work
+    if isinstance(res,int):
+        if ( noerrata == False):
+            rhn.session.channel.software.mergeErrata(rhn.key, chanlabel, kwargs['label'])
+        rhn.session.channel.software.mergePackages(rhn.key, chanlabel, kwargs['label'])
+        rhn.session.channel.software.regenerateNeededCache(rhn.key, kwargs['label'])
+
+    return isinstance(res, int)
+
 
 # --------------------------------------------------------------------------------- #
 def deleteChannel(rhn, channel_label):

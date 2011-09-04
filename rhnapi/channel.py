@@ -989,7 +989,7 @@ def listBaseChannels(rhn, regex=None):
     usage: listBaseChannels(rhn)
 
     List the base channels on your satellite
-    
+
     returns: list of channel labels
 
     parameters:
@@ -997,8 +997,16 @@ def listBaseChannels(rhn, regex=None):
     regex(str)              - optional regular expression to match against labels
     """
     try:
-        allchannels = sorted(rhn.session.channel.listSoftwareChannels(rhn.key), key=itemgetter('label'))
-        basechannels = [ x['label'] for x in allchannels if x['parent_label'] == '' ]
+        # Note we cannot use listSoftwareChannels here or it wont see channels shared by·
+        # multi-org-trusts, ref unresolved BZ655056, therefore it's neccesary to get all·
+        # Channels, then see if they have a parent_label via channel.software.getDetails()
+        # because, stupidly listAllChannels doesn't return parent_label, ref BZ500690
+        allchannels = sorted(rhn.session.channel.listAllChannels(rhn.key), key=itemgetter('label'))
+        basechannels = list()
+        for channel in allchannels:
+            chdetails = rhn.session.channel.software.getDetails(rhn.key, channel['id'])
+            if len(chdetails['parent_channel_label']) == 0:
+                basechannels.append(channel['label'])
         if regex is not None:
             pattern = re.compile(r'%s' % str(regex))
             return [ x for x in basechannels if pattern.search(x) ]

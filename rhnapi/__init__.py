@@ -132,7 +132,7 @@ def fetchCreds(filename, servername, debug=False):
     login = LOGIN
     password = PASSWORD
 
-    Values picked up from [DEFAULTS] if missing from a section    
+    Values picked up from [DEFAULTS] if missing from a section
     """
     # set initial values
     mylogin = None
@@ -293,7 +293,7 @@ class rhnSession:
                 self.session = xmlrpclib.Server(self.rhnurl, verbose=0, transport = P)
             else:
                 self.session = xmlrpclib.Server(self.rhnurl, verbose=0)
-            
+
             # now we login
             self.key = self.session.auth.login(self.login, self._password)
 
@@ -309,7 +309,7 @@ class rhnSession:
                             print "saved credentials to %s" % self.configfile
                     else:
                         print "failed to save credentials to %s" % self.configfile
-                    
+
 
         except xmlrpclib.Fault, E:
             self.fail(E, 'login to RHN server %s' % self.rhnurl )
@@ -341,6 +341,12 @@ class rhnSession:
         """
         return self.session.api.systemVersion()
 
+    def getRHNUser(self):
+        """
+        return the user currently logged in via rhnSession
+        """
+        return self.login
+
     def getApiVersion(self):
         """
         return the RHN API version in use.
@@ -358,7 +364,6 @@ class rhnSession:
         disable debug output
         """
         self.debug = False
-
 
     def logout(self):
         """

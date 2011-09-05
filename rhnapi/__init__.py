@@ -397,6 +397,19 @@ class rhnSession:
                 return self.fail(E, 'encode date. Error: %s' % E.args[0]) 
         else:
             return xmlrpclib.DateTime()
+    
+    def decodeDate(self, rpcdate, timefmt = '%Y-%m-%d %H:%M:%S'):
+        """
+        decode an XMLRPC DateTime object to a string in the appropriate format.
+        Time format defaults to YYYY-MM-DD HH:MM:SS
+
+        parameters:
+        rpcdate(xmlrpclib.DateTime) object
+        timefmt(str)
+        """
+        tt = time.strptime(rpcdate.value, '%Y%m%dT%H:%M:%S')
+        return time.strftime(timefmt, tt)
+
 
 class rhnException(Exception):
     """

@@ -56,10 +56,7 @@ proxy.py              - proxy
 satellite.py          - satellite
 schedule.py           - schedule
 systemgroup.py        - systemgroup
-system.py             - system, system.config**
+system.py             - system, system.config, system.custominfo, system.search, system.provisioning.snapshot
 user.py               - user
-
-** the system namespace is currently missing
-   system.custominfo, system.search, system.provisioning.snapshot
-utils.py
+utils.py              - additional custom methods and utilities using the RHN API. Not part of the official API.
 

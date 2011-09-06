@@ -1,2 +1,3 @@
+# exclude README
 recursive-include rhnapi *.py
-graft rhnapi/docs 
+graft rhnapi/docs

@@ -18,6 +18,7 @@ except ImportError:
 from operator import itemgetter
 import time
 from  xmlrpclib import DateTime as xmlrpcDateTime
+import csv
 
 # presumes the existence of the rhnapi module on your PYTHONPATH
 from rhnapi.satellite import listEntitlements
@@ -186,3 +187,43 @@ def prompt_confirm(action, default='Y'):
     # anything else, return False
     else:
         return False
+
+# --------------------------------------------------------------------------------- #
+def csv_report(objectlist, outputfile,  fields = None):
+    """
+    Creates a CSV report, with a header line from the data provided
+    This uses the python stdlib csv.DictWriter class, where each line is constructed from
+    dictionary key/value pairs
+
+    This will write a header line with field names too.
+
+
+    parameters:
+    objectlist  - list of dict/hash objects, as much of the satellite output appears to be
+    outputfile  - a filename/path (not a file descriptor) to write data to. Will be overwritten if it exists.
+    fields      - the list of dictionary keys (in order) to put in each row. This can be a subset of the keys
+                  in each object. 
+
+    """
+    try:
+        # attempt to open the output file for writing
+        fd = open(outputfile, 'wb')
+        if fields is None:
+            # assume 
+            fields = objectlist[0].keys()
+
+        headerline = {}
+        # generate a header line
+        for f in fields:
+            headerline[f] = f
+        
+        mywriter = csv.DictWriter(fd, fields, restval='', extrasaction = 'ignore')
+        mywriter.writerow(headerline)
+        mywriter.writerows(objectlist)
+        fd.close()
+        return True
+    except Exception, E:
+        raise E
+        return False
+
+

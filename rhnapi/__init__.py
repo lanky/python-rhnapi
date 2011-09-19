@@ -71,6 +71,7 @@ import re
 import os
 from ConfigParser import SafeConfigParser
 import time
+import logging
 
 # these methods could all be part of the main class, but don't need to be:
 # besides, who knows if I'll need them somewhere else in the future?
@@ -273,6 +274,9 @@ class rhnSession:
         # in case we need it:
         self.configfile = config
 
+        # just so it's an existing property
+        self.logger = None
+
         # If login and password are specified explicitly they override the config file
         # otherwise we read credentials from the config file, unless none was specified
         if self.login == None and self._password == None and self.configfile != None:
@@ -315,6 +319,82 @@ class rhnSession:
 
         except xmlrpclib.Fault, E:
             self.fail(E, 'login to RHN server %s' % self.rhnurl )
+
+    def addLogger(self, logname, logdest, level = 20, logfmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'):
+        """
+        Generates self.logger, a logging.Logger instance.
+
+        returns a logging.logger instance, with appropriate configuration
+        supports logging to streams (sys.stdout, sys.stderr) and files.
+
+        parameters:
+        logname(str)    - name of log instance (appears in log messages). Your script name is a good choice.
+        logdest(str)    - destination for log messages (sys.stdout/err or a filename (NOT filehandle))
+        loglevel(int)   - log messages at this priority or higher
+                          log levels are numeric, mapping like this:
+                          10 -> DEBUG
+                          20 -> INFO
+                          30 -> WARN
+                          40 -> ERROR
+                          50 -> CRIT
+        """
+        # quick dict mapping of str -> loglevel for convenience
+
+        # if we pass a nonexistent level, we get INFO
+        loglevel = log_levels.get(level, logging.INFO)
+        
+        # set up logging
+        # used later...
+        broken_log = False
+
+        # initialise a logger with the appropriate name:
+        self.logger = logging.getLogger(logname)
+        # set logging levels
+        self.logger.setLevel(loglevel)
+        # configure the format of log messages
+        formatter = logging.Formatter(logfmt)
+
+        # we should now have a functional logger, so let's configure a destination
+        # this is done by adding an appropriate handler:
+
+        # handle stdout and stderr first
+        if logdest in [ sys.stdout , sys.stderr ]:
+            ch = logging.StreamHandler()
+            ch.setFormatter(formatter)
+            ch.setLevel(logging.INFO)
+            self.logger.addHandler(ch)
+        else:
+            try:
+                lf = logging.FileHandler(logdest)
+            except IOError:
+                lf = logging.StreamHandler()
+                broken_log = True
+
+            lf.setFormatter(formatter)
+            lf.setLevel(logging.DEBUG)
+            self.logger.addHandler(lf)
+
+
+        # if we increase verbosity and aren't already using a streamhandler to stdout...
+        if broken_log:
+            self.logger.error("Cannot open logfile %s. Falling back to standard output" % opts.logfile)
+
+
+    def logMessage(self, loglevel, message):
+        """
+        Write a log message :)
+
+        passes if this failes, as failed logging should not fail everuything else.
+
+        parameters
+        loglevel(int)       - log priority. Can be logging.INFO (etc) or numeric
+        message(str)        - the actual message to send.
+        """
+        try:
+            self.logger.log(loglevel, message)
+        except:
+            pass
+            
 
     def fail(self, Exception, message):
         """

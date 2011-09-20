@@ -320,7 +320,7 @@ class rhnSession:
         except xmlrpclib.Fault, E:
             self.fail(E, 'login to RHN server %s' % self.rhnurl )
 
-    def addLogger(self, logname, logdest, level = 20, logfmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'):
+    def addLogger(self, logname, logdest, loglevel = 10, logfmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'):
         """
         Generates self.logger, a logging.Logger instance.
 
@@ -338,10 +338,6 @@ class rhnSession:
                           40 -> ERROR
                           50 -> CRIT
         """
-        # quick dict mapping of str -> loglevel for convenience
-
-        # if we pass a nonexistent level, we get INFO
-        loglevel = log_levels.get(level, logging.INFO)
         
         # set up logging
         # used later...
@@ -364,6 +360,7 @@ class rhnSession:
             ch.setLevel(logging.INFO)
             self.logger.addHandler(ch)
         else:
+        # failing that we must have specified a file...
             try:
                 lf = logging.FileHandler(logdest)
             except IOError:

@@ -254,6 +254,7 @@ class rhnSession:
         No protocol required for the proxy definition.
 
         parameters: (* = optional)
+        for e in erratalist:
         url(str)              - hostname or ip address of the RHN server
         rhnlogin(str)         - username (prompted if omitted)
         rhnpassword(str)      - password (prompted if omitted)
@@ -374,14 +375,14 @@ class rhnSession:
 
         # if we increase verbosity and aren't already using a streamhandler to stdout...
         if broken_log:
-            self.logger.error("Cannot open logfile %s. Falling back to standard output" % opts.logfile)
+            self.logger.error("Cannot open logfile %s. Falling back to standard output" % logdest)
 
 
     def logMessage(self, loglevel, message):
         """
         Write a log message :)
 
-        passes if this failes, as failed logging should not fail everuything else.
+        passes if this fails, as failed logging should not fail everuything else.
 
         parameters
         loglevel(int)       - log priority. Can be logging.INFO (etc) or numeric
@@ -391,6 +392,30 @@ class rhnSession:
             self.logger.log(loglevel, message)
         except:
             pass
+
+    def logDebug(self, message):
+        """
+        Special case of logMessage for debug logs
+        """
+        return self.logMessage(logging.DEBUG, message)
+            
+    def logInfo(self, message):
+        """
+        Special case of logMessage for debug logs
+        """
+        return self.logMessage(logging.INFO, message)
+
+    def logWarning(self, message):
+        """
+        Log at 'Warn' level
+        """
+        return self.logMessage(logging.WARN, message)
+
+    def logCritical(self, message):
+        """
+        log at 'Crit' level
+        """
+        return self.logMessage(logging.CRITICAL, message)
             
 
     def fail(self, Exception, message):

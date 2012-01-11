@@ -1,12 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# An abstraction of the RHN API for activation keys.
-# Author: Stuart Sears <sjs@redhat.com>
-# Caution. This is an unsupported API package.
-# it may cause untold and hideous damage to your
-# RHN satellite and anything else you hold dear
-# for which I will not be held responsible.
-# if you use it you acknowledge this risk :)
+# RHN/Spacewalk API Module abstracting the activationkey namespace
+#
+# Copyright 2009-2012 Stuart Sears
+#
+# This file is part of python-rhnapi
+#
+# python-rhnapi is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# python-rhnapi is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with python-rhnapi. If not, see http://www.gnu.org/licenses/.
+
 
 __doc__ = """
 rhnapi.activationkey is an abstraction of the API calls available in RHN Satellite  >= 5.1.0
@@ -16,103 +28,148 @@ Import this as rhnapi.activationkey
 Most of the methods here require an authenticated RHN session as their first argument, 
 which you can create with rhnapi.rhnSession().
 """
+__author__ = "Stuart Sears"
+
+# additional required imports
 import sys
 
-def addChildChannels(rhn, keyid, chan_labels):
+# --------------------------------------------------------------------------------- #
+
+def addChildChannels(rhn, keyid, chanlabels):
     """
-    API: activationkey.addChildChannels
+    API:
+    activationkey.addChildChannels
 
-    usage: addChildChannels(rhn, keyid, chan_labels)
-
-    returns: bool, or exception
+    usage:
+    addChildChannels(rhn, keyid, chanlabels)
 
     description:
     Add the specified child channels to an activation key.
+
+    returns:
+    bool
+
     
     parameters:
     rhn                     - an authenticated rhn session
     keyid (str)             - the key identifier (long hex or human-readable name)
-    chan_labels (list/str)  - a list of child channel labels to add to the key
+    chanlabels (list/str)   - a list of child channel labels to add to the key
     """
     try:
-        return rhn.session.activationkey.addChildChannels(rhn.key, keyid, chan_labels) == 1
+        return rhn.session.activationkey.addChildChannels(rhn.key, keyid, chanlabels) == 1
     except Exception, E:
-        return rhn.fail(E,'add one or more of child channels %r to %s' % (chan_labels, keyid))
+        return rhn.fail(E,'add one or more of child channels %r to %s' % (chanlabels, keyid))
 
-def addConfigChannels(rhn, keyids, config_labels, addToTop = False):
+# --------------------------------------------------------------------------------- #
+
+def addConfigChannels(rhn, keyids, cfgchans, addToTop = False):
     """
-    API: activationkey.addConfigChannels
+    API:
+    activationkey.addConfigChannels
 
-    usage: addConfigChannels(rhn, keyids, configchannels, addToTop=False)
+    usage:
+    addConfigChannels(rhn, keyids, cfgchans, addToTop=False)
 
     description:
     Add a list of configuration channels, in ranked order, to the given key
     (or list of keys)
     
-    returns: True, or throws its toys about
+    returns:
+    bool
     
     parameters:
     rhn                        - an authenticated rhn session
     keyids (list/str)          - the key identifier (long hex or human-readable name)
-    config_labels(list/str)    - a list of configuration channel labels
+    cfgchans(list/str)      - a list of configuration channel labels
     addToTop(bool)             - add this list to the top [false]
     """
     try:
-        return rhn.session.activationkey.addConfigChannels(rhn.key, keyids, config_labels, addToTop) == 1
+        return rhn.session.activationkey.addConfigChannels(rhn.key, keyids, cfgchans, addToTop) == 1
     except Exception, E:
-        return rhn.fail(E,'add one or more of %r to keys %r' % (config_labels, keyids))
+        return rhn.fail(E,'add one or more of %r to keys %r' % (cfgchans, keyids))
 
-def addEntitlements(rhn, keyid, entitlements):
+# --------------------------------------------------------------------------------- #
+
+def addEntitlements(rhn, keyid, entslabels):
     """
-    API: activationkey.addEntitlements
+    API:
+    activationkey.addEntitlements
 
-    usage: addEntitlements(rhn, keyid, entitlements)
+    usage:
+    addEntitlements(rhn, keyid, entslabels)
 
+    description:
     Add one or more of the following entitlements to a key:
     [monitoring_entitled, provisioning_entitled, virtualization_host, virtualization_host_platform]
+
+    returns:
+    bool
+    
     params:
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
-    entitlements (list)    - a list of add-on entitlements.
+    entslabels (list)      - a list of add-on entitlements.
 
     entitlements are one or more of [ 'monitoring_entitled', 'provisioning_entitled',
                                       'vitualization_host', 'virtualization_host_platform' ]
     """
     try:
-        return rhn.session.activationkey.addEntitlements(rhn.key, keyid, entitlements) == 1
+        return rhn.session.activationkey.addEntitlements(rhn.key, keyid, entslabels) == 1
     except Exception, E:
-        return rhn.fail(E,'add one or more of  %r to key %s' % (entitlements, keyid))
+        return rhn.fail(E,'add one or more of  %r to key %s' % (entslabels, keyid))
 
-def addGroups(rhn, keyid, group_ids):
+# --------------------------------------------------------------------------------- #
+
+def addGroups(rhn, keyid, groupids):
     """
-    API: activationkey.addServerGroups
+    API:
+    activationkey.addServerGroups
 
-    usage: addGroups(rhn, keyid, groups)
+    usage:
+    addGroups(rhn, keyid, group_ids)
+
+    description:
+    Adds the given list of server group IDs to the chosen activation key
+
+    returns:
+    bool
+
     shorter name for addServerGroups
+    params:
+    rhn                     - authenticated rhnSession object
+    keyid(str)              - the activation key
+    groupids(list/int)     - list of group IDs (integers)
     """
-    return addServerGroups(rhn, keyid, group_ids)
+    return addServerGroups(rhn, keyid, groupids)
 
-def addServerGroups(rhn, keyid, group_ids):
+# --------------------------------------------------------------------------------- #
+
+def addServerGroups(rhn, keyid, groupids):
     """
-    API: activationkey.addServerGroups
+    API:
+    activationkey.addServerGroups
 
-    usage:  addServerGroups(rhn, keyid, groups)
+    usage:
+    addServerGroups(rhn, keyid, groupids)
 
     description:
     Add a list of system groups to an activation key
     The system groups are specified by id, not name.
     
-    returns: True, or throws exception
+    returns:
+    bool
 
     parameters:
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
-    group_ids (list)       - a list of additional system group IDs.
+    groupids (list)        - a list of additional system group IDs.
     """
     try:
-       return  rhn.session.activationkey.addServerGroups(rhn.key, keyid, group_ids) == 1
+       return  rhn.session.activationkey.addServerGroups(rhn.key, keyid, groupids) == 1
     except Exception, E:
-        return rhn.fail(E,'add one or more of groups %r to key %s' % (group_ids, keyid))
+        return rhn.fail(E,'add one or more of groups %r to key %s' % (groupids, keyid))
+
+# --------------------------------------------------------------------------------- #
 
 def addGroupsByName(rhn, keyid, groupnames):
     """
@@ -136,42 +193,67 @@ def addGroupsByName(rhn, keyid, groupnames):
     ids = [ x['id'] for x in allgroups if x['name'] in groupnames ]
     return addServerGroups(rhn, keyid, ids)
 
-def addPackages(rhn, keyid, packages):
+# --------------------------------------------------------------------------------- #
+
+def addPackages(rhn, keyid, pkglist):
     """
-    usage: addPackages(rhn, keyid, packages)
+    API: activationkey.addPackages
 
-    Add a list of packages (with arch) to a key.
+    usage: addPackages(rhn, keyid, pkglist)
 
-    returns: int(1) or Exception
+    description:
+    Add a list of pkglist (with arch) to a key.
+
+    returns:
+    bool
 
     params
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
-    package(list of dict)  - a list of package dicts { 'name', 'arch'(optional) }
+    pkglist(list of dict)  - a list of package dicts { 'name', 'arch'(optional) }
     """
     try:
-        return rhn.session.activationkey.addPackages(rhn.key, keyid, packages) == 1
+        return rhn.session.activationkey.addPackages(rhn.key, keyid, pkglist) == 1
     except Exception, E:
-        return rhn.fail(E,'add one or more of %r to %s' % ([ x['name'] for x in packages ], keyid))
+        return rhn.fail(E,'add one or more of %r to %s' % ([ x['name'] for x in pkglist ], keyid))
+
+# --------------------------------------------------------------------------------- #
 
 def addPackageNames(rhn, keyid, packagenames):
     """
+    API: activationkey.addPackageNames
+
+    usage: addPackageNames(rhn, keyid, packagenames)
+
+    description:
     Add a list of package names to a key.
-    params
+    Deprecated (but still functional) in favour of addPackages. Use that instead.
+    
+    params:
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
     packagenames (list)    - a list of packagenames
     """
     try:
-        return rhn.session.activationkey.addPackageNames(rhn.key, keyid, channels) == 1
+        return rhn.session.activationkey.addPackageNames(rhn.key, keyid, packagenames) == 1
     except Exception, E:
         return rhn.fail(E,'add one or more of %r to %s' % (packagenames, keyid))
 
+# --------------------------------------------------------------------------------- #
+
 def checkConfigDeployment(rhn, keyid):
     """
-    usage: checkConfigDeployment(rhn, keyid)
+    API:
+    activationkey.checkConfigDeployment
 
-    returns: True (1) or exception
+    usage:
+    checkConfigDeployment(rhn, keyid)
+
+    description:
+    reports whether configuration deployment is enabled for a given key
+
+    returns:
+    bool - true if enabled, false if disabled. Or throws an exception.
 
     params:
     rhn                    - an authenticated rhn session
@@ -179,19 +261,29 @@ def checkConfigDeployment(rhn, keyid):
     groups (list)          - a list of additional system group IDs.
     """
     try:
-        return rhn.session.activationkey.checkConfigDeployment(rhn.key, keyid)
+        return rhn.session.activationkey.checkConfigDeployment(rhn.key, keyid) == 1
     except Exception, E:
         return rhn.fail(E,'check config deployment status for key %s' % keyid)
 
 
-def create(rhn, description, keyid="",  basechannel='', entitlements=[], usagelimit=None, universalDefault=False ):
+# --------------------------------------------------------------------------------- #
+
+def create(rhn, description, keyid='',  basechannel='', entitlements=[], usagelimit=None, universalDefault=False ):
     """
+    API:
+    activationkey.create
+
+    usage:
+    create(rhn, description, keyid='',  basechannel='', entitlements=[], usagelimit=None, universalDefault=False )
+
+    description:
     Create a new activation key with the given properties.
     The keyid parameter passed in will be prefixed with the organization ID.
     Eg. If the caller passes in the key "foo" and belongs to an organization with the ID 100,
     the actual activation key will be "100-foo".
 
-    returns: str (the new activation key)
+    returns:
+    str (the new activation key)
 
     params: (* = optional)
     rhn                      -  an authenticated RHN session and its associated properties.
@@ -203,7 +295,7 @@ def create(rhn, description, keyid="",  basechannel='', entitlements=[], usageli
     *universaldefault (bool) -  this key is the universal default key for all registrations (False)
     """
     try:
-        if usagelimit != None:
+        if usagelimit is not None:
             # if we have specified a usage limit...
             return rhn.session.activationkey.create(rhn.key,keyid,description,basechannel,entitlements,usagelimit,universalDefault)
         else:
@@ -212,9 +304,22 @@ def create(rhn, description, keyid="",  basechannel='', entitlements=[], usageli
     except Exception, E:
         return rhn.fail(E,'create activation key %s' % keyid)
     
+# --------------------------------------------------------------------------------- #
+
 def delete(rhn, keyid):
     """
+    API:
+    activationkey.delete
+
+    usage:
+    delete(rhn, keyid)
+
+    description:
     Delete an existing activation key.
+
+    returns:
+    bool
+
     params:
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
@@ -224,9 +329,22 @@ def delete(rhn, keyid):
     except Exception, E:
         return rhn.fail(E,'delete activation key %s' % keyid )
 
+# --------------------------------------------------------------------------------- #
+
 def getDetails(rhn, keyid):
     """
+    API:
+    activationkey.getDetails
+
+    usage:
+    getDetails(rhn, keyid)
+
+    description:
     show information about an activation key.
+    
+    returns:
+    dict
+
     params:
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
@@ -236,17 +354,29 @@ def getDetails(rhn, keyid):
     except Exception, E:
         return rhn.fail(E,'retrieve details for activation key %s' % keyid)
 
+# --------------------------------------------------------------------------------- #
+
 def list(rhn):
     """
     Calls the more-longwinded ListActivationKeys
     """
     return listActivationKeys(rhn)
 
+# --------------------------------------------------------------------------------- #
+
 def listActivatedSystems(rhn, keyid):
     """
-    usage: listActivatedSystems(rhn, keyid)
+    API:
+    actiationkey.listActivatedSystems
 
-    returns: list/dict { id, hostname, last checkin }
+    usage:
+    listActivatedSystems(rhn, keyid)
+
+    description:
+    lists systems registered using a given activation key
+
+    returns:
+    list/dict { id, hostname, last checkin }
 
     params:
     rhn                    - an authenticated rhn session
@@ -257,13 +387,19 @@ def listActivatedSystems(rhn, keyid):
     except Exception, E:
         return rhn.fail(E, 'list activated systems for key %s' % keyid)
 
+# --------------------------------------------------------------------------------- #
+
 def listActivationKeys(rhn):
     """
-    List the Activation Keys available to the current logged-in user
+    API: activationkey.listActivationKeys
 
     usage: listActivationKeys(rhn)
 
-    returns: list(dict)
+    description:
+    List the Activation Keys available to the current logged-in user
+
+    returns:
+    list of dict, one per key
 
     params:
     rhn                    - an authenticated rhn session
@@ -273,13 +409,22 @@ def listActivationKeys(rhn):
     except Exception, E:
         return rhn.fail(E,'list activation keys for logged-in user %s' % rhn.login )
 
+# --------------------------------------------------------------------------------- #
+
 def listActivationKeyNames(rhn):
     """
+    API:
+    none, special case of listActivationKeys for simpler use cases
+
+    usage:
+    listActivationKeyNames(rhn)
+
+    description:
     List the Activation Keys available to the current logged-in user
 
-    usage: listActivationKeyNames(rhn)
 
-    returns: list(str)
+    returns:
+    list of tuple: ( description(str), key(str) )
 
     params:
     rhn                    - an authenticated rhn session
@@ -289,13 +434,21 @@ def listActivationKeyNames(rhn):
     except Exception, E:
         return rhn.fail(E,'list activation keys for logged-in user %s' % rhn.login )
 
+# --------------------------------------------------------------------------------- #
+
 def listConfigChannels(rhn, keyid):
     """
-    List the Activation Keys available to the current logged-in user
+    API:
+    activationkey.listConfigChannels
+    
+    usage:
+    listConfigChannels(rhn, keyid)
+    
+    description:
+    List the Configuration Channels associated with the given activation key
 
-    usage: listActivationKeys(rhn)
-
-    returns: list(dict)
+    returns:
+    list of dict, one per config channel
 
     params:
     rhn                    - an authenticated rhn session
@@ -307,146 +460,251 @@ def listConfigChannels(rhn, keyid):
         return rhn.fail(E, 'list config channels for key %s' % keyid)
 
         
-def removeChildChannels(rhn, keyid, channels):
+# --------------------------------------------------------------------------------- #
+
+def removeChildChannels(rhn, keyid, chanlabels):
     """
-    Add the specified child channels to an activation key.
+    API:
+    activationkey.removeChildChannels
 
-    usage: removeChildChannels(rhn, keyid, channels)
 
-    returns: True if successful, exception otherwise
+    usage: removeChildChannels(rhn, keyid, chanlabels)
+
+    description:
+    Removes the specified child chanlabels from an activation key.
+
+    returns:
+    bool (True if successful).
 
     params:
     rhn                   - an authenticated rhn session
     keyid (str)           - the key identifier (long hex or human-readable name)
-    channels (list(int))  - a list of child channel IDs to remove from the key.
+    chanlabels (list(int))  - a list of child channel IDs to remove from the key.
     """
     try:
-        return rhn.session.activationkey.removeChildChannels(rhn.key, keyid, channels) == 1
+        return rhn.session.activationkey.removeChildChannels(rhn.key, keyid, chanlabels) == 1
     except Exception, E:
-        return rhn.fail(E,'remove one or more of child channels %r from key %s' % (channels, keyid))
+        return rhn.fail(E,'remove one or more of child channels %r from key %s' % (chanlabels, keyid))
 
-def removeConfigChannels(rhn, keyids, channels):
+# --------------------------------------------------------------------------------- #
+
+def removeConfigChannels(rhn, keyids, cfgchans):
     """
-    Add the specified child channels to an activation key.
+    API:
+    activationkey: removeConfigChannels
 
-    usage: removeConfigChannels(rhn, keyid, channels)
+    usage:
+    removeConfigChannels(rhn, keyid, cfgchans)
+    
+    description:
+    Add the specified child cfgchans to an activation key.
 
-    returns: True if successful, exception otherwise
+    returns:
+    True if successful, exception otherwise
 
     params:
     rhn                   - an authenticated rhn session
     keyid (list(str))     - the key identifier (long hex or human-readable name)
-    channels (list(str))  - a list of config channel labels to remove from the key.
+    cfgchans (list(str))  - a list of config channel labels to remove from the key.
     """
     try:
-        return rhn.session.activationkey.removeChildChannels(rhn.key, keyid, channels) == 1
+        return rhn.session.activationkey.removeConfigChannels(rhn.key, keyid, cfgchans) == 1
     except Exception, E:
-        return rhn.fail(E,'remove one or more of config channels %r from key %s' % (channels, keyid))
+        return rhn.fail(E,'remove one or more of config channels %r from key %s' % (cfgchans, keyid))
     
-def removeEntitlements(rhn, keyid, entitlements):
+# --------------------------------------------------------------------------------- #
+
+def removeEntitlements(rhn, keyid, entlabels):
     """
-    Remove one or more of the following entitlements from a key:
+    API:
+    activationkey.removeEntitlements
+
+    usage:
+    removeEntitlements(rhn, keyid, entlabels)
+   
+    description:
+    Remove one or more of the following entlabels from a key:
     [monitoring_entitled, provisioning_entitled, virtualization_host, virtualization_host_platform]
 
-    usage: removeEntitlements(rhn, keyid, entitlements)
-
-    returns: True or throws exception
+    returns:
+    bool
 
     params:
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
-    entitlements (list)    - a list of entitlements to remove
+    entlabels (list)       - a list of entitlement labels to remove
     """
     try:
         return rhn.session.activationkey.removeEntitlements(rhn.key, keyid, channels) == 1
     except Exception, E:
-        return rhn.fail(E,'remove one or more of  %r from key %s' % (entitlements, keyid))
+        return rhn.fail(E,'remove one or more of  %r from key %s' % (entlabels, keyid))
 
-def removePackages(rhn, keyid, packagenames):
+# --------------------------------------------------------------------------------- #
+
+def removePackageNames(rhn, keyid, packagenames):
     """
-    Add a list of package names to a key.
+    API:
+    activationkey.removePackageNames
+
+    usage:
+    removePackageNames(rhn, keyid, packagenames)
+
+    description:
+    Remove the given list of packages from an activation key
+    deprecated in favour of removePackages
+
     params
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
     packagenames (list)    - a list of packagenames
     """
     try:
-        return rhn.session.activationkey.addPackageNames(rhn.key, keyid, channels) == 1
+        return rhn.session.activationkey.removePackageNames(rhn.key, keyid, packagenames) == 1
     except Exception, E:
         return rhn.fail(E,'remove one or more of %r from key %s' % (packagenames, keyid))
 
-def removeGroups(rhn, keyid, groups):
+# --------------------------------------------------------------------------------- #
+
+def removePackages(rhn, keyid, packagelist):
+    """
+    API:
+    activationkey.removePackages
+
+    usage:
+    removePackages(rhn, keyid, packagelist)
+
+    description:
+    Remove the given list of packages from an activation key
+
+    params
+    rhn                         - an authenticated rhn session
+    keyid (str)                 - the key identifier (long hex or human-readable name)
+    packagelist (list/dict)     - list of package dicts, in this format:
+                                  { 'name' : packagename, 'arch' : arch_label }
+                                  'arch' is optional
+    """
+    try:
+        return rhn.session.activationkey.removePackages(rhn.key, keyid, packagelist) == 1
+    except Exception, E:
+        return rhn.fail(E,'remove one or more of %r from key %s' % (packagenames, keyid))
+
+# --------------------------------------------------------------------------------- #
+
+def removeGroups(rhn, keyid, groupids):
     """
     shortcut to removeServerGroups
     """
-    removeServerGroups(rhn, keyid, groups)
+    return removeServerGroups(rhn, keyid, groupids)
 
-def removeServerGroups(rhn, keyid, groups):
+# --------------------------------------------------------------------------------- #
+
+def removeServerGroups(rhn, keyid, groupids):
     """
     Add a list of system groups to an activation key
     The system groups are specified by id, not name.
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
-    groups (list)          - a list of removeitional system group IDs.
+    groupids (list)        - a list of system group IDs.
     """
     try:
-        return rhn.session.activationkey.removeServerGroups(rhn.key, keyid, channels) == 1
+        return rhn.session.activationkey.removeServerGroups(rhn.key, keyid, groupids) == 1
     except Exception, E:
-        return rhn.fail(E,'remove one or more of %r from key %s' % (packagenames, keyid))
+        return rhn.fail(E,'remove one or more of %r from key %s' % (groupids, keyid))
+
+# --------------------------------------------------------------------------------- #
 
 def removeGroupsByName(rhn, keyid, groupnames):
     """
+    API:
+    none, custom method
+
+    usage:
+    removeGroupsByName(rhn, keyid, groupnames)
+
+    description:
     Add a list of system groups by name. This involves calling out to rhnapi.groups
-    params
+
+    params:
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
-    groups (list)          - a list of group names to remove.
+    groupnames (list)          - a list of group names to remove.
     """
     import systemgroup
     groupinfo = systemgroup.listAllGroups(rhn)
-    ids = [ x['id'] for x in allgroups if x['name'] in groupnames ]
+    ids = [ x['id'] for x in groupinfo if x['name'] in groupnames ]
     return removeServerGroups(rhn, keyid, ids)
 
-def setConfigChannels(rhn, keyids, channels):
+# --------------------------------------------------------------------------------- #
+
+def setConfigChannels(rhn, keyids, cfgchans):
     """
+    API:
+    activationkey.setConfigChannels
+
+    usage:
+    setConfigChannels(rhn, keyids, cfgchans)
+
+    description:
     Replaces the current set of config channels with the given list for all of the given activation keys.
-    channels list is in ranking order
+    the channel list should be in descending order of rank.
 
-    usage: setConfigChannels(rhn, keyids, channels)
 
-    returns: True or exception
+    returns:
+    bool
 
     params:
     rhn                    - an authenticated rhn session
     keyids (list/str)      - the key identifier (long hex or human-readable name)
-    channels (list/str)    - a list of group names to remove.
+    cfgchans (list/str)    - a list of config channel labels
     """
     try:
-        return rhn.session.activationkey.setConfigChannels(rhn.key, keyids, channels) == 1
+        return rhn.session.activationkey.setConfigChannels(rhn.key, keyids, cfgchans) == 1
     except Exception, E:
-        return rhn.fail(E, 'set config channels %r for keys %r' %(channels, keyids))
+        return rhn.fail(E, 'set config channels %r for keys %r' %(cfgchans, keyids))
 
-def setDetails(rhn, keyid, keydata):
+# --------------------------------------------------------------------------------- #
+
+def setDetails(rhn, keyid, keyobj):
     """
-    show information about an activation key.
+    API:
+    activationkey.setDetails
+
+    usage:
+    setDetails(rhn, keyid, keyobj)
+
+    description:
+    replaces the settings for an existing activation key
+
+    returns:
+    bool
+
     params:
     rhn                    - an authenticated rhn session
     keyid (str)            - the key identifier (long hex or human-readable name)
-    keydata (dict)         - information to store in the key. Could be retrieved using
+    keyobj (dict)          - information to store in the key. Could be retrieved using
                              getDetails
     """
     try:
-        return rhn.session.activationkey.setDetails(rhn.key, keyid, keydata ) == 1
+        return rhn.session.activationkey.setDetails(rhn.key, keyid, keyobj ) == 1
     except Exception, E:
+        
         return rhn.fail(E,'retrieve details for activation key %s' % keyid)
+
+# --------------------------------------------------------------------------------- #
 
 def enableConfigDeployment(rhn, keyid):
     """
-    usage: enableConfigDeployment(rhn, keyid) 
+    API:
+    activationkey.enableConfigDeployment
 
-    Lists the kickstart profiles on the satellite
+    usage:
+    enableConfigDeployment(rhn, keyid) 
 
-    returns: list of dicts, one per channel.
+    description:
+    enables config file deployment for the chosen key
+
+    returns:
+    bool
 
     parameters:
     rhn                      - an authenticated RHN session
@@ -457,16 +715,24 @@ def enableConfigDeployment(rhn, keyid):
     except Exception, E:
         return rhn.fail(E, 'enable config deployment for key %s' % keyid)
 
+# --------------------------------------------------------------------------------- #
+
 def disableConfigDeployment(rhn, keyid):
     """
-    usage: disableConfigDeployment(rhn, keyid) 
+    API:
+    activationkey.disableConfigDeployment
 
+    usage:
+    disableConfigDeployment(rhn, keyid) 
+
+    description:
     Lists the kickstart profiles on the satellite
 
-    returns: list of dicts, one per channel.
+    returns:
+    bool
 
     parameters:
-    rhn                      - an authenticated RHN session
+    rhn                    - an authenticated RHN session
     keyid (str)            - the key identifier (long hex or human-readable name)
     """
     try:

@@ -1,19 +1,37 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# api.py
-# an abstraction of the 'api' namespace from the RHN satellite XMLRPC API (5.4+)
-# all of these require an authenticated RHN session from rhnapi.rhnSession
-#    * getApiCallList
-#    * getApiNamespaceCallList
-#    * getApiNamespaces
-#    * getVersion
-#    * systemVersion
+# RHN/Spacewalk API Module abstracting the 'api' namespace
+#
+# Copyright 2009-2012 Stuart Sears
+#
+# This file is part of python-rhnapi
+#
+# python-rhnapi is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# python-rhnapi is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with python-rhnapi. If not, see http://www.gnu.org/licenses/.
 
 def getApiCallList(rhn):
     """
+    API:
+    api.getApiCallList
+
+    usage:
+    getApiCallList(rhn)
+
+    description:
     Lists all available api calls grouped by namespace
 
-    returns: list (dict)
+    returns:
+    list (dict)
 
     params:
     rhn               - authenticated rhnapi.rhnSession
@@ -25,9 +43,17 @@ def getApiCallList(rhn):
 
 def getApiNamespaceCallList(rhn, namespace):        
     """
+    API:
+    api.getApiNamespaceCallList
+
+    usage:
+    getApiNamespaceCallList(rhn, namespace)
+
+    description:
     Lists all available api calls for the given namespace
 
-    returns: list (dict)
+    returns:
+    list (dict)
 
     params:
     rhn               - authenticated rhnapi.rhnSession
@@ -39,9 +65,17 @@ def getApiNamespaceCallList(rhn, namespace):
 
 def getApiNamespaces(rhn):
     """
+    API:
+    api. getApiNamespaces
+
+    usage:
+    getApiNamespaces(rhn)
+
+    description:
     Lists all available api namespaces
 
-    returns: list (dict)
+    returns:
+    list (dict)
 
     params:
     rhn               - authenticated rhnapi.rhnSession
@@ -53,14 +87,37 @@ def getApiNamespaces(rhn):
 
 def getVersion(rhn):
     """
+    API:
+    api.getVersion
+
+    usage:
+    getVersion(rhn)
+
+    description:
     returns the api version
+
+    returns:
+    string
+
+    params:
+    rhn               - authenticated rhnapi.rhnSession
     """
     return rhn.session.api.getVersion()
 
 
 def systemVersion(rhn):
     """
-    returns the server version
+    API:
+    api.systemVersion
+
+    usage:
+    systemVersion(rhn)
+    
+    description:
+    returns the spacewalk/satellite server version
+
+    returns:
+    string
     """
     return rhn.session.api.systemVersion()
 

@@ -1,12 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# a top-level init file for the RHN API namespaces
-# Author: Stuart Sears <sjs@redhat.com>
+# RHN/Spacewalk API Module
+#
+# Copyright 2009-2012 Stuart Sears
+#
+# This file is part of python-rhnapi
+#
+# python-rhnapi is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# python-rhnapi is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with python-rhnapi. If not, see http://www.gnu.org/licenses/.
 
-# top-level imports
-# This file provides an abstraction for the top-level RHN API in python.
-# The base RHN class is in __init__.py so you get it anyway.
-# import rhnapi just imports this file for the moment.
+
+
+# a top-level init file for the RHN API namespaces
 
 __doc__ = """
 Contains the core RHN class, with the 'api' namespace subsumed into it.
@@ -42,6 +57,8 @@ TODO
 * better handling of XMLRPC errors - at the moment we just print out the error message.
 I'm sure there's a better way to manage this. Raise a proper exception, I suppose.
 """
+
+__author__ = "Stuart Sears"
 
 # the following controls what is imported when you do a 'from rhnapi import *'
 __all__ =     [

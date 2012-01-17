@@ -1,115 +1,169 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
-# an abstraction of the 'errata' namespace from the RHN API
-# from satellite 5.1.0.
-# earlier versions may behave oddly
-# later versions may change the output.
+# RHN/Spacewalk API Module abstracting the 'errata' namespace
+#
+# Copyright 2009-2012 Stuart Sears
+#
+# This file is part of python-rhnapi
+#
+# python-rhnapi is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# python-rhnapi is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with python-rhnapi. If not, see http://www.gnu.org/licenses/.
 
-# to provide the parent RHN class.
-# current methods to cover:
-#    * addPackages
-#    * applicableToChannels
-#    * bugzillaFixes
-#    * clone
-#    * create
-#    * delete
-#    * findByCve
-#    * getDetails
-#    * listAffectedSystems
-#    * listByDate
-#    * listCves
-#    * listKeywords
-#    * listPackages
-#    * listUnpublishedErrata
-#    * publish
-#    * publishAsOriginal
-#    * removePackages
-#    * setDetails
+# ---------------------------------------------------------------------------------- #
 
-
-def addPackages(rhn, advisory, packages):
+def addPackages(rhn, erratum, packagelist):
     """
-    API: errata.addPackages
+    API:
+    errata.addPackages
 
-    usage: addPackages(rhn, advisory, packages)
+    usage:
+    addPackages(rhn, erratum, packagelist)
 
     description:
-    Add a set of packages to an erratum with the given advisory name.
+    Add a set of packages to an erratum with the given erratum name.
     This method will only allow for modification of custom errata created either through the UI or API
 
-    returns: int (number of packages successfully added) or exception
+    returns:
+    int (number of packages successfully added)
 
     parameters:
     rhn                         - an authenticated RHN session
-    advisory(str)               - errata advisory name
-    packages(list of int)       - list of package ids
-
-    returns int (number of packages added)
+    erratum(str)                - erratum advisory name
+    packagelist(list of int)    - list of package ids
     """
     try:
-        return rhn.session.errata.addPackages(rhn.key, advisory, packages)
+        return rhn.session.errata.addPackages(rhn.key, erratum, packagelist)
     except Exception, E:
-        return rhn.fail(E, 'add packages to erratum %s' % advisory)
-        
-def applicableToChannels(rhn, advisory):
-    """
-    API: errata.applicableToChannels
+        return rhn.fail(E, 'add packagelist to erratum %s' % erratum)
 
-    usage: applicableToChannels(rhn, advisory)
+# ---------------------------------------------------------------------------------- #
+        
+def applicableToChannels(rhn, erratum):
+    """
+    API:
+    errata.applicableToChannels
+
+    usage:
+    applicableToChannels(rhn, erratum)
 
     description:
-    Lists the channels that an advisory applies to.
+    Lists the channels that an erratum applies to.
 
-    returns: list of dicts, one per channel.
-
-    parameters:
-    rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
-    """
-    try:
-        return rhn.session.errata.applicableToChannels(rhn.key, advisory)
-    except Exception, E:
-        return rhn.fail(E, 'list channels affected by erratum %s' % advisory)
-# errata.bugzillaFixes
-def bugzillaFixes(rhn, advisory):
-    """
-    usage: bugzillaFixes(rhn, advisory)
-
-    Lists the bugzilla fixes that an advisory applies to.
-
-    returns: list of bugzilla IDs
+    returns:
+    list of dict, one per channel.
 
     parameters:
     rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
+    erratum(str)        - errata erratum name
     """
     try:
-        return rhn.session.errata.bugzillaFixes(rhn.key, advisory)
+        return rhn.session.errata.applicableToChannels(rhn.key, erratum)
     except Exception, E:
-        return rhn.fail(E, 'list bugzilla fixes provided by by erratum %s' % advisory)
+        return rhn.fail(E, 'list channels affected by erratum %s' % erratum)
 
-# errata.clone
-def clone(rhn, channel_label, advisorys):
+# ---------------------------------------------------------------------------------- #
+
+def bugzillaFixes(rhn, erratum):
     """
-    usage: cloneErrata(RHN, channel_label, advisorys)
+    API:
+    errata.bugzillaFixes
 
+    usage:
+    bugzillaFixes(rhn, erratum)
+
+    description:
+    Lists the bugzilla fixes that an erratum applies to.
+
+    returns:
+    dict, using bugzilla IDs as keys.
+    For example
+     {'230295': "['CVE-2007-0998 HVM guest VNC server allows compromise of
+     entire host OS by any VNC console user']"}
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    erratum(str)            - erratum advisory name
+    """
+    try:
+        return rhn.session.errata.bugzillaFixes(rhn.key, erratum)
+    except Exception, E:
+        return rhn.fail(E, 'list bugzilla fixes provided by by erratum %s' % erratum)
+
+# ---------------------------------------------------------------------------------- #
+
+def clone(rhn, chanlabel, errlist):
+    """
+    API:
+    errata.clone
+
+    usage:
+    clone(rhn, chanlabel, errlist)
+    
+    description:
     Clones errata from into a given channel
 
-    returns: list of dicts, one per erratum
+    returns:
+    list of dict, one per erratum
 
     parameters:
-    rhn                      - an authenticated RHN session
-    channel_label(str)       - the target channel
-    advisorys(list/str)  - list of errata advisory names
+    rhn                     - an authenticated RHN session
+    chanlabel(str)          - the target channel
+    errlist(list/str)       - list of erratum advisory names
     """
     try:
-        return rhn.session.errata.clone(rhn.key, channel_label, advisorys)
+        return rhn.session.errata.clone(rhn.key, chanlabel, errlist)
     except Exception, E:
-        return rhn.fail(E, 'clone errata %s into channel %s' % (','.join(advisorys), channel_label))
+        return rhn.fail(E, 'clone errata %s into channel %s' % (','.join(errlist), chanlabel))
 
-def create(rhn, erratum_info, bugs = [], keywords = [] , packages = [], publish = False, channels = None  ):
+# ---------------------------------------------------------------------------------- #
+
+def cloneAsOriginal(rhn, chanlabel, errlist):
     """
-    usage: createErrata(rhn, ARGS)
+    API:
+    errata.cloneAsOriginal
+
+    usage:
+    cloneAsOriginal(rhn, chanlabel, errlist)
+
+    description:
+    clones an erratum into a cloned channel with reference to the original source channel,
+    pushing only packages that are relevant to the target channel.
+
+    e.g.
+    if an erratum contains packages affecting multiple RH channels and it is cloned into a
+    channel that was cloned from RHEL5, this call only pushes *relevant* packages to the
+    destination channel, not ALL of them.
+    This should be used for preference over the basic errata.clone call.
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    chanlabel(str)          - the target channel
+    errlist(list/str)       - list of erratum advisory names
+    """
+    try:
+        return rhn.session.errata.cloneAsOriginal(rhn.key, chanlabel, errlist)
+    except Exception, E:
+        return rhn.fail(E, 'clone errata into channel %s' % chanlabel)
+
+# ---------------------------------------------------------------------------------- #
+
+def create(rhn, errobj, bugs = [], keywords = [] , packages = [], publish = False, channels = None  ):
+    """
+    API:
+    errata.create
+
+    usage:
+    createErrata(rhn, ARGS)
 
     creates an erratum. This is far too complicated atm, so is not yet implemented.
     At a basic level, this creates an erratum with no associated  bugs
@@ -117,9 +171,9 @@ def create(rhn, erratum_info, bugs = [], keywords = [] , packages = [], publish 
 
     parameters:
     rhn                           - authenticated rhnapi.rhnSession
-    errata_info(dict)             - erratum expressed as a dict: { synopsis(str) , advisory_name(str),
-                                    advisory_release(int) ,
-                                    advisory_type(str) - one of ['Security Advisory',
+    errobj(dict)                  - erratum expressed as a dict: { synopsis(str) , erratum_name(str),
+                                    erratum_release(int) ,
+                                    erratum_type(str) - one of ['Security Advisory',
                                             'Product Enhancement Advisory', 'Bug Fix Advisory'],
                                     product(str),
                                     topic(str),
@@ -132,28 +186,36 @@ def create(rhn, erratum_info, bugs = [], keywords = [] , packages = [], publish 
     * packageslist(list/int)      - list of package IDs
     * publish(bool)               - whether to automatically publish the erratum (False)
     * channels(list/str)          - list of channel labels to publish into, if publish is True
-    )
 
-    THis may have to be put into several methods!
+    This may have to be put into several methods!
 
-    returns: list of dicts, one per channel.
+    returns:
+    list of dicts, one per channel.
 
     parameters:
     rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
+    erratum(str)        - errata erratum name
     """
     try:
-        return rhn.session.errata.create(rhn.key, erratum_info, bugs, keywords, packages, channels)
+        return rhn.session.errata.create(rhn.key, errobj, bugs, keywords, packages, channels)
     except Exception, E:
-        return rhn.fail(E, 'create new erratum %s' % errata_info['advisory_name'])
+        return rhn.fail(E, 'create new erratum %(erratum_name)s' % errata_info)
+
+# ---------------------------------------------------------------------------------- #
 
 def createErratum(rhn, synopsis, name, release, erratatype, product = '', topic = '' , description = '', references = '' , notes = '', solution = ''):
     """
-    usage: createErratum(rhn, synopsis, name, release,
+    API:
+    none, special simplified case of errata.create
+    
+    usage:
+    createErratum(rhn, synopsis, name, release,
                          erratatype, product, topic = '' ,
                          descroption = '', references = '' ,
                          notes = '', solution = '')
-    create a dict from the parameters passed and then pass that onto rhnapi.errata.create() above
+
+    description:
+    creates a dict from the parameters passed and then pass that onto rhnapi.errata.create() above
     Intended to create a basic erratum object, which we can then manipulate.
     unpublished, with no associated bugs, packages, or channels.
 
@@ -174,167 +236,236 @@ def createErratum(rhn, synopsis, name, release, erratatype, product = '', topic 
     notes(str)                      - freeform notes str
     solutionn(str)                  - how the 'bug' was fixed (i.e. what the erratum does)
     """
-    return create(rhn, { 'synopsis' : synopsis, 'advisory_name' : name, 'advisory_release' : release,
-                         'advisory_type' : erratumtype, 'product' : product, 'topic' : topic,
+    return create(rhn, { 'synopsis' : synopsis, 'erratum_name' : name, 'erratum_release' : release,
+                         'erratum_type' : erratumtype, 'product' : product, 'topic' : topic,
                          'description' : description, 'references' : references, 'solution' : solution} )
 
-def delete(rhn, advisory):
+# ---------------------------------------------------------------------------------- #
+
+def delete(rhn, erratum):
     """
-    usage: delete(rhn, advisory)
-
-    deletes an erratum
-
-    returns: True, or exception thrown
-
-    parameters:
-    rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
-    """
-    try:
-        return rhn.session.errata.delete(rhn.key, advisory) == 1
-    except Exception, E:
-        return rhn.fail(E, 'delete erratum %s' % advisory)
-
-def findByCve(rhn, cveName):        
-    """
-    usage: findByCve(rhn, cveName)
-
-    Lookup the details for errata associated with the given CVE (e.g. CVE-2008-3270)
-
-    returns: list of dict (errata)
-
-    parameters:
-    rhn                      - an authenticated RHN session
-    findByCve(str)        - errata advisory name
-    """
-    try:
-        return rhn.session.errata.findByCve(rhn.key, cveName)
-    except Exception, E:
-        return rhn.fail(E, 'find errata for CVE %s' % cveName)
-
-def getDetails(rhn, advisory):
-    """
-    usage: getDetails(RHN, advisory)
-
-    Retrieves details for the given erratum
-
-    returns: dict
-
-    parameters:
-    rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
-    """
-    try:
-        return rhn.session.errata.getDetails(rhn.key, advisory)
-    except Exception, E:
-        return rhn.fail(E, 'list details for erratum %s' % advisory)
-
-def listAffectedSystems(rhn, advisory):
-    """
-    API: errata.
+    API:
+    errata.delete
 
     usage: 
+    delete(rhn, erratum)
 
-    Lists the system 
+    description:
+    deletes an erratum
 
-    returns: list of dicts, one per channel.
+    returns:
+    Boolean
 
     parameters:
-    rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
+    rhn                     - an authenticated RHN session
+    erratum(str)            - errata erratum name
     """
     try:
-        return rhn.session.errata.listAffectedSystems(rhn.key, advisory)
+        return rhn.session.errata.delete(rhn.key, erratum) == 1
     except Exception, E:
-        return rhn.fail(E, 'list systems affected by erratum %s' % advisory)
+        return rhn.fail(E, 'delete erratum %s' % erratum)
+
+# ---------------------------------------------------------------------------------- #
+
+def findByCve(rhn, cvename):        
+    """
+    API:
+    errata.findByCve
+
+    usage:
+    findByCve(rhn, cvename)
+
+    description:
+    Lookup the details for errata associated with the given CVE (e.g. CVE-2008-3270)
+
+    returns:
+    list of dict (errata)
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    cvename(str)            - errata erratum name
+    """
+    try:
+        return rhn.session.errata.findByCve(rhn.key, cvename)
+    except Exception, E:
+        return rhn.fail(E, 'find errata for CVE %s' % cvename)
+
+# ---------------------------------------------------------------------------------- #
+
+def getDetails(rhn, erratum):
+    """
+    API:
+    errata.getDetails
+
+    usage:
+    getDetails(RHN, erratum)
+
+    description:
+    Retrieves details for the given erratum
+
+    returns:
+    dict
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    erratum(str)            - errata erratum name
+    """
+    try:
+        return rhn.session.errata.getDetails(rhn.key, erratum)
+    except Exception, E:
+        return rhn.fail(E, 'list details for erratum %s' % erratum)
+
+# ---------------------------------------------------------------------------------- #
+
+def listAffectedSystems(rhn, erratum):
+    """
+    API:
+    errata.listAffectedSystems
+
+    usage:
+    listAffectedSystems(rhn, erratum)
+
+    description:
+    Lists the systems affected by the given erratum
+
+    returns:
+    list of dict, one per system
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    erratum(str)            - errata erratum name
+    """
+    try:
+        return rhn.session.errata.listAffectedSystems(rhn.key, erratum)
+    except Exception, E:
+        return rhn.fail(E, 'list systems affected by erratum %s' % erratum)
+
+# ---------------------------------------------------------------------------------- #
     
-def listByDate(rhn, channel_label):
+def listByDate(rhn, chanlabel):
     """
-    usage: listByDate(rhn, channel_label)
+    API:
+    errata.listByDate
 
+    usage:
+    listByDate(rhn, chanlabel)
+
+    description:
     Lists Errata in date order.
+    This method is deprecated, see channel.listErrata instead
 
-    returns: list of dicts:
-    { id, date, type, name, advisory }
+    returns:
+    list of dict, one per erratum
+    { id, date, type, name, erratum }
 
     parameters:
     rhn                      - an authenticated RHN session
-    channel_label(str)       - the affected channel
+    chanlabel(str)       - the affected channel
     """
     try:
-        return rhn.session.errata.listByDate(rhn.key, channel_label)
+        return rhn.session.errata.listByDate(rhn.key, chanlabel)
     except Exception, E:
-        return rhn.fail(E, 'list errata by date for channel %s' % (channel_label) )
+        return rhn.fail(E, 'list errata by date for channel %s' % (chanlabel) )
 
-def listCVEs(rhn, advisory):
+# ---------------------------------------------------------------------------------- #
+
+def listCVEs(rhn, erratum):
     """
-    usage: listCVEs(rhn, advisory)
+    API:
+    errata.listCves
 
+    usage:
+    listCVEs(rhn, erratum)
+
+    description:
     Lists the CVEs assosicated with an erratum
 
-    returns: list of CVE strings
+    returns:
+    list of CVE strings
 
     parameters:
-    rhn                      - an authenticated RHN session
-    advisory             - the name an advisory
+    rhn                     - an authenticated RHN session
+    erratum                 - the name an erratum
     """
     try:
-        return rhn.session.errata.listCves(rhn.key, advisory)
+        return rhn.session.errata.listCves(rhn.key, erratum)
     except Exception, E:
-        return rhn.fail(E, 'list CVEs for advisory %s' % advisory)
+        return rhn.fail(E, 'list CVEs for erratum %s' % erratum)
 
-def listKeywords(rhn, advisory):
+# ---------------------------------------------------------------------------------- #
+
+def listKeywords(rhn, erratum):
     """
-    usage: listKeywords(rhn, advisory)
+    API:
+    errata.listKeywords
 
-    Lists the package filenames affected by a given erratum
+    usage:
+    listKeywords(rhn, erratum)
 
-    returns: list of keywords(str)
+    description:
+    Lists the keywords associated with an erratum
+
+    returns:
+    list of keywords(str)
 
     parameters:
-    rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
+    rhn                     - an authenticated RHN session
+    erratum(str)            - errata erratum name
     """
     try:
-        return rhn.session.errata.listKeywords(rhn.key, advisory)
+        return rhn.session.errata.listKeywords(rhn.key, erratum)
     except Exception, E:
-        return rhn.fail(E, 'list keywords for erratum %s' % advisory)
+        return rhn.fail(E, 'list keywords for erratum %s' % erratum)
 
-def listPackages(rhn, advisory):
+# ---------------------------------------------------------------------------------- #
+
+def listPackages(rhn, erratum):
     """
-    usage: listPackages(rhn, advisory)
+    API:
+    errata.listPackages
 
+    usage:
+    listPackages(rhn, erratum)
+
+    description:
     Lists the packages affected by an erratum
 
-    returns: list of dicts, one per channel.
+    returns:
+    list of dict, one per package
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    erratum(str)            - errata erratum name
+    """
+    try:
+        return rhn.session.errata.listPackages(rhn.key, erratum)
+    except Exception, E:
+        return rhn.fail(E, 'list packages affected by erratum %s' % erratum)
+
+# ---------------------------------------------------------------------------------- #
+
+def listPackageNames(rhn, erratum):
+    """
+    API:
+    none, custom method (special case of listPackages)
+
+    usage:
+    listPackageNames(rhn, erratum)
+
+    description:
+    Lists the package filenames in a given erratum
+
+    returns:
+    list of str (filenames)
 
     parameters:
     rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
+    erratum(str)        - errata erratum name
     """
     try:
-        return rhn.session.errata.listPackages(rhn.key, advisory)
+        return sorted([ "%(name)s-%(version)s-%(release)s.%(arch_label)s.rpm" % x for x in rhn.session.errata.listPackages(rhn.key, erratum)])
     except Exception, E:
-        return rhn.fail(E, 'list packages affected by erratum %s' % advisory)
-
-# custom method
-def listPackageNames(rhn, advisory):
-    """
-    usage: listPackages(rhn, advisory)
-
-    Lists the package filenames affected by a given erratum
-    (custom method)
-
-    returns: list of dicts, one per channel.
-
-    parameters:
-    rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
-    """
-    try:
-        return sorted([ "%(name)s-%(version)s-%(release)s" % x for x in rhn.session.errata.listPackages(rhn.key, advisory)])
-    except Exception, E:
-        return rhn.fail(E, 'list packages affected by erratum %s' % advisory)
+        return rhn.fail(E, 'list packages provided by erratum %s' % erratum)
 
 def getOval(rhn, errata_id):
     """
@@ -351,22 +482,30 @@ def getOval(rhn, errata_id):
     errata_id(str)           - errata identifier: one of
                                * errata ID
                                * CVE/CAN (remove all dashes)
-                               * advisory name/number
+                               * erratum name/number
     """
     if rhn.satellite_version >= '5.4.0':
-        return "This method is deprecated in Satellite 5.4 and no longer works."
+        return "This method is no longer available from Satellite 5.4 onwards."
     try:
         return rhn.session.errata.getOval(rhn.key, errata_id)
     except Exception, E:
-        return rhn.fail(E, 'get info for the erratum %s' % errata_id)
+        return rhn.fail(E, 'get Oval info for the erratum %s' % errata_id)
+
+# ---------------------------------------------------------------------------------- #
 
 def listUnpublishedErrata(rhn):
     """
-    usage: listUnpublishedErrata(rhn)
+    API:
+    errata.listUnpublishedErrata
 
-    Returns a list of unpublished errata 
+    usage:
+    listUnpublishedErrata(rhn)
 
-    returns: list of dict
+    description:
+    Returns a list of unpublished (custom) errata 
+
+    returns:
+    list of dict
 
     parameters:
     rhn                      - an authenticated RHN session
@@ -376,76 +515,148 @@ def listUnpublishedErrata(rhn):
     except Exception, E:
         return rhn.fail(E, 'list unpublished errata')
 
-def publish(rhn, advisory, channels):
-    """
-    usage: publishErrata(rhn, advisory, channels)
+# ---------------------------------------------------------------------------------- #
 
+def publish(rhn, erratum, chanlist):
+    """
+    API:
+    errata.publish
+
+    usage:
+    publish(rhn, erratum, chanlist)
+
+    description:
     Publishes an erratum into a list of channels
 
-    returns: list of dicts, one per channel.
+    returns:
+    list of dict, one per channel.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    advisory             - the erratum to publish
-    channels(list/str)   - the channels to puclish this erratum to
+    rhn                     - an authenticated RHN session
+    erratum                 - the erratum to publish
+    chanlist(list/str)      - the chanlist to puclish this erratum to
     """
     try:
-        return rhn.session.errata.publish(rhn.key, advisory, channels)
+        return rhn.session.errata.publish(rhn.key, erratum, chanlist)
     except Exception, E:
-        return rhn.fail(E, 'publish erratum %s to channels %s' % (advisory, ','.join(channels)))
+        return rhn.fail(E, 'publish erratum %s to chanlist %s' % (erratum, ','.join(chanlist)))
 
-def publishAsOriginal(rhn, advisory, channels):        
+# ---------------------------------------------------------------------------------- #
+
+def publishAsOriginal(rhn, erratum, chanlist):        
     """
-    usage: publishAsOriginal(rhn, advisory, channels)
-    
-    Publishes an existing (unpublished) cloned errata to a set of cloned channels according to its original erratum 
+    API:
+    errata.publishAsOriginal
 
-    returns: dict
+    usage:
+    publishAsOriginal(rhn, erratum, chanlist)
+
+    description:    
+    Publishes an existing (unpublished) cloned errata to a set of cloned chanlist according to its original erratum
+    (i.e. only pushes packages appropriate to the destination channels)
+
+    returns:
+    dict
 
     parameters:
-    rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
-    channels(list of str) - list of channel labels to publish erratum into
+    rhn                     - an authenticated RHN session
+    erratum(str)            - errata erratum name
+    chanlist(list of str)   - list of channel labels to publish erratum into
     """
     try:
-        return rhn.session.errata.publishAsOriginal(rhn.key, advisory, channels)
+        return rhn.session.errata.publishAsOriginal(rhn.key, erratum, chanlist)
     except Exception, E:
-        return rhn.fail(E, 'publish erratum %s' % advisory)
+        return rhn.fail(E, 'publish erratum %s' % erratum)
 
-def removePackages(rhn, advisory, packages):        
+# ---------------------------------------------------------------------------------- #
+
+def removePackages(rhn, erratum, pkglist):        
     """
-    usage: removePackages(rhn, advisory, packages)
+    API:
+    errata.removePackages
 
-    Remove a set of packages from an erratum with the given advisory name.
+    usage:
+    removePackages(rhn, erratum, pkglist)
+
+    description:
+    Remove a set of packages from an erratum with the given erratum name.
     This method will only allow for modification of custom errata created either through the UI or API. 
 
-    returns: list of keywords(str)
+    returns:
+    list of keywords(str)
 
     parameters:
-    rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
-    packages(list of int) - list of package IDs to remove.
+    rhn                     - an authenticated RHN session
+    erratum(str)            - errata erratum name
+    pkglist(list of int)    - list of package IDs to remove.
     """
     try:
-        return rhn.session.errata.removePackages(rhn.key, advisory, packages)
+        return rhn.session.errata.removePackages(rhn.key, erratum, packages)
     except Exception, E:
-        return rhn.fail(E, 'remove packages from erratum %s' % advisory)
+        return rhn.fail(E, 'remove packages from erratum %s' % erratum)
 
-def setDetails(rhn, advisory, errata_dict):        
+def setDetails(rhn, erratum, errdict):        
     """
-    usage: setDetails(rhn, advisory, errata_dict)
+    API:
+    errata.setDetails
 
-    Lists the package filenames affected by a given erratum
+    usage:
+    setDetails(rhn, erratum, errdict)
 
-    returns: True, or throws exception
+    description:
+    sets details for the specified erratum. Info is provided in a dict format.
+    Any omitted keys are unaffected
+    This method will only allow for modification of custom errata created either through the UI or API.
+
+    returns:
+    Boolean
 
     parameters:
-    rhn                      - an authenticated RHN session
-    advisory(str)        - errata advisory name
-    errata_dict(dict)        - erratum in dict form
+    rhn                     - an authenticated RHN session
+    erratum(str)            - errata erratum name
+    errdict(dict)           - erratum in dict form
     """
     try:
-        return rhn.session.errata.setDetails(rhn.key, advisory, errata_dict) == 1
+        return rhn.session.errata.setDetails(rhn.key, erratum, errdict) == 1
     except Exception, E:
-        return rhn.fail(E, 'set details for erratum %s' % advisory)
+        return rhn.fail(E, 'set details for erratum %s' % erratum)
+
+def modifyDetails(rhn, erratum, **kwargs):
+    """
+    API:
+    none, custom method (special case of setDetails)
+
+    usage:
+    modifyDetails(rhn, erratum, **kwargs)
+    where **kwargs is a number of key=value pairs (see parameters below)
+
+    description:
+    special case of errata.setDetails
+
+    returns:
+    Boolean
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    erratum(str)            - errata erratum name
+
+    plus one or more of the following as KEY=VAL pairs
+    synopsis (str)          - description of the erratum
+    advisory_name(str)      - name of erratum (trad: PREFIX-YYYY:NNNN)
+    advisory_release(int)   - Advisory Release
+    advisory_type(str)      - Type of advisory (one of the following: 'Security Advisory', 'Product Enhancement Advisory', or 'Bug Fix Advisory'
+    product(str)
+    topic(str)
+    description(str)
+    references(str)
+    notes(str)
+    solution(str)
+    bugs(list/dict)         - List of dict, one per bug { 'id' : (int) , 'summary' : (str) }
+    keywords(list/str)      - List of keywords to associate with the errata.
+    CVEs(list/str)          - List of CVEs to associate with the errata
+    """
+    try:
+        return rhn.session.errata.setDetails(rhn.key, erratum, kwargs) == 1
+    except Exception, E:
+        return rhn.fail(E, 'modify details for erratum %s' % erratum)
         

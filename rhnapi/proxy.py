@@ -1,121 +1,164 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# abstraction of 'proxy' namespace from the RHN API
-# for satellite 5.1.0
-"""
+# RHN/Spacewalk API Module
+#
+# Copyright 2009-2012 Stuart Sears
+#
+# This file is part of python-rhnapi
+#
+# python-rhnapi is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# python-rhnapi is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with python-rhnapi. If not, see http://www.gnu.org/licenses/.
+__doc__ = """
 rhnapi.proxy
 
 Abstraction of the 'proxy' namespeace in the RHN Satelite API
 updated for satellite v 5.4
 
-These calls all take an argument of 'system_id' which is the content of
-a systemid file - open('/etc/sysconfig/rhn/systemid').read() should do.
+These calls all take an argument of 'syscert' which is the content of
+a syscert file - open('/etc/sysconfig/rhn/syscert').read() should do.
 
 This suggests that they are only useful when run from a system that is
 * intended to become an RHN proxy
 * already is a registered RHN proxy
-
 """
 
-def activateProxy(rhn, system_id, proxy_ver):
+__author__ = "Stuart Sears"
+
+def activateProxy(rhn, syscert, proxyver):
 	"""
-    API: proxy.activateProxy
+    API:
+    proxy.activateProxy
 
-	usage: activateProxy(rhn, system_id, proxy_ver)
+	usage:
+    activateProxy(rhn, syscert, proxyver)
 
+    description:
 	Activates a system as an RHN proxy server, using
-	the given system_id file and proxy version
+	the given syscert file and proxy version
 
-	returns: Bool, or throws exception
+	returns:
+    Bool, or throws exception
 
 	params:
 	rhn                     - an authenticated RHN session.
-	system_id               - A system ID file (content of?)
-	proxy_ver(str)          - the proxy version to be activated
+	syscert(str)            - /etc/sysconfig/rhn/systemid file content
+	proxyver(str)           - the proxy version to be activated
 	"""
 	try:
-		return rhn.session.proxy.activateProxy(system_id, proxy_ver) == 1
+		return rhn.session.proxy.activateProxy(syscert, proxyver) == 1
 	except Exception, E:
 		 return rhn.fail(E, 'activate system %d as an RHN proxy server')
 
-def deactivateProxy(rhn, system_id, proxy_ver):
+# ---------------------------------------------------------------------------- #
+
+def deactivateProxy(rhn, syscert, proxyver):
 	"""
-    API: proxy.deactivateProxy
+    API:
+    proxy.deactivateProxy
 
-	usage: activateProxy(rhn, system_id, proxy_ver)
+	usage:
+    activateProxy(rhn, syscert, proxyver)
 
+    description:
 	Activates a system as an RHN proxy server, using
-	the given system_id file and proxy version
+	the given syscert file and proxy version
 
 	returns: 
+    Bool, or throws exception
 
 	params:
-	rhn                      - an authenticated RHN session.
-	system_id                - A system ID file (content of?)
-	proxy_ver(str)           - the proxy version to be activated
+	rhn                     - an authenticated RHN session.
+	syscert(str)            - /etc/sysconfig/rhn/systemid file content
+	proxyver(str)           - the proxy version to be activated
 	"""
 	try:
-		return rhn.session.proxy.deactivateProxy(system_id, proxy_ver) == 1
+		return rhn.session.proxy.deactivateProxy(syscert, proxyver) == 1
 	except Exception, E:
-		 return rhn.fail(E, 'deactivate systemid %s as proxy server' % system_id)
+		 return rhn.fail(E, 'deactivate syscert %s as proxy server' % syscert)
 
-## ------ added for satellite 5.4 version ------------------- ##
-def createMonitoringScout(rhn, system_id):
+# ---------------------------------------------------------------------------- #
+
+def createMonitoringScout(rhn, syscert):
     """
-    API: proxy.createMonitoringScout(rhn, system_id)
+    API:
+    proxy.createMonitoringScout(rhn, syscert)
 
-    usage: createMonitoringScout(rhn, system_id)
+    usage:
+    createMonitoringScout(rhn, syscert)
 
-    description: Create Monitoring Scout for proxy
+    description:
+    Create Monitoring Scout for proxy
 
-    returns: string
+    returns:
+    string
 
     parameters:
-    rhn                      - authenticated rhnapi.rhnSession() object
-	system_id                - A system ID file (content of?)
+    rhn                     - authenticated rhnapi.rhnSession() object
+	syscert(str)            - /etc/sysconfig/rhn/systemid file content
     """
     try:
-        return rhn.session.proxy.createMonitoringScout(system_id)
+        return rhn.session.proxy.createMonitoringScout(syscert)
     except Exception, E:
         return rhn.fail(E, 'create monitoring scout for ')
 
+# ---------------------------------------------------------------------------- #
 
-def isProxy(rhn, system_id):
+def isProxy(rhn, syscert):
     """
-    API: proxy.isProxy
+    API:
+    proxy.isProxy
 
-    usage: isProxyrhn, system_id)
+    usage:
+    isProxy(rhn, syscert)
 
-    description: checks if the given system is an RHN proxy or not.
+    description:
+    Checks if the given system is an RHN proxy or not.
 
-    returns: Bool, or throws exception
+    returns:
+    Bool, or throws exception
 
     parameters:
-    rhn                      - authenticated rhnapi.rhnSession() object
-	system_id                - A system ID file (content of?)
+    rhn                     - authenticated rhnapi.rhnSession() object
+	syscert(str)            - /etc/sysconfig/rhn/systemid file content
     """
     try:
-        return rhn.session.proxy.isProxy(system_id) == 1
+        return rhn.session.proxy.isProxy(syscert) == 1
     except Exception, E:
         return rhn.fail(E, 'check if system is a proxy server')
 
-def listAvailableProxyChannels(rhn, system_id):
+# ---------------------------------------------------------------------------- #
+
+def listAvailableProxyChannels(rhn, syscert):
     """
-    API: proxy.listAvailableProxyChannels
+    API:
+    proxy.listAvailableProxyChannels
 
-    usage: listAvailableProxyChannels(rhn, system_id)
+    usage:
+    listAvailableProxyChannels(rhn, syscert)
 
-    description: List available version of proxy channel for system identified
-    by the given client certificate i.e. systemid file
+    description:
+    List available version of proxy channel for system identified
+    by the given client certificate i.e. syscert file
 
-    returns: list of string (one per available version)
+    returns:
+    list of string (one per available version)
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
-	system_id                - A system ID file (content of?)
+	syscert(str)             - /etc/sysconfig/rhn/systemid file content
     """
     try:
-        return rhn.session.proxy.listAvailableProxyVersions(system_id)
+        return rhn.session.proxy.listAvailableProxyVersions(syscert)
     except Exception, E:
         return rhn.fail(E, 'list proxy versions')
 

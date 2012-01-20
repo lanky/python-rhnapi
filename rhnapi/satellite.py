@@ -1,9 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# and abstraction of the 'satellite' namespace
-# in the RHN API for sat version 5.1.0
+# RHN/Spacewalk API Module abstracting the 'satellite' namespace
+#
+# Copyright 2009-2012 Stuart Sears
+#
+# This file is part of python-rhnapi
+#
+# python-rhnapi is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# python-rhnapi is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with python-rhnapi. If not, see http://www.gnu.org/licenses/.
 
-"""
+__doc__ = """
 rhnapi.satellite
 
 An abstraction of the RHN API 'satellite' namespace for use
@@ -12,15 +28,21 @@ in python scripts
 Updated for satellite 5.4.
 """
 
+__author__ = "Stuart Sears"
+
 def listEntitlements(rhn):
 	"""
-    API: satellite.listEntitlements
+    API:
+    satellite.listEntitlements
 
-	Usage: listEntitlements(rhn)
+	Usage:
+    listEntitlements(rhn)
 	
+    description:
 	Lists the available entitlements on a satellite server.
 
-	Returns: 2x dict, system and channel
+	Returns:
+    2x dict, system and channel
         { 'system' : [
             {'free_slots': 2657,
              'label': 'enterprise_entitled',
@@ -40,7 +62,7 @@ def listEntitlements(rhn):
             ]
         }
 
-	params:
+	parameters:
 	rhn                     - an authenticated RHN session.
 	"""
 	try:
@@ -48,20 +70,26 @@ def listEntitlements(rhn):
 	except Exception, E:
 		return rhn.fail(E, 'list entitlements on RHN server %s' % rhn.hostname)
 
+# ---------------------------------------------------------------------------- #
+
 def listProxies(rhn):
 	"""
-    API: satellite.listProxies
+    API:
+    satellite.listProxies
 
-	Usage: listProxies(rhn)
+	Usage:
+    listProxies(rhn)
 	
+    description:
 	Lists the available entitlements on a satellite server.
 
-	Returns: list of dict, one per system that is an activated proxy
+	Returns:
+    list of dict, one per system that is an activated proxy
             {'id': int (system id),
              'last_checkin': <DateTime '20110309T14:04:56' at 308d2d8>,
              'name': 'system name'}]
 
-	params:
+	parameters:
 	rhn                     - an authenticated RHN session.
 	"""
 	try:
@@ -69,16 +97,22 @@ def listProxies(rhn):
 	except Exception, E:
 		return rhn.fail(E, 'list proxies registered with RHN server %s' % rhn.hostname)
 
-## ----------- updates for satellite 5.4 ------------------------------------ ##
+# ---------------------------------------------------------------------------- #
+
 def getCertificateExpirationDate(rhn):
     """
-    API: satellite.getCertificateExpirationDate
+    API:
+    satellite.getCertificateExpirationDate
 
-    usage: getCertificateExpirationDate(rhn)
+    usage:
+    getCertificateExpirationDate(rhn)
 
-    description: Retrieves the certificate expiration date of the activated certificate.
+    description:
+    Retrieves the certificate expiration date of the activated certificate.
 
-    returns: dateTime.iso8601 (xmlrpclib.DateTime) - cast to str for parseable output.
+    returns:
+    dateTime.iso8601 (xmlrpclib.DateTime) - cast to str for parseable output.
+    - use rhn.decodeDate()
             <DateTime '20110727T00:00:00' at 2ce8488>
 
     parameters:

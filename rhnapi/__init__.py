@@ -93,7 +93,8 @@ import logging
 # these methods could all be part of the main class, but don't need to be:
 # besides, who knows if I'll need them somewhere else in the future?
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+
 def getHostname(url):
     """
     returns a sanitised URL for RHN connection - deals with those that
@@ -105,7 +106,8 @@ def getHostname(url):
 
     # add  the correct start and end bits:
     return hostname
-# --------------------------------------------------------------------------------- #
+
+# ---------------------------------------------------------------------------- #
 
 def rhnifyURL(url):
     """
@@ -118,8 +120,7 @@ def rhnifyURL(url):
 
     # add  the correct start and end bits:
     return 'https://%s/rpc/api' % hostname
-# --------------------------------------------------------------------------------- #
-
+# ---------------------------------------------------------------------------- #
 
 def promptUser():
     """
@@ -127,7 +128,7 @@ def promptUser():
     """
     rhnuser = str(raw_input('Please enter your RHN username: ')).strip()
     return rhnuser
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def promptPass(username):
     """
@@ -138,7 +139,7 @@ def promptPass(username):
     from getpass import getpass
     rhnpass = getpass('Please enter the RHN password for user %s: ' % username)
     return rhnpass.strip()
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def fetchCreds(filename, servername, debug=False):
     """
@@ -172,10 +173,12 @@ def fetchCreds(filename, servername, debug=False):
     if debug:
         print "retrieved following values from %s" % srcfile
         print "login: %s" % str(mylogin)
-        print "password: %s" % str(mypass)
+        print "password: %s" % ('*' * len(str(mypass)))
 
     return str(mylogin).strip(), str(mypass).strip()
-# --------------------------------------------------------------------------------- #
+
+# ---------------------------------------------------------------------------- #
+
 def saveCreds(filename, servername, login=None, password=None, debug = False):
     """
     Attempt to save login and password to the given configfile
@@ -213,14 +216,9 @@ def saveCreds(filename, servername, login=None, password=None, debug = False):
         return True
     except:
         return False
-# --------------------------------------------------------------------------------- #
-
-
-# --------------------------------------------------------------------------------- #
-
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
     
-### ------------------ DEFINED CLASSES ------------------------- ###
+# -------------------------- Class Definitions     --------------------------- #
 
 class proxiedTransport(xmlrpclib.SafeTransport):
     """
@@ -256,7 +254,7 @@ class proxiedTransport(xmlrpclib.SafeTransport):
     def send_host(self, connection, host):
         connection.putheader('Host', self.realhost)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 class rhnSession:
 
@@ -269,6 +267,8 @@ class rhnSession:
         Initialize a connection to RHN (or a satellite) using the provided information.
         proxy server should be local https proxy, if available. IPaddress/Hostname:port.
         No protocol required for the proxy definition.
+
+        returns rhnSession object
 
         parameters: (* = optional)
         url(str)              - hostname or ip address of the RHN server

@@ -1,13 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# and abstraction of the "system" namespace
-# from the RHN API for satellite 5.1.0
-# used to manipulate registered systems
+# RHN/Spacewalk API Module abstracting the 'system' namespace
+# and all its children / sub-namespaces
+#
+# Copyright 2009-2012 Stuart Sears
+#
+# This file is part of python-rhnapi
+#
+# python-rhnapi is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# python-rhnapi is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with python-rhnapi. If not, see http://www.gnu.org/licenses/.
 
-# all these methods require an RHN session, from rhnapi
-# (import rhnapi will do this for you)
-
-# global translations if required:
+__author__ = "Stuart Sears"
 
 ent_names = { 'monitoring_entitled'              : 'monitoring',
               'provisioning_entitled'            : 'provisioning',
@@ -16,13 +29,15 @@ ent_names = { 'monitoring_entitled'              : 'monitoring',
               'virtualization_host_entitled'     : 'virtualization',
             }
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def addEntitlements(rhn, server_id, ent_list):
+def addEntitlements(rhn, serverid, entlist):
     """
-    API: system.addEntitlements
+    API:
+    system.addEntitlements
 
-    usage: addEntitlements(rhn, server_id, ent_list)
+    usage:
+    addEntitlements(rhn, serverid, entlist)
 
     description:
     Adds the list of entitlements to a given server ID
@@ -32,78 +47,92 @@ def addEntitlements(rhn, server_id, ent_list):
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID to add entitlements to
-    entsList(list/str)       - a list of entitlement labels to add
+    serverid(int)            - server ID to add entitlements to
+    entlist(list/str)        - a list of entitlement labels to add
                                entitlements that already exist are ignored.
     """
     try:
-        return rhn.session.system.addEntitlements(rhn.key, server_id, ent_list) == 1
+        return rhn.session.system.addEntitlements(rhn.key, serverid, entlist) == 1
     except Exception, E:
-        return rhn.fail(E, "add entitlements %s to server ID %d (%s)" % (','.join(entslist) , server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "add entitlements %s to server ID %d (%s)" % (','.join(entlist) , serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def addNote(rhn, server_id, note):
+def addNote(rhn, serverid, note):
     """
-    API: system.addNote
+    API:
+    system.addNote
 
-    usage: addNote(rhn, server_id, note)
+    usage:
+    addNote(rhn, serverid, note)
 
-    Add a note to an existing server_id
+    Add a note to an existing serverid
 
     returns: 
     Bool, or throws exception
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID
+    serverid(int)            - server ID
     note(str)                - the note to add
     """
     try:
-        return rhn.session.system.addNote(rhn.key, server_id, note) == 1
+        return rhn.session.system.addNote(rhn.key, serverid, note) == 1
     except Exception, E:
-        return rhn.fail(E, "add note to server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "add note to server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def applyErrata(rhn, server_id, errata):
+def applyErrata(rhn, serverid, errlist):
     """
-    API: system.applyErrata
+    API:
+    system.applyErrata
 
-    usage: applyErrata(rhn, server_id, errata)
+    usage:
+    applyErrata(rhn, serverid, errlist)
 
     Applies the specifed list of errata to a server
+
+    Deprecated. To be replaced by scheduleApplyErrata
 
     returns:
     Bool, or throws exception
 
     parameters:
-    rhn                       - an authenticated RHN session
-    server_id(int)            - server ID
-    errata(list/int)          - list of erratum IDs to apply
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID
+    errlist(list/int)       - list of erratum IDs to apply
     """
     try:
-        return rhn.session.system.applyErrata(rhn.key, server_id, errataList) == 1
+        return rhn.session.system.applyErrata(rhn.key, serverid, errataList) == 1
     except Exception, E:
-        return rhn.fail(E, "apply errata to server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "apply errata to server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def comparePackages(rhn, server_id1, server_id2):
+def comparePackages(rhn, serverid1, serverid2):
     """
-    API: system.comparePackages
+    API:
+    system.comparePackages
 
-    usage: comparePackages(rhn, server_id1, server_id2)
+    usage:
+    comparePackages(rhn, serverid1, serverid2)
 
     description:
     Compares installed package lists on 2 servers
 
-    returns: list of dict, one per package
-            { 'package_name_id' : int
-              'package_name' : strs
-              'this_system' : str (version on server1)
-              'other_system' : str (version on server2)
-              'comparison' : int }
+    returns:
+    list of dict, one per package
+            { 'pkgname_id' :
+    int
+              'pkgname' :
+    strs
+              'this_system' :
+    str (version on server1)
+              'other_system' :
+    str (version on server2)
+              'comparison' :
+    int }
         where the comparison integer means:
             * 0 - No difference.
             * 1 - Package on this system only.
@@ -112,32 +141,40 @@ def comparePackages(rhn, server_id1, server_id2):
             * 4 - Newer package version on other system.
 
     parameters:
-    rhn                  - an authenticated RHN session
-    server_id1(int)      - server ID
-    second_id2(int)      - server ID
+    rhn                 - an authenticated RHN session
+    serverid1(int)      - first server ID
+    serverid2(int)      - second server ID
     """
     try:
-        return rhn.session.system.comparePackages(rhn.key, server_id1, server_id2)
+        return rhn.session.system.comparePackages(rhn.key, serverid1, serverid2)
     except Exception, E:
-        return rhn.fail(E, "compare packages on servers %d (%s) and %d (%s)" % (server_id1, getServerName(rhn, server_id1), server_id2, getServerName(rhn, server_id2)))
+        return rhn.fail(E, "compare packages on servers %d (%s) and %d (%s)" % (serverid1, getServerName(rhn, serverid1), serverid2, getServerName(rhn, serverid2)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def comparePackageProfile(rhn, server_id, profile_label):
+def comparePackageProfile(rhn, serverid, pkgprofile):
     """
-    API: system.comparePackageProfile
+    API:
+    system.comparePackageProfile
     
-    usage: comparePackageProfile(rhn, server_id, profile_label)
+    usage:
+    comparePackageProfile(rhn, serverid, pkgprofile)
     
     description:
     Compares a system's package list against a saved package profile.
     
-    returns: list of dict, one per package
-            { 'package_name_id' : int
-              'package_name' : strs
-              'this_system' : str (version on specified system)
-              'other_system' : str (version in package profile)
-              'comparison' : int }
+    returns:
+    list of dict, one per package
+            { 'pkgname_id' :
+    int
+              'pkgname' :
+    strs
+              'this_system' :
+    str (version on specified system)
+              'other_system' :
+    str (version in package profile)
+              'comparison' :
+    int }
         where the comparison integer means:
             * 0 - No difference.
             * 1 - Package on this system only.
@@ -145,26 +182,29 @@ def comparePackageProfile(rhn, server_id, profile_label):
             * 3 - Package on other system only.
             * 4 - Newer package version on other system.
 
-    returns: list of dict, one per package (for the union of all pkgs on system
+    returns:
+    list of dict, one per package (for the union of all pkgs on system
     and in profile)
     
     parameters:
-    rhn                  - an authenticated RHN session
-    server_id(int)       - server ID
-    profile_label(str)   - label of a saved package profile
+    rhn                 - an authenticated RHN session
+    serverid(int)       - server ID
+    pkgprofile(str)     - label of a saved package profile
     """
     try:
-        return rhn.session.system.comparePackageProfile(rhn.key, server_id, profile_label)
+        return rhn.session.system.comparePackageProfile(rhn.key, serverid, pkgprofile)
     except Exception, E:
-        return rhn.fail(E, 'compare packages on server %d (%s) to package profile %s' % (server_id, getServerName(rhn, server_id), profile_label))
+        return rhn.fail(E, 'compare packages on server %d (%s) to package profile %s' % (serverid, getServerName(rhn, serverid), pkgprofile))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def convertToFlexEntitlement(rhn, system_list, chan_family):
+def convertToFlexEntitlement(rhn, serverids, chanfamily):
     """
-    API: system.convertToFlexEntitlement
+    API:
+    system.convertToFlexEntitlement
 
-    usage: convertToFlexEntitlement(rhn, system_list, chan_label)
+    usage:
+    convertToFlexEntitlement(rhn, serverids, chanlabel)
 
     description:
     Converts the given list of systems for a given channel family to use
@@ -175,270 +215,326 @@ def convertToFlexEntitlement(rhn, system_list, chan_family):
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
-    system_list(list/int)    - list of system ID numbers
-    chan_family(str)          - channel family label
+    serverids(list/int)    - list of system ID numbers
+    chanfamily(str)          - channel family label
     """
     try:
-        return rhn.session.system.convertToFlexEntitlement(rhn.key, system_list, chan_family)
+        return rhn.session.system.convertToFlexEntitlement(rhn.key, serverids, chanfamily)
     except Exception, E:
-        return rhn.fail(E, 'convert systems to use flex entitlement for channel family %s' % chan_family)
+        return rhn.fail(E, 'convert systems to use flex entitlement for channel family %s' % chanfamily)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def createPackageProfile(rhn, server_id, label, description):
+def createPackageProfile(rhn, serverid, label, description):
     """
-    API: system.createPackageProfile
+    API:
+    system.createPackageProfile
 
-    usage: createPackageProfile(rhn, server_id, label, description)
+    usage:
+    createPackageProfile(rhn, serverid, label, description)
 
     description:
-    Create a new package profile for a given server_id.
+    Create a new package profile for a given serverid.
     parameters:
-    rhn                   - an authenticated RHN session
-    server_id(int)        - server ID number
-    label(str)            - label for new package profile
-    description(str)      - a description of the profile
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID number
+    label(str)              - label for new package profile
+    description(str)        - a description of the profile
     """
     try:
-        rhn.session.system.createPackageProfile(rhn.key, server_id, label, description)
+        rhn.session.system.createPackageProfile(rhn.key, serverid, label, description)
     except Exception, E:
-        return rhn.fail(E, "create package profile %s for server_id %d (%s)" % (label, server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "create package profile %s for serverid %d (%s)" % (label, serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def createSystemRecord(rhn, server_id, kslabel):
+def createSystemRecord(rhn, serverid, kslabel):
     """
-    API: system.createSystemRecord
+    API:
+    system.createSystemRecord
     
-    usage: createSystemRecord(rhn, server_id, kslabel)
+    usage:
+    createSystemRecord(rhn, serverid, kslabel)
     
     description:
     Creates a cobbler system record with the specified kickstart label
     
-    returns: True, or throws exception
+    returns:
+    True, or throws exception
     
     parameters:
     rhn                  - an authenticated RHN session
-    server_id(int)       - server ID
+    serverid(int)       - server ID
     """
     try:
-        return rhn.session.system.createSystemRecord(rhn.key, server_id, kslabel) == 1
+        return rhn.session.system.createSystemRecord(rhn.key, serverid, kslabel) == 1
     except Exception, E:
-        return rhn.fail(E, 'create cobbler system record for server ID %d (%s)' % (server_id, getSystemName(rhn, server_id)))
+        return rhn.fail(E, 'create cobbler system record for server ID %d (%s)' % (serverid, getSystemName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def deleteCustomValues(rhn, server_id, label_list):
+def deleteCustomValues(rhn, serverid, custvals):
     """
-    API: system.deleteCustomValues
+    API:
+    system.deleteCustomValues
                   
-    usage: deleteCustomValues(rhn, server_id, label_list)
+    usage:
+    deleteCustomValues(rhn, serverid, custvals)
                   
     description:
     delete the given custom values from the chosen system record.
                   
-    returns: True, or throws exception
+    returns:
+    True, or throws exception
                   
     parameters:
-    rhn                  - an authenticated RHN session
-    server_id(int)       - server ID
-    label_list(list/str) - custom value name/label (or list of)
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID
+    custvals(list/str)      - custom value name/label (or list of)
     """
-    if not isinstance(label_list, list):
-        label_list = [ label_list ]
+    if not isinstance(custvals, list):
+        custvals = [ custvals ]
     try:
-        return rhn.session.system.deleteCustomValues(rhn.key, server_id, label_list) == 1
+        return rhn.session.system.deleteCustomValues(rhn.key, serverid, custvals) == 1
     except Exception, E:
-        return rhn.fail(E, 'delete one or more of custom values [%s] from server ID %d (%s)' % (','.join(label_list), server_id, getSystemName(rhn, server_id)))
+        return rhn.fail(E, 'delete one or more of custom values [%s] from server ID %d (%s)' % (','.join(custvals), serverid, getSystemName(rhn, serverid)))
+        
+# ---------------------------------------------------------------------------- #
 
-# --------------------------------------------------------------------------------- #
-
-def deleteNote(rhn, server_id, note_id):
+def deleteGuestProfiles(rhn, serverid, guestlist):
     """
-    API: system.deleteNote
+    API:
+    system.deleteGuestProfiles
+
+    usage:
+    deleteGuestProfiles(rhn, serverid, guestlist)
+
+    description:
+    deletes the specified list of guest profiles for the specified host.
+
+    returns:
+    True, or throws exception
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID
+    guestlist(list/str)     - list of guest names to delete
+    """
+    try:
+        return  rhn.session.system.deleteGuestProfiles(rhn.key, serverid, guestlist) == 1
+    except Exception, E:
+        return rhn.fail(E, 'remove guest profiles from server %s' % getServerName(serverid) )
+
+# ---------------------------------------------------------------------------- #
+
+def deleteNote(rhn, serverid, noteid):
+    """
+    API:
+    system.deleteNote
             
-    usage: deleteNote(rhn, server_id, note_id)
+    usage:
+    deleteNote(rhn, serverid, noteid)
             
     description:
     deletes the given note from the specified server record
     
-    returns: True, or throws exception
+    returns:
+    True, or throws exception
             
     parameters:
-    rhn                  - an authenticated RHN session
-    server_id(int)       - server ID
-    note_id(int)         - note ID
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID
+    noteid(int)             - note ID
     """
     try:
-        return rhn.session.system.deleteNote(rhn.key, server_id, note_id) == 1
+        return rhn.session.system.deleteNote(rhn.key, serverid, noteid) == 1
     except Exception, E:
-        return rhn.fail(E, 'delete note %d from server %d (%s)' % (note_id, server_id, getSystemName(rhn, server_id)))
+        return rhn.fail(E, 'delete note %d from server %d (%s)' % (noteid, serverid, getSystemName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def deleteNotes(rhn, server_id):
+def deleteNotes(rhn, serverid):
     """
-    API: system.deleteNotes
+    API:
+    system.deleteNotes
         
-    usage: deleteNotes(rhn, server_id)
+    usage:
+    deleteNotes(rhn, serverid)
         
     description:
     deletes ALL notes from the given server record
             
-    returns: True, or throws exception 
+    returns:
+    True, or throws exception 
         
     parameters:
-    rhn                  - an authenticated RHN session
-    server_id            - server ID
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID
     """
     try:
-        return rhn.session.system.deleteNotes(rhn, server_id) == 1
+        return rhn.session.system.deleteNotes(rhn, serverid) == 1
     except Exception, E:
-        return rhn.fail(E, 'delete all notes from server id %d (%s)' % (server_id, getSystemName(rhn, server_id)))
+        return rhn.fail(E, 'delete all notes from server id %d (%s)' % (serverid, getSystemName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def deletePackageProfile(rhn, profile_id):
+def deletePackageProfile(rhn, profileid):
     """
-    API: system.deletePackageProfile
+    API:
+    system.deletePackageProfile
         
-    usage: deletePackageProfile(rhn, profile_id)
+    usage:
+    deletePackageProfile(rhn, profileid)
         
     description:
     delete the specified package profile
         
-    returns: True, or throws exception
+    returns:
+    True, or throws exception
         
     parameters:
     rhn                  - an authenticated RHN session
-    profile_id(int)      - saved package profile ID
+    profileid(int)      - saved package profile ID
     """
     try:
-        return rhn.session.system.deletePackageProfile(rhn, profile_id) == 1
+        return rhn.session.system.deletePackageProfile(rhn, profileid) == 1
     except Exception, E:
-        return rhn.fail(E, 'delete package profile ID %d' % profile_id)
+        return rhn.fail(E, 'delete package profile ID %d' % profileid)
 
+# ---------------------------------------------------------------------------- #
 
-# --------------------------------------------------------------------------------- #
-
-def deleteSystem(server_cert):
+def deleteSystem(syscert):
     """
-    API: system.deleteSystem
+    API:
+    system.deleteSystem
     
-    usage: deleteSystem(rhn, server_cert)
+    usage:
+    deleteSystem(rhn, syscert)
     
     description:
     Delete an individual system using its client certificate.
     Does not require an RHN session, so can be used directly from the client system
     This is often used for re-registering a server after installation.
     
-    returns: True, or throws exception
+    returns:
+    True, or throws exception
     
     parameters:
-    server_cert(str)         - the server certificate (/etc/sysconfig/rhn/systemid) content (not path)
+    syscert(str)         - the server certificate (/etc/sysconfig/rhn/systemid) content (not path)
     """
     try:
-        return rhn.session.system.deleteSystems(rhn.key, server_cert) == 1
+        return rhn.session.system.deleteSystems(rhn.key, syscert) == 1
     except Exception, E:
-        return rhn.fail(E, "delete the following server: %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "delete the following server: %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def deleteSystems(rhn, system_list):
+def deleteSystems(rhn, serverids):
     """
-    API: system.deleteSystems
+    API:
+    system.deleteSystems
     
-    usage: deleteSystems(rhn, system_list)
+    usage:
+    deleteSystems(rhn, serverids)
     
     description:
     Delete systems given a list of system ids
     
     parameters:
-    rhn                      - an authenticated RHN session
-    system_list([int])        - list of server_ids
+    rhn                     - an authenticated RHN session
+    serverids([int])        - list of server IDs from RHN
     """
     try:
-        return rhn.session.system.deleteSystems(rhn.key, systemlist) == 1
+        return rhn.session.system.deleteSystems(rhn.key, serverids) == 1
     except Exception, E:
-        return rhn.fail(E, "delete one or more of systems: [ %s ]" % (",".join([ str(x) for x in systemlist ])))
+        return rhn.fail(E, "delete one or more of systems: [ %s ]" % (",".join([ str(x) for x in serverids ])))
 
+# ---------------------------------------------------------------------------- #
 
-# --------------------------------------------------------------------------------- #
-
-def downloadSystemId(rhn, server_id):
+def downloadSystemId(rhn, serverid):
     """
-    API: system.downloadSystemId
+    API:
+    system.downloadSystemId
     
-    usage: downloadSystemId(rhn, server_id)
+    usage:
+    downloadSystemId(rhn, serverid)
         
     description:
-    downloads the server_id file (/etc/sysconfig/rhn/systemid) for a given server_id.
+    downloads the serverid file (/etc/sysconfig/rhn/systemid) for a given serverid.
     
-    returns: string (contents of systemid file)
+    returns:
+    string (contents of systemid file)
     
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)           - server ID number
+    serverid(int)           - server ID number
     """
     try:
         rhn.session.system.downloadSystemId(rhn.key, ServerID)
     except Exception, E:
-        return rhn.fail(E, "download the server_id for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "download the serverid for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getChildChannels(rhn, server_id):
+def getBaseChannel(rhn, serverid):
     """
-    API: none, special case of system.listSubscribedChildChannels
+    API:
+    none, special case of system.getSubscribedBaseChannel
 
-    usage: getChildChannels(rhn, server_id)
-    
-    description:
-    returns a list of labels of the system subscribed child channels
-    
-    params:
-    rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
-    """
-    try:
-        print "Determining child channels subscribed for server %d" % server_id
-        ccarray = rhn.session.system.listSubscribedChildChannels(rhn.key, server_id)
-        return [ x['label'] for x in ccarray ]
-    except Exception, E:
-        return rhn.fail(E, "retrieve Subscribed Child Channel information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
-
-# --------------------------------------------------------------------------------- #
-
-def getBaseChannel(rhn, server_id):
-    """
-    API: none, special case of system.getSubscribedBaseChannel
-
-    usage: getBaseChannel(rhn, server_id)
+    usage:
+    getBaseChannel(rhn, serverid)
     
     description:
     returns the label of the given system's base channel
     
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getSubscribedBaseChannel(rhn.key, server_id)['label']
+        return rhn.session.system.getSubscribedBaseChannel(rhn.key, serverid)['label']
     except Exception, E:
-        return rhn.fail(E, "retrieve Subscribed Base Channel information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve Subscribed Base Channel information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getConnectionPath(rhn, server_id):
+def getChildChannels(rhn, serverid):
     """
-    API: system.getConnectionPath
+    API:
+    none, special case of system.listSubscribedChildChannels
+
+    usage:
+    getChildChannels(rhn, serverid)
+    
+    description:
+    returns a list of labels of the system subscribed child channels
+    
+    params:
+    rhn                      - an authenticated RHN session
+    serverid(int)            - server ID number
+    """
+    try:
+        print "Determining child channels subscribed for server %d" % serverid
+        ccarray = rhn.session.system.listSubscribedChildChannels(rhn.key, serverid)
+        return [ x['label'] for x in ccarray ]
+    except Exception, E:
+        return rhn.fail(E, "retrieve Subscribed Child Channel information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
+
+# ---------------------------------------------------------------------------- #
+
+def getConnectionPath(rhn, serverid):
+    """
+    API:
+    system.getConnectionPath
         
-    usage: getConnectionPath(rhn, server_id)
+    usage:
+    getConnectionPath(rhn, serverid)
         
     description:
     Get the list of proxies that the given system connects through in order to reach the server.
         
-    returns: list of dict, one per proxy
+    returns:
+    list of dict, one per proxy
             {
             'position' : (int) position in list, 1 being nearest the system
             'id'       : (int) proxy system id
@@ -446,27 +542,29 @@ def getConnectionPath(rhn, server_id):
             }
         
     parameters:
-    rhn                      - an authenticated RHN session
-    server_id(int)           - server ID number
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID number
     """
     try:
-        return rhn.session.system.getConnectionPath(rhn.key, server_id)
+        return rhn.session.system.getConnectionPath(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, 'get list of proxies for server id %d (%s)' % (server_id, getSystemName(rhn, server_id)))
+        return rhn.fail(E, 'get list of proxies for server id %d (%s)' % (serverid, getSystemName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-#### system information methods ####
-def getCpu(rhn, server_id):
+def getCpu(rhn, serverid):
     """
-    API: system.getCpu
+    API:
+    system.getCpu
     
-    usage: getCpu(rhn, server_id)
+    usage:
+    getCpu(rhn, serverid)
     
     description:
     returns CPU information for a given server
     
-    returns: dict
+    returns:
+    dict
             {
             "cache"     : (str)
             "family"    : (str)
@@ -480,52 +578,70 @@ def getCpu(rhn, server_id):
             }
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getCpu(rhn.key, server_id)
+        return rhn.session.system.getCpu(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve CPU information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve CPU information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getCustomValues(rhn, server_id):
+def getCustomValues(rhn, serverid):
     """
-    API: system.getCustomValues
+    API:
+    system.getCustomValues
     
-    usage: getCustomValues(rhn, server_id)
+    usage:
+    getCustomValues(rhn, serverid)
     
     description:
     returns CPU information for a given server
     
-    returns: dict: { 'custom info label' : data }
+    returns:
+    dict: { 'custom info label' : data }
     
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getCustomValues(rhn.key, server_id)
+        return rhn.session.system.getCustomValues(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve Custom Values set for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve Custom Values set for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getDetails(rhn, server_id):
+def getDetails(rhn, serverid):
     """
-    API: system.getDetails
+    API:
+    system.getDetails
     
-    usage: getDetails(rhn, server_id)
+    usage:
+    getDetails(rhn, serverid)
     
     description:
     gets detailed information about the chosen server, including location, OS, entitlements etc
     
-    returns: dict
-            { 'auto_update' : bool, 'release' : str, 'address1' : str, 'address2' : str, 'city' : str,
-              'country' : str, 'state' : str, 'building' : str, 'rack' : str, 'room' : str, 
-              'description' : str, 'hostname' : str, 'last_boot' : dateTime.iso8601, 'lock_status' : bool,
-              'id' : int, 'profile_name' : str,
-              'base_entitlement' : str, one of ['enterprise_entitled' 'sw_mgr_entitled' ]
+    returns:
+    dict
+            { 'auto_update' : bool,
+              'release' : str,
+              'address1' : str,
+              'address2' : str,
+              'city' : str,
+              'country' : str,
+              'state' : str,
+              'building' : str,
+              'rack' : str,
+              'room' : str, 
+              'description' : str,
+              'hostname' : str,
+              'last_boot' : dateTime.iso8601,
+              'lock_status' : bool,
+              'id' : int,
+              'profile_name' : str,
+              'base_entitlement' :     str, one of ['enterprise_entitled' 'sw_mgr_entitled' ]
               'addon_entitlements' : [str]  - [ 'monitoring_entitled', 'provisioning_entitled', 
                                                 'virtualization_host', 'virtualization_host_platform' ]
               'osa_status' : str (one of 'unknown', 'offline', 'online']
@@ -533,26 +649,28 @@ def getDetails(rhn, server_id):
     
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getDetails(rhn.key, server_id)
+        return rhn.session.system.getDetails(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve detailed information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve detailed information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
+# ---------------------------------------------------------------------------- #
 
-# --------------------------------------------------------------------------------- #
-
-def getDevices(rhn, server_id):
+def getDevices(rhn, serverid):
     """
-    API: system.getdevices
+    API:
+    system.getdevices
     
-    usage: getDevices(rhn, server_id)
+    usage:
+    getDevices(rhn, serverid)
     
     description:
     lists devices for the given system
     
-    returns: list of dict, one per device:
+    returns:
+    list of dict, one per device:
             { 'device' : str,
               'device_class' : str,
               'driver' : str,
@@ -563,24 +681,27 @@ def getDevices(rhn, server_id):
             
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getDevices(rhn.key, server_id)
+        return rhn.session.system.getDevices(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve device list for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve device list for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getDmi(rhn, server_id):
+def getDmi(rhn, serverid):
     """
-    API: system.getDmi
+    API:
+    system.getDmi
     
-    usage: getDmi(rhn, server_id)
+    usage:
+    getDmi(rhn, serverid)
     
     description:
     returns DMI information (BIOS Vendor etc etc)
-    returns: dict
+    returns:
+    dict
              { 'vendor'       : str,
                'system'       : str,
                'product'      : str,
@@ -593,42 +714,47 @@ def getDmi(rhn, server_id):
              
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getDmi(rhn.key, server_id)
+        return rhn.session.system.getDmi(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve DMI information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve DMI information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getEntitlements(rhn, server_id):
+def getEntitlements(rhn, serverid):
     """
-    API: system.getEntitlements
+    API:
+    system.getEntitlements
     
-    usage: getEntitlements(rhn, server_id)
+    usage:
+    getEntitlements(rhn, serverid)
     
     description:
     gets the list of entitlements for a given server ID
 
-    returns: list of string (entitlement labels)
+    returns:
+    list of string (entitlement labels)
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)           - server ID to add entitlements to
+    serverid(int)           - server ID to add entitlements to
     """
     try:
-        return rhn.session.system.getEntitlements(rhn.key, server_id)
+        return rhn.session.system.getEntitlements(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, 'list entitlements for system ID %d' % (server_id))
+        return rhn.fail(E, 'list entitlements for system ID %d' % (serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getEventHistory(rhn, server_id):
+def getEventHistory(rhn, serverid):
     """
-    API: system.getEventHistory
+    API:
+    system.getEventHistory
         
-    usage: getEventHistory(rhn, server_id)
+    usage:
+    getEventHistory(rhn, serverid)
             
     description:
     Returns a list history items associated with the system, ordered from newest to oldest.
@@ -636,7 +762,8 @@ def getEventHistory(rhn, server_id):
     (as compared to instant).
     For more information on such events, see the system.listSystemEvents operation. 
             
-    returns: list of dict, one per history event
+    returns:
+    list of dict, one per history event
             { 'completed' : dateTime.iso8601,
               'summary' : str,
               'details' : str
@@ -644,26 +771,29 @@ def getEventHistory(rhn, server_id):
             
     parameters:
     rhn                  - an authenticated RHN session
-    server_id(int)           - server ID to add entitlements to
+    serverid(int)           - server ID to add entitlements to
     """
     try:
-        return rhn.session.system.getEventHistory(rhn.key, server_id)
+        return rhn.session.system.getEventHistory(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, 'get even history for server ID %d (%s)' % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, 'get even history for server ID %d (%s)' % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getId(rhn, server_name):
+def getId(rhn, servername):
     """
-    API: system.getId
+    API:
+    system.getId
     
-    usage: getId(rhn, server_name)
+    usage:
+    getId(rhn, servername)
     
     description
     look up a system ID for a given name. There may be more than one of these, as
     profile names are not guaranteed to be unique.
     
-    returns: list of dict, one per matching system ID
+    returns:
+    list of dict, one per matching system ID
             { 'id' : int,
               'name' : str,
               'last_checkin' : dateTime.iso8601
@@ -671,21 +801,22 @@ def getId(rhn, server_name):
     
     parameters:
     rhn                      - an authenticated RHN session
-    server_name(str)         - server name (often hostname)
+    servername(str)         - server name (often hostname)
     """
     try:
-        return rhn.session.system.getId(rhn.key, server_name)
+        return rhn.session.system.getId(rhn.key, servername)
     except Exception, E:
-        return rhn.fail(E, "get system id(s) for server %s" % (server_name))
+        return rhn.fail(E, "get system id(s) for server %s" % (servername))
 
+# ---------------------------------------------------------------------------- #
 
-# --------------------------------------------------------------------------------- #
-
-def getLastCheckin(rhn, server_id):
+def getLastCheckin(rhn, serverid):
     """
-    API: none, custom method
+    API:
+    none, custom method
 
-    usage: getLastCheckin(rhn, server_id)
+    usage:
+    getLastCheckin(rhn, serverid)
     
     description:
     returns an xmlrpclib.DateTime object representing the system"s last known
@@ -694,100 +825,112 @@ def getLastCheckin(rhn, server_id):
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return getName(rhn, server_id)['last_checkin']
+        return getName(rhn, serverid)['last_checkin']
     except Exception, E:
-        return rhn.fail(E, "get last check-in sate for server_id %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "get last check-in sate for serverid %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getMemory(rhn, server_id):
+def getMemory(rhn, serverid):
     """
-    API: system.getMemory
+    API:
+    system.getMemory
 
-    usage: getMemory(rhn, server_id)
+    usage:
+    getMemory(rhn, serverid)
 
     description:
     returns Memory information for a given server
 
-    returns: dict:
+    returns:
+    dict:
         { 'ram' : (int) physical memory in Mb
           'swap' : (int) swap space in Mb
         }
 
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getMemory(rhn.key, server_id)
+        return rhn.session.system.getMemory(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve Memory information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve Memory information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getName(rhn, server_id):
+def getName(rhn, serverid):
     """
-    API: system.getName
+    API:
+    system.getName
         
-    usage: getName(rhn, server_id)
+    usage:
+    getName(rhn, serverid)
         
     description:
     Get system name and last check in information for the given system ID.
             
-    returns: dict
+    returns:
+    dict
             { 'id' : int,
               'name' : str,
               'last_checkin' : dateTime.iso8601
             }
         
     parameters:
-    rhn                  - an authenticated RHN session
+    rhn                     - an authenticated RHN session
     """
     try:
-        return rhn.session.system.getName(rhn.key, server_id)
+        return rhn.session.system.getName(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, 'get Name and last checkin for server ID %d' % server_id)
+        return rhn.fail(E, 'get Name and last checkin for server ID %d' % serverid)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getNetwork(rhn, server_id):
+def getNetwork(rhn, serverid):
     """
-    API : system.getNetwork
+    API :
+    system.getNetwork
 
-    usage: getNetwork(rhn, server_id)
+    usage:
+    getNetwork(rhn, serverid)
     
     description:
     returns IP address and hostname for the given server
 
-    returns: dict
+    returns:
+    dict
         { 'ip' : (str) IP Address
           'hostname' : (str) Hostname
         }
 
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getNetwork(rhn.key, server_id)
+        return rhn.session.system.getNetwork(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve Network information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve Network information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getNetworkDevices(rhn, server_id):
+def getNetworkDevices(rhn, serverid):
     """
-    API: system.getNetworkDevices
+    API:
+    system.getNetworkDevices
 
-    usage: getNetworkDevices(rhn, server_id)
+    usage:
+    getNetworkDevices(rhn, serverid)
     
     description:
     returns NetworkDevices information for a given server
 
-    returns: list of dict, one per interface
+    returns:
+    list of dict, one per interface
         { 'ip' : (str)
           'interface' : (str)
           'netmask' : (str)
@@ -798,165 +941,219 @@ def getNetworkDevices(rhn, server_id):
         
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getNetworkDevices(rhn.key, server_id)
+        return rhn.session.system.getNetworkDevices(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve Network Device information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve Network Device information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getRegistrationDate(rhn, server_id):
+def getRegistrationDate(rhn, serverid):
     """
-    API: system.getRegistrationDate
+    API:
+    system.getRegistrationDate
 
-    usage: getRegistrationDate(rhn, server_id)
+    usage:
+    getRegistrationDate(rhn, serverid)
     
     description:
     Returns the date the system was registered.
 
-    returns: DateTime.iso8601
+    returns:
+    DateTime.iso8601
 
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getRegistrationDate(rhn.key, server_id)
+        return rhn.session.system.getRegistrationDate(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve the Registration Date for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve the Registration Date for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getRelevantErrata(rhn, server_id):
+def getRelevantErrata(rhn, serverid):
     """
-    API: system.getRelevantErrata
+    API:
+    system.getRelevantErrata
 
     usage:
-    getRelevantErrata(rhn, server_id)
+    getRelevantErrata(rhn, serverid)
 
     description:
-    getRelevantErrata(rhn, server_id)
+    getRelevantErrata(rhn, serverid)
 
-    returns: list of dict, one per erratum
+    returns:
+    list of dict, one per erratum
         { 'id' : (int) Erratum ID
           'date' : (str) date the erratum was created
           'advisory_synopsis': (str)
-          'advisory_type' : (str)
+          'errtype' : (str)
           'advisory_name' : (str)
         }
 
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getRelevantErrata(rhn.key, server_id)
+        return rhn.session.system.getRelevantErrata(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "get relevant errata for server ID (%d) (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "get relevant errata for server ID (%d) (%s)" % (serverid, getServerName(rhn, serverid)))
 
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getRelevantErrataByType(rhn, server_id, advisory_type):
+def getRelevantErrataByType(rhn, serverid, errtype):
     """
-    API: system.getRelevantErrataByType
+    API:
+    system.getRelevantErrataByType
 
     usage:
-    getRelevantErrata(rhn, server_id, advisory_type)
+    getRelevantErrata(rhn, serverid, errtype)
 
     description:
-    getRelevantErrata(rhn, server_id)
+    getRelevantErrata(rhn, serverid)
 
-    returns: list of dict, one per erratum
+    returns:
+    list of dict, one per erratum
         { 'id' : (int) Erratum ID
           'date' : (str) date the erratum was created
           'advisory_synopsis': (str)
-          'advisory_type' : (str)
+          'errtype' : (str)
           'advisory_name' : (str)
         }
 
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)           - server ID number
-    advisory_type(str)       - type of advisory. One of ['Security Advisory', 'Product Enhancement Advisory', 'Bug Fix Advisory' ] 
+    serverid(int)           - server ID number
+    errtype(str)       - type of advisory. One of ['Security Advisory', 'Product Enhancement Advisory', 'Bug Fix Advisory' ] 
     """
     try:
-        return rhn.session.system.getRelevantErrata(rhn.key, server_id)
+        return rhn.session.system.getRelevantErrata(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "get relevant errata of type %s for server ID (%d) (%s)" % ( advisory_type, server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "get relevant errata of type %s for server ID (%d) (%s)" % ( errtype, serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getRelevantSecurityErrata(rhn, server_id):
+def getRelevantSecurityErrata(rhn, serverid):
     """
-    API: none, custom method
+    API:
+    none, custom method
     returns getRelevantErrataByType with a 'Security Advisory' argument
     """
     try:
-        return getRelevantErrataByType(rhn.key, server_id, advisory_type = 'Security Advisory')
+        return getRelevantErrataByType(rhn.key, serverid, errtype = 'Security Advisory')
     except Exception, E:
-        return rhn.fail(E, "get security errata for server ID (%d) (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "get security errata for server ID (%d) (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getRelevantBugfixErrata(rhn, server_id):
+def getRelevantBugfixErrata(rhn, serverid):
     """
-    API: none, custom method
+    API:
+    none, custom method
     returns getRelevantErrataByType with a 'Bug Fix Advisory' argument
     """
     try:
-        return getRelevantErrataByType(rhn.key, server_id, advisory_type = 'Bug Fix Advisory')
+        return getRelevantErrataByType(rhn.key, serverid, errtype = 'Bug Fix Advisory')
     except Exception, E:
-        return rhn.fail(E, "get security errata for server ID (%d) (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "get security errata for server ID (%d) (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getRelevantEnhancementErrata(rhn, server_id):
+def getRelevantEnhancementErrata(rhn, serverid):
     """
-    API: none, custom method
+    API:
+    none, custom method
     returns getRelevantErrataByType with a 'Product Enhancement Advisory' argument
     """
     try:
-        return getRelevantErrataByType(rhn.key, server_id, advisory_type = 'Product Enhancement Advisory')
+        return getRelevantErrataByType(rhn.key, serverid, errtype = 'Product Enhancement Advisory')
     except Exception, E:
-        return rhn.fail(E, "get security errata for server ID (%d) (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "get security errata for server ID (%d) (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# -------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getRunningKernel(rhn, server_id):
+def getRunningKernel(rhn, serverid):
     """
-    API: system.getRunningKernel
+    API:
+    system.getRunningKernel
 
-    usage: getRunningKernel(rhn, server_id)
+    usage:
+    getRunningKernel(rhn, serverid)
     
     description:
     Returns the running kernel of the given system.
 
-    returns: string
+    returns:
+    string
     
     params:
-    rhn                      - an authenticated RHN session
-    server_id(int)           - server ID number
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID number
     """
     try:
-        return rhn.session.system.getRunningKernel(rhn.key, server_id)
+        return rhn.session.system.getRunningKernel(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve running kernel information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve running kernel information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getScriptResults(rhn, action_id):
+def getScriptActionDetails(rhn, actionid):
     """
-    API: system.getScriptResults
+    API:
+    system.getScriptActionDetails
 
-    usage: getScriptResults(rhn, action_id)
+    usage:
+    getScriptActionDetails(rhn, actionid)
+
+    description:
+    Returns script details for script run actions
+
+    returns:
+    dict,
+        {
+            "id" : (int)action id
+            "content" : (str) script content
+            "run_as_user" : (str) Run as user
+            "run_as_group" : (str) Run as group
+            "timeout" : (int) Timeout in seconds
+            [
+                # one entry for each server this script ran on, like this:
+                {
+                "serverId" : (int) ID of the server the script runs on.
+                "startDate" : (dateTime.iso8601) Time script began execution.
+                "stopDate" : (dateTime.iso8601) Time script stopped execution.
+                "returnCode" : (int) Script execution return code.
+                "output" : (str)Output of the script
+                }
+
+        }
+    """
+    try:
+        return rhn.session.system.getScriptActionDetails(rhn.key, actionid)
+    except Exception, E:
+        return rhn.fail(E, 'get script action information for action ID %d' % actionid)
+
+# ---------------------------------------------------------------------------- #
+
+def getScriptResults(rhn, actionid):
+    """
+    API:
+    system.getScriptResults
+
+    usage:
+    getScriptResults(rhn, actionid)
 
     description:
     Fetch results from a script execution. Returns an empty list if no results are yet available.
 
-    returns: list of dict
+    returns:
+    list of dict
         { 'serverId'   : (int)
           'startDate'  : (DateTime)
           'stopDate'   : (DateTime)
@@ -966,20 +1163,22 @@ def getScriptResults(rhn, action_id):
     
     params:
     rhn                      - an authenticated RHN session
-    action_id(int)           - Id for the scheduled action that runs the script.
+    actionid(int)           - Id for the scheduled action that runs the script.
     """
     try:
-        return rhn.session.system.getScriptResults(rhn.key, action_id)
+        return rhn.session.system.getScriptResults(rhn.key, actionid)
     except Exception, E:
-        return rhn.fail(E, "retrieve results for script ID %d" % action_id)
+        return rhn.fail(E, "retrieve results for script ID %d" % actionid)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getServerName(rhn, server_id):
+def getServerName(rhn, serverid):
     """
-    API: none, custom method
+    API:
+    none, custom method
 
-    usage: getServerName(rhn, server_id)
+    usage:
+    getServerName(rhn, serverid)
 
     description:    
     lookup the profile name for a specific server
@@ -989,25 +1188,28 @@ def getServerName(rhn, server_id):
 
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)           - server ID
+    serverid(int)           - server ID
     """
     try:
-        return rhn.session.system.getName(rhn.key, int(server_id))['name']
+        return rhn.session.system.getName(rhn.key, int(serverid))['name']
     except Exception, E:
-        return rhn.fail(E, "find a profile name for server ID %d " % server_id)
+        return rhn.fail(E, "find a profile name for server ID %d " % serverid)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getSubscribedBaseChannel(rhn, server_id):
+def getSubscribedBaseChannel(rhn, serverid):
     """
-    API: getSubscribedBaseChannel
+    API:
+    getSubscribedBaseChannel
 
-    usage: getSubscribedBaseChannel(rhn, server_id)
+    usage:
+    getSubscribedBaseChannel(rhn, serverid)
 
     description:
     returns details of the base channel for a given server
 
-    returns: dict
+    returns:
+    dict
         {'arch_name': (str)
          'checksum_label': (str),
          'description': (str),
@@ -1028,55 +1230,62 @@ def getSubscribedBaseChannel(rhn, server_id):
 
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)           - server ID number
+    serverid(int)           - server ID number
     """
     try:
-        return rhn.session.system.getSubscribedBaseChannel(rhn.key, server_id)
+        return rhn.session.system.getSubscribedBaseChannel(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve base channel information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve base channel information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getUnscheduledErrata(rhn, server_id):
+def getUnscheduledErrata(rhn, serverid):
     """
-    API: system.getScheduledErrata
+    API:
+    system.getScheduledErrata
 
-    usage: getUnscheduledErrata(rhn, server_id)
+    usage:
+    getUnscheduledErrata(rhn, serverid)
 
     description:
     Provides an array of errata that are applicable to a given system.
 
-    returns: list of dict, one per erratum
+    returns:
+    list of dict, one per erratum
         { 'id' : (int) Erratum ID
           'date' : (str) date the erratum was created
           'advisory_synopsis': (str)
-          'advisory_type' : (str)
+          'errtype' : (str)
           'advisory_name' : (str)
         }
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getUnscheduledErrata(rhn.key, server_id)
+        return rhn.session.system.getUnscheduledErrata(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve Unscheduled Errata information for server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "retrieve Unscheduled Errata information for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def getVariables(rhn, server_id):
+def getVariables(rhn, serverid):
     """
-    API: system.getVariables
+    API:
+    system.getVariables
 
-    usage: getVariables(rhn, server_id)
+    usage:
+    getVariables(rhn, serverid)
 
     description:
     Lists kickstart variables set in the system record for the specified server.
-    Note: This call assumes that a system record exists in cobbler for the given system and will raise an XMLRPC fault if that is not the case.
+    Note:
+    This call assumes that a system record exists in cobbler for the given system and will raise an XMLRPC fault if that is not the case.
     To create a system record over xmlrpc use system.createSystemRecord
     To create a system record in the Web UI please go to System -> -> Provisioning -> Select a Kickstart profile -> Create Cobbler System Record.
 
-    returns: dict
+    returns:
+    dict
         {'netboot_enabled' : (bool)
          'kickstart_variables': (list of dict)
             [ {'key' : (str),
@@ -1087,77 +1296,139 @@ def getVariables(rhn, server_id):
 
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.getVariables(rhn.key, server_id)
+        return rhn.session.system.getVariables(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve kickstart variables for server  ID %d (%s)" % (server_id, getServerName(rhn, server_id))) 
+        return rhn.fail(E, "retrieve kickstart variables for server  ID %d (%s)" % (serverid, getServerName(rhn, serverid))) 
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def isNvreInstalled(rhn, server_id, name, version, release, epoch = None):
+def isNvreInstalled(rhn, serverid, name, version, release, epoch = None):
     """
-    API: system.isNvreInstalled
+    API:
+    system.isNvreInstalled
 
-    usage: isNvreInstalled(rhn, server_id, pName, pVersion, pRelease, pEpoch = "")
+    usage:
+    isNvreInstalled(rhn, serverid, pName, pVersion, pRelease, pEpoch = "")
 
     description:
     Check if the package with the given NVRE is installed on given system
 
     params:   (* = optional)
-    rhn                      - an authenticated RHN session
-    server_id(int)           - server ID number
-    name(str)                - name of the RPM package
-    version(str)             - RPM package version
-    release(str)             - RPM package release
-    epoch(str)*              - RPM package epoch (if there is one)
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID number
+    name(str)               - name of the RPM package
+    version(str)            - RPM package version
+    release(str)            - RPM package release
+    epoch(str)*             - RPM package epoch (if there is one)
 
     """
     pkgstr = '-'.join([name, version, release])
     try:
         if epoch is not None:
-            return rhn.session.system.isNvreInstalled(rhn.key, server_id, name, version, release, epoch) == 1
+            return rhn.session.system.isNvreInstalled(rhn.key, serverid, name, version, release, epoch) == 1
         else:
-            return rhn.session.system.isNvreInstalled(rhn.key, server_id, name, version, release) == 1
+            return rhn.session.system.isNvreInstalled(rhn.key, serverid, name, version, release) == 1
     except Exception, E:
-        return rhn.fail(E, "determine if the given package %s is installed on server ID %d (%s)" %(pkgstr, server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "determine if the given package %s is installed on server ID %d (%s)" %(pkgstr, serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listActivationKeys(rhn, server_id):
+def joinSystemGroup(rhn, serverid, grpid):
     """
-    API: system.listActivationKeys
+    API:
+    none, special case of system.setGroupMembership
 
-    usage: listActivationKeys(rhn, server_id)
+    usage:
+    joinSystemGroup(rhn, serverid, grpid)
+
+    description:
+    adds the given server id to/from the given groupid.
+    
+    returns:
+    bool, or throws exception
+    
+    parameters:
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server to manage
+    grpid(int)              - server group id
+    """
+    try:
+        return rhn.session.system.setGroupMembership(rhn.key, serverid, grpid, 1) == 1
+    except Exception, E:
+        return rhn.fail(E,'set group membership for server id %d' % (serverid))
+
+# ---------------------------------------------------------------------------- #
+
+def leaveSystemGroup(rhn, serverid, grpid):
+
+    """
+    API:
+    none, special case of
+    system.setGroupMembership
+
+    usage:
+    leaveSystemGroup(rhn, serverid, grpid)
+
+    description:
+    removes the given server id from the given groupid
+    
+    returns:
+    bool, or throws exception
+    
+    parameters:
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server to manage
+    grpid(int)              - server group id
+    """
+    try:
+        return rhn.session.system.setGroupMembership(rhn.key, serverid, grpid, 0 ) == 1
+    except Exception, E:
+        return rhn.fail(E,'set group membership for server id %d' % (serverid))
+
+# ---------------------------------------------------------------------------- #
+
+def listActivationKeys(rhn, serverid):
+    """
+    API:
+    system.listActivationKeys
+
+    usage:
+    listActivationKeys(rhn, serverid)
 
     description: 
     List the activation keys the system was registered with.
     An empty list will be returned if an activation key was not used during registration.
 
-    returns: list of activation keys (hex strings)
+    returns:
+    list of activation keys (hex strings)
 
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.listActivationKeys(rhn.key, server_id)
+        return rhn.session.system.listActivationKeys(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "List activation keys used to register server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "List activation keys used to register server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listActiveSystems(rhn):
     """
-    API: system.listActiveSystems
+    API:
+    system.listActiveSystems
 
-    usage: listActiveSystems(rhn)
+    usage:
+    listActiveSystems(rhn)
     
     description:
     returns a list of active systems for the logged-in user
 
-    returns: list of dict, one per active system
+    returns:
+    list of dict, one per active system
          {'id': (int),
           'last_checkin': (DateTime),
           'name': (str)
@@ -1170,18 +1441,21 @@ def listActiveSystems(rhn):
     except Exception, E:
         return rhn.fail(E, "list active systems for user %s" % (rhn.login))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listAdministrators(rhn, server_id):
+def listAdministrators(rhn, serverid):
     """
-    API: system.listAdministrators
+    API:
+    system.listAdministrators
 
-    usage: listAdministrators(rhn, server_id)
+    usage:
+    listAdministrators(rhn, serverid)
     
     description:
     Returns a list of users which can administer the system
 
-    returns: list of dict, one per user
+    returns:
+    list of dict, one per user
         {'login_uc': (str) uppercased login,
          'login': (str),
          'enabled': (bool),
@@ -1190,25 +1464,29 @@ def listAdministrators(rhn, server_id):
     
     params:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.listAdministrators(rhn.key, server_id)
+        return rhn.session.system.listAdministrators(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "retrieve Administrator list for server_id %d" % (server_id))
+        return rhn.fail(E, "retrieve Administrator list for serverid %d" % (serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listBaseChannels(rhn, server_id):
+def listBaseChannels(rhn, serverid):
     """
-    API: system.listBaseChannels
+    API:
+    system.listBaseChannels
 
-    usage: listBaseChannels(rhn, server_id)
+    usage:
+    listBaseChannels(rhn, serverid)
 
     description:
     lists the available base channels - RH originals and clones of them!
+    Deprecated - use system.listSubscribableBaseChannels instead
 
-    returns: list of dict, one per channel
+    returns:
+    list of dict, one per channel
         {
         "id"           : Base Channel ID.
         "name"         : Name of channel.
@@ -1219,55 +1497,62 @@ def listBaseChannels(rhn, server_id):
 
     params:
     rhn - an authenticated RHN session
-    server_id(int) - the server_id to investigate
+    serverid(int) - the serverid to investigate
     """
     try:
-        return rhn.session.system.listBaseChannels(rhn.key, server_id)
+        return rhn.session.system.listBaseChannels(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail("E", "list Base Channels available to server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail("E", "list Base Channels available to server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listChildChannels(rhn, server_id):
+def listChildChannels(rhn, serverid):
     """
-    API: system.listChildChannels
+    API:
+    system.listChildChannels
 
-    usage: listChildChannels(rhn, server_id)
+    usage:
+    listChildChannels(rhn, serverid)
 
     description:
     Returns a list of subscribable child channels.
     This only shows channels the system is *not* currently subscribed to. 
+    Deprecated - use system.listSubscribableChildChannels instead
 
-    returns: list of dict, one per available child channel
+    returns:
+    list of dict, one per available child channel
         {   "id" : (int) channel id
             "name" : channel name
             "label" : channel label
             "summary" : channel summary
-            "has_license" : 
-            "gpg_key_url" :
+            "has_license" : (str)
+            "gpg_key_url" : (str)
         }
         
     params:
     rhn - an authenticated RHN session
-    server_id(int) - the server_id to investigate
+    serverid(int) - the serverid to investigate
     """
     try:
-        return rhn.session.system.listChildChannels(rhn.key, server_id)
+        return rhn.session.system.listChildChannels(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail("E", "list Child Channels available to Server ID %d (%s)" % (server_id), getServerName(rhn, server_id))
+        return rhn.fail("E", "list Child Channels available to Server ID %d (%s)" % (serverid), getServerName(rhn, serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listDuplicatesByHostname(rhn):
     """
-    API: system.listDuplicatesByHostname
+    API:
+    system.listDuplicatesByHostname
 
-    usage: listDuplicatesByHostname(rhn)
+    usage:
+    listDuplicatesByHostname(rhn)
 
     description:
     List duplicate systems by Hostname
 
-    returns: list of dict, one per group of dupes (per hostname)
+    returns:
+    list of dict, one per group of dupes (per hostname)
         {'hostname': (str)
          'systems' : (list of dict)
           [ { 'id' : (int)
@@ -1283,18 +1568,21 @@ def listDuplicatesByHostname(rhn):
     except Exception, E:
         return rhn.fail(E, "list duplicate servers by hostname")
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listDuplicatesByIp(rhn):
     """
-    API: system.listDuplicatesByIp
+    API:
+    system.listDuplicatesByIp
 
-    usage: listDuplicatesByIp(rhn)
+    usage:
+    listDuplicatesByIp(rhn)
 
     description:
     List duplicate systems by IP Address
 
-    returns: list of dict, one per group of dupes (per hostname)
+    returns:
+    list of dict, one per group of dupes (per hostname)
         {'ip': (str)
          'systems' : (list of dict)
           [ { 'id' : (int)
@@ -1311,18 +1599,21 @@ def listDuplicatesByIp(rhn):
     except Exception, E:
         return rhn.fail(E, "list duplicate servers by IP Address")
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listDuplicatesByMac(rhn):
     """
-    API: system.listDuplicatesByMac
+    API:
+    system.listDuplicatesByMac
 
-    usage: listDuplicatesByMac(rhn)
+    usage:
+    listDuplicatesByMac(rhn)
 
     description:
     List duplicate systems by Mac
 
-    returns: list of dict, one per group of dupes (per hostname)
+    returns:
+    list of dict, one per group of dupes (per hostname)
         {'mac': (str)
          'systems' : (list of dict)
           [ { 'id' : (int)
@@ -1338,18 +1629,21 @@ def listDuplicatesByMac(rhn):
     except Exception, E:
         return rhn.fail(E, "list duplicate servers by MAC Address")
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listEligibleFlexGuests(rhn):
     """
-    API: system.listEligibleFlexGuests
+    API:
+    system.listEligibleFlexGuests
 
-    usage: listEligibleFlexGuests(rhn)
+    usage:
+    listEligibleFlexGuests(rhn)
 
     description:
     List eligible flex guests accessible to the user 
 
-    returns: list of dict, one per channel family
+    returns:
+    list of dict, one per channel family
         { "id" : (int)
         "label" : (str)
         "name" : (str)
@@ -1364,18 +1658,21 @@ def listEligibleFlexGuests(rhn):
     except Exception, E:
         return rhn.fail(E, "list eligible flex guests")
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listFlexGuests(rhn):
     """
-    API: system.listFlexGuests
+    API:
+    system.listFlexGuests
 
-    usage: listFlexGuests(rhn)
+    usage:
+    listFlexGuests(rhn)
 
     description:
     List  flex guests accessible to the user 
 
-    returns: list of dict, one per channel family
+    returns:
+    list of dict, one per channel family
         { "id" : (int)
         "label" : (str)
         "name" : (str)
@@ -1390,50 +1687,56 @@ def listFlexGuests(rhn):
     except Exception, E:
         return rhn.fail(E, "list flex guests")
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listGroups(rhn, server_id):
+def listGroups(rhn, serverid):
     """
-    API: system.listGroups
+    API:
+    system.listGroups
 
-    usage: listGroups(rhn, server_id)
+    usage:
+    listGroups(rhn, serverid)
     
     description:
-    lists the available groups for a given server_id
+    lists the available groups for a given serverid
 
-    returns: list of dict, one per system group
+    returns:
+    list of dict, one per system group
         {
         "id"                : (int) server group id
         "subscribed"        : (int) 1 if the given server is subscribed to this server group, 0 otherwise
-        "system_group_name" : (str) Name of the server group
+        "system_grpname" : (str) Name of the server group
         "sgid"              : (int) server group id (Deprecated)
         }
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.listGroups(rhn.key, server_id)
+        return rhn.session.system.listGroups(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "list available groups for server ID %d (%s) " % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "list available groups for server ID %d (%s) " % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listInactiveSystems(rhn, days = None):
     """
-    API: system.listInactiveSystems
+    API:
+    system.listInactiveSystems
 
-    usage: listInactiveSystems(rhn, days)
+    usage:
+    listInactiveSystems(rhn, days)
 
     description:
     Lists systems that have been inactive for the default period of inactivity,
     or for the given number of days.
     
-    returns: list of dict, one per system
+    returns:
+    list of dict, one per system
         { 
         'id' : (int) server id
-        'last_checkin' : DateTime
+        'last_checkin' : DateTime.iso8601
         'name' : (str) server profile name
         }
 
@@ -1453,54 +1756,60 @@ def listInactiveSystems(rhn, days = None):
         else:
             return rhn.fail(E, 'list inactive systems')
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listLatestAvailablePackage(rhn, server_ids, package_name):
+def listLatestAvailablePackage(rhn, serverids, pkgname):
     """
-    API: system.listLatestAvailablePackage
+    API:
+    system.listLatestAvailablePackage
 
-    usage: listLatestAvailablePackage(rhn, server_ids, package_name)
+    usage:
+    listLatestAvailablePackage(rhn, serverids, pkgname)
 
     description:
     Get the latest available version of a package for each system 
 
-    returns: list of dict, one per system
+    returns:
+    list of dict, one per system
         {
         'id'      : (int) server ID
         'name'    : (str) server name
         'package' : {
                     'id'      : (int) package id
-                    'name'    : 
-                    'version' :
-                    'release' :
-                    'epoch'   :
-                    'arch'    :
+                    'name'    : (str) package name
+                    'version' : (str)
+                    'release' : (str)
+                    'epoch'   : (str)
+                    'arch'    : (str)
                     }
 
         }
 
     params:
     rhn(rhnSession)             - authenticated, active rhnapi.rhnSession object
-    server_ids(list)            - list of int, server IDs
-    package_name(str)           - the package name to look for
+    serverids(list)            - list of int, server IDs
+    pkgname(str)           - the package name to look for
     """
     try:
-        return rhn.session.system.listLatestAvailablePackage(rhn.key, server_ids, package_name)
+        return rhn.session.system.listLatestAvailablePackage(rhn.key, serverids, pkgname)
     except Exception, E:
-        return rhn.fail(E, 'list latest versions of %s for the given lits of servers' % package_name)
+        return rhn.fail(E, 'list latest versions of %s for the given lits of servers' % pkgname)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listLatestInstallablePackages(rhn, server_id):
+def listLatestInstallablePackages(rhn, serverid):
     """
-    API: system.listLatestInstallablePackages
+    API:
+    system.listLatestInstallablePackages
 
-    usage: listLatestInstallablePackages(rhn, server_id)
+    usage:
+    listLatestInstallablePackages(rhn, serverid)
     
     description:
-    lists the latest installable packages for a  given server_id
+    lists the latest installable packages for a given serverid
 
-    returns: list of dict, one per installable package
+    returns:
+    list of dict, one per installable package
         {
         "name"
         "version"
@@ -1512,25 +1821,28 @@ def listLatestInstallablePackages(rhn, server_id):
     
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.listLatestInstallablePackages(rhn.key, server_id)
+        return rhn.session.system.listLatestInstallablePackages(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "list latest installable packages for server id %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "list latest installable packages for server id %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listLatestUpgradeablePackages(rhn, server_id):
+def listLatestUpgradeablePackages(rhn, serverid):
     """
-    API: system.listLatestUpgradeablePackages
+    API:
+    system.listLatestUpgradeablePackages
 
-    usage: listLatestUpgradeablePackages(rhn, server_id)
+    usage:
+    listLatestUpgradeablePackages(rhn, serverid)
     
     description:
-    lists the latest upgradeable packages for a  given server_id
+    lists the latest upgradeable packages for a  given serverid
     
-    returns: list of dict, one per package:
+    returns:
+    list of dict, one per package:
         {
         "name"
         "arch"
@@ -1540,31 +1852,34 @@ def listLatestUpgradeablePackages(rhn, server_id):
         "to_version"
         "to_release"
         "to_epoch"
-        "to_package_id"
+        "to_pkgid"
         }
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.listLatestUpgradeablePackages(rhn.key, server_id)
+        return rhn.session.system.listLatestUpgradeablePackages(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "list latest Upgradeable packages for server_id %d (%s) " % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "list latest Upgradeable packages for serverid %d (%s) " % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listNewerInstalledPackages(rhn, server_id, pkg_name, pkg_ver, pkg_rel, pkg_epoch = ""):
+def listNewerInstalledPackages(rhn, serverid, pkgname, pkgver, pkgrel, pkgepoch = ""):
     """
-    API: system.listNewerInstalledPackages
+    API:
+    system.listNewerInstalledPackages
 
-    usage: listNewerInstalledPackages(rhn, server_id, pkg_name, pkg_ver, pkg_rel, pkg_epoch)
+    usage:
+    listNewerInstalledPackages(rhn, serverid, pkgname, pkgver, pkgrel, pkgepoch)
 
     description:    
     Given a package name, version, release, and epoch, returns the list of packages
     installed on the system with the same name that are newer.
 
-    returns: list of dict, one per package
+    returns:
+    list of dict, one per package
         {
         "name"
         "version"
@@ -1574,29 +1889,32 @@ def listNewerInstalledPackages(rhn, server_id, pkg_name, pkg_ver, pkg_rel, pkg_e
     
     parameters: (* = optional)
     rhn                     - an authenticated RHN session
-    server_id(int)          - server ID number
-    pkg_name(str)           - package name
-    pkg_ver(str)            - package version
-    pkg_rel(str)            - package release
-    *pkg_epoch(str)         - package epoch
+    serverid(int)           - server ID number
+    pkgname(str)            - package name
+    pkgver(str)             - package version
+    pkgrel(str)             - package release
+    *pkgepoch(str)          - package epoch
     """
     try:
-        return rhn.session.system.listNewerInstalledPackages(rhn, server_id, pkg_name, pkg_ver, pkg_rel, pkg_epoch)
+        return rhn.session.system.listNewerInstalledPackages(rhn, serverid, pkgname, pkgver, pkgrel, pkgepoch)
     except Exception, E:
-        return rhn.fail(E, "List installed packages newer than %s" % ("-", join([pkg_name, pkg_ver, pkg_rel, pkg_epoch])))
+        return rhn.fail(E, "List installed packages newer than %s" % ("-", join([pkgname, pkgver, pkgrel, pkgepoch])))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listNotes(rhn, server_id):
+def listNotes(rhn, serverid):
     """
-    API: system.listNotes
+    API:
+    system.listNotes
 
-    usage: listNotes(rhn, server_id)
+    usage:
+    listNotes(rhn, serverid)
 
     description:
     Provides a list of notes associated with a system. 
 
-    returns: list of dict, one per note
+    returns:
+    list of dict, one per note
         {
         "id"        : (int) note ID
         "subject"   : (str) Subject of the note
@@ -1607,26 +1925,29 @@ def listNotes(rhn, server_id):
     
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.listNotes(rhn.key, server_id)
+        return rhn.session.system.listNotes(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, 'list notes for system %d (%s)'%(server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, 'list notes for system %d (%s)'%(serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listOlderInstalledPackages(rhn, server_id, pkg_name, pkg_ver, pkg_rel, pkg_epoch = "" ):
+def listOlderInstalledPackages(rhn, serverid, pkgname, pkgver, pkgrel, pkgepoch = "" ):
     """
-    API: system.listOlderInstalledPackages
+    API:
+    system.listOlderInstalledPackages
 
-    usage: listOlderInstalledPackages(rhn, server_id, server_id, pkg_name, pkg_ver, pkg_rel, pkg_epoch)
+    usage:
+    listOlderInstalledPackages(rhn, serverid, serverid, pkgname, pkgver, pkgrel, pkgepoch)
     
     description:
     Given a package name, version, release, and epoch, returns the list of packages
     installed on the system with the same name that are older.
     
-    returns: list of dict, one per package
+    returns:
+    list of dict, one per package
         {
         "name"
         "version"
@@ -1636,34 +1957,37 @@ def listOlderInstalledPackages(rhn, server_id, pkg_name, pkg_ver, pkg_rel, pkg_e
     
     parameters: (* = optional)
     rhn                     - an authenticated RHN session
-    server_id(int)          - server ID number
-    pkg_name(str)           - package name
-    pkg_ver(str)            - package version
-    pkg_rel(str)            - package release
-    *pkg_epoch(str)         - package epoch
+    serverid(int)           - server ID number
+    pkgname(str)            - package name
+    pkgver(str)             - package version
+    pkgrel(str)             - package release
+    *pkgepoch(str)          - package epoch
     """
     try:
-        return rhn.session.system.listOlderInstalledPackages(rhn, server_id, server_id, pkg_name, pkg_ver, pkg_rel, pkg_epoch)
+        return rhn.session.system.listOlderInstalledPackages(rhn, serverid, serverid, pkgname, pkgver, pkgrel, pkgepoch)
     except Exception, E:
         return rhn.fail(E, "List installed packages older than %s on server %d (%s)" % (
-            "-".join([server_id, pkg_name, pkg_ver, pkg_rel, pkg_epoch]), server_id, getSystemName))
+            "-".join([serverid, pkgname, pkgver, pkgrel, pkgepoch]), serverid, getSystemName))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listOutOfDateSystems(rhn):
     """
-    API: system.listOutOfDateSystems
+    API:
+    system.listOutOfDateSystems
 
-    usage: listOutOfDateSystems(rhn)
+    usage:
+    listOutOfDateSystems(rhn)
 
     description:
     Returns list of systems needing package updates
     
-    returns: list of dict, one per system
+    returns:
+    list of dict, one per system
         {
-        'id'
-        'name'
-        'last_checkin'
+        'id'            : (int)
+        'name'          : (str)
+        'last_checkin'  : (DateTime.iso8601)
         }
 
     parameters:
@@ -1674,18 +1998,21 @@ def listOutOfDateSystems(rhn):
     except Exception, E:
         return rhn.fail(E, "get a list of out of date systems")
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listPackageProfiles(rhn):
     """
-    API: system.listPackageProfiles
+    API:
+    system.listPackageProfiles
 
-    usage: listPackageProfiles(rhn)
+    usage:
+    listPackageProfiles(rhn)
 
     description:
     List the package profiles for this organization
 
-    returns: list of dict, one per profile
+    returns:
+    list of dict, one per profile
         {
         'id'
         'name'
@@ -1700,18 +2027,21 @@ def listPackageProfiles(rhn):
     except Exception, E:
         return rhn.fail(E, "list package profiles for your organization" )
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listPackages(rhn, server_id):
+def listPackages(rhn, serverid):
     """
-    API: system.listPackages
+    API:
+    system.listPackages
 
-    usage: listPackages(rhn, server_id)
+    usage:
+    listPackages(rhn, serverid)
 
     description:
     List the installed packages for a given system    
 
-    returns: list of dict, one per installed package
+    returns:
+    list of dict, one per installed package
         {
         "name"
         "version"
@@ -1723,46 +2053,51 @@ def listPackages(rhn, server_id):
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.listPackages(rhn.key, server_id)
+        return rhn.session.system.listPackages(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "Get a list of installed packages for server %d" % (server_id))
+        return rhn.fail(E, "Get a list of installed packages for server %d" % (serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listPackagesFromChannel(rhn, server_id, chanlabel):
+def listPackagesFromChannel(rhn, serverid, chanlabel):
     """
-    API: system.listPackagesFromChannel
+    API:
+    system.listPackagesFromChannel
 
-    usage: listPackagesFromChannel(rhn, server_id, chanlabel)
+    usage:
+    listPackagesFromChannel(rhn, serverid, chanlabel)
 
     List the installed packages for a given system that are from a specific channel.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
-    chanlabel(str)              - Channel label
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID number
+    chanlabel(str)          - Channel label
     """
     try:
-        return rhn.session.system.listPackagesFromChannel(rhn, server_id, chanlabel)
+        return rhn.session.system.listPackagesFromChannel(rhn, serverid, chanlabel)
     except Exception, E:
-        return rhn.fail(E, "Get a list of installed packages for server %d from channel %s" % (server_id, chanlabel))
+        return rhn.fail(E, "Get a list of installed packages for server %d from channel %s" % (serverid, chanlabel))
 
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listSubscribableBaseChannels(rhn, server_id):
+def listSubscribableBaseChannels(rhn, serverid):
     """
-    API: system.listSubscribableBaseChannels
+    API:
+    system.listSubscribableBaseChannels
 
-    usage: listSubscribableBaseChannels(rhn, server_id)
+    usage:
+    listSubscribableBaseChannels(rhn, serverid)
 
     description:
     lists the available base channels - RH originals and clones of them!
 
-    returns: list of dict, one per channel
+    returns:
+    list of dict, one per channel
         {
         "id"           : Base Channel ID.
         "name"         : Name of channel.
@@ -1772,27 +2107,30 @@ def listSubscribableBaseChannels(rhn, server_id):
         }
 
     params:
-    rhn - an authenticated RHN session
-    server_id(int) - the server_id to investigate
+    rhn                     - an authenticated RHN session
+    serverid(int)           - the serverid to investigate
     """
     try:
-        return rhn.session.system.listSubscribableBaseChannels(rhn.key, server_id)
+        return rhn.session.system.listSubscribableBaseChannels(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail("E", "list Base Channels available to server ID %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail("E", "list Base Channels available to server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listSubscribableChildChannels(rhn, server_id):
+def listSubscribableChildChannels(rhn, serverid):
     """
-    API: system.listSubscribableChildChannels
+    API:
+    system.listSubscribableChildChannels
 
-    usage: listSubscribableChildChannels(rhn, server_id)
+    usage:
+    listSubscribableChildChannels(rhn, serverid)
 
     description:
     Returns a list of subscribable child channels.
     This only shows channels the system is *not* currently subscribed to. 
 
-    returns: list of dict, one per available child channel
+    returns:
+    list of dict, one per available child channel
         {   "id" : (int) channel id
             "name" : channel name
             "label" : channel label
@@ -1802,26 +2140,29 @@ def listSubscribableChildChannels(rhn, server_id):
         }
         
     params:
-    rhn - an authenticated RHN session
-    server_id(int) - the server_id to investigate
+    rhn                     - an authenticated RHN session
+    serverid(int)           - the serverid to investigate
     """
     try:
-        return rhn.session.system.listSubscribableChildChannels(rhn.key, server_id)
+        return rhn.session.system.listSubscribableChildChannels(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail("E", "list Child Channels available to Server ID %d (%s)" % (server_id), getServerName(rhn, server_id))
+        return rhn.fail("E", "list Child Channels available to Server ID %d (%s)" % (serverid), getServerName(rhn, serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listSubscribedChildChannels(rhn, server_id):
+def listSubscribedChildChannels(rhn, serverid):
     """
-    API: system.listSubscribedChildChannels
+    API:
+    system.listSubscribedChildChannels
 
-    usage: listSubscribedChildChannels(rhn, server_id)
+    usage:
+    listSubscribedChildChannels(rhn, serverid)
 
     description:
     List the child channels a system is subscribed to
 
-    returns: list of dict, each representing a channel
+    returns:
+    list of dict, each representing a channel
         {
         "id", "name", "label", "arch_name", "summary",
         "description", "checksum_label", "last_modified",
@@ -1833,20 +2174,22 @@ def listSubscribedChildChannels(rhn, server_id):
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.listSubscribedChildChannels(rhn.key, server_id)
+        return rhn.session.system.listSubscribedChildChannels(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "list subscribed child channels for server %d" % (server_id))
+        return rhn.fail(E, "list subscribed child channels for server %d" % (serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listSystemEvents(rhn, server_id):
+def listSystemEvents(rhn, serverid):
     """
-    API: system.listSystemEvents
+    API:
+    system.listSystemEvents
 
-    usage: listSystemEvents(rhn, server_id)
+    usage:
+    listSystemEvents(rhn, serverid)
 
     description:
     List all system events for given server.
@@ -1854,7 +2197,8 @@ def listSystemEvents(rhn, server_id):
     This may require the caller to filter the results to fetch the
     specific events they are looking for
 
-    returns: list of dict, one per event.
+    returns:
+    list of dict, one per event.
     The dict structure is enormous and complex...
     {
     "name"              : (str) Name of this action.
@@ -1872,7 +2216,8 @@ def listSystemEvents(rhn, server_id):
     "completed_date"    : (str) The date/time the event was completed. (optional)
     "pickup_date"       : (str) The date/time the action was picked up. (optional)
     "result_msg"        : (str) The result string after the action executes at the client machine. (optional)
-    "additional_info"   : list of dict, as below:
+    "additional_info"   :
+    list of dict, as below:
                         {
                         "detail" : The detail provided depends on the specific event.
                         "result" : The result (if included) depends on the specific event.
@@ -1886,27 +2231,30 @@ def listSystemEvents(rhn, server_id):
     "pickup_time" (Deprecated by pickup_date)
 
     parameters:
-    rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID number
     """
     try:
-        return rhn.session.system.listSystemEvents(rhn.key, server_id)
+        return rhn.session.system.listSystemEvents(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, "Get a list of system events for server %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "Get a list of system events for server %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listSystems(rhn, rhnuser = None):
     """
-    API: system.listSystems
+    API:
+    system.listSystems
 
-    usage: listUserSystems(rhn, rhnuser)
+    usage:
+    listUserSystems(rhn, rhnuser)
 
     description:
     lists the systems registered / managed by a given username.
     org admins get all registered systems    
 
-    returns: list of dict, one per system
+    returns:
+    list of dict, one per system
         {
         'id'
         'name'
@@ -1914,8 +2262,8 @@ def listSystems(rhn, rhnuser = None):
         }
 
     parameters:
-    rhn             - an authenticated RHN session
-    rhnuser         - RHN user account
+    rhn                     - an authenticated RHN session
+    rhnuser                 - RHN user account
     """
     if rhnuser == None:
         rhnuser = rhn.login
@@ -1924,18 +2272,21 @@ def listSystems(rhn, rhnuser = None):
     except Exception, E:
         return rhn.fail(E, "list systems for user %s" % (rhnuser))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listSystemsWithPackageId(rhn, package_id):
+def listSystemsWithPackageId(rhn, pkgid):
     """
-    API: system.listSystemsWithPackage
+    API:
+    system.listSystemsWithPackage
 
-    usage: listSystemsWithPackageId(rhn, package_id)
+    usage:
+    listSystemsWithPackageId(rhn, pkgid)
 
     description:
     Lists the systems that have the given installed package (identified by its RHN packageId)
 
-    returns: list of dict, one per system
+    returns:
+    list of dict, one per system
         {
         'id'
         'name'
@@ -1944,25 +2295,28 @@ def listSystemsWithPackageId(rhn, package_id):
 
     parameters:
     rhn                     - an authenticated RHN session
-    package_id(int)         - package ID number
+    pkgid(int)              - package ID number
     """
     try:
-        return rhn.session.system.listSystemsWithPackage(rhn.key, package_id)
+        return rhn.session.system.listSystemsWithPackage(rhn.key, pkgid)
     except Exception, E:
-        return rhn.fail(E,'list systems with package ID %d installed' % package_id)
+        return rhn.fail(E,'list systems with package ID %d installed' % pkgid)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listSystemsWithPackage(rhn, package_name, package_ver, package_release):
+def listSystemsWithPackageNVR(rhn, pkgname, pkgver, pkgrelease):
     """
-    API: system.listSystemsWithPackage
+    API:
+    system.listSystemsWithPackage
 
-    usage: listSystemsWithPackage(rhn, package_name, package_ver, package_release)
+    usage:
+    listSystemsWithPackage(rhn, pkgname, pkgver, pkgrelease)
 
     description:
     Lists the systems with the given package installed (identified by name, version and release)
 
-    returns: list of dict, one per system
+    returns:
+    list of dict, one per system
         {
         'id'
         'name'
@@ -1971,28 +2325,31 @@ def listSystemsWithPackage(rhn, package_name, package_ver, package_release):
 
     parameters:
     rhn                     - an authenticated RHN session
-    package_name(str)       - package name
-    package_ver(str)        - package version
-    package_rel(str)        - package release
+    pkgname(str)            - package name
+    pkgver(str)             - package version
+    pkgrel(str)             - package release
     """
     try:
-        return rhn.session.system.listSystemsWithPackage(rhn.key, package_name, package_ver, package_release)
+        return rhn.session.system.listSystemsWithPackage(rhn.key, pkgname, pkgver, pkgrel)
     except Exception, E:
-        return rhn.fail(E,'list systems with package "%s-%s-%s" installed' % (package_name, package_ver, package_rel))
+        return rhn.fail(E,'list systems with package "%s-%s-%s" installed' % (pkgname, pkgver, pkgrel))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listUngroupedSystems(rhn):
     """
-    API: system.listUngroupedSystems
+    API:
+    system.listUngroupedSystems
 
-    usage: listUngroupedSystems(rhn)
+    usage:
+    listUngroupedSystems(rhn)
     
     description:
     List systems that are not members of any system group
 
     
-    returns: list of dict, one per system
+    returns:
+    list of dict, one per system
         {
         'id'
         'name'
@@ -2005,22 +2362,25 @@ def listUngroupedSystems(rhn):
     try:
         return rhn.session.system.listUngroupedSystems(rhn.key)
     except Exception, E:
-        return rhn.fail(E, "list systems which are not in any system groups" % (server_id))
+        return rhn.fail(E, "list systems which are not in any system groups" % (serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listUserSystems(rhn, rhnuser = None):
     """
-    API: system.listUserSystems
+    API:
+    system.listUserSystems
 
-    usage: listUserSystems(rhn, rhnuser)
+    usage:
+    listUserSystems(rhn, rhnuser)
 
     description:
     lists the systems registered / managed by a given username.
     org admins get all registered systems.
     If no username is supplied, this will behave exactly the same as system.listSystems
 
-    returns: list of dict, one per system
+    returns:
+    list of dict, one per system
         {
         'id'
         'name'
@@ -2041,47 +2401,53 @@ def listUserSystems(rhn, rhnuser = None):
             rhnuser = rhn.login
         return rhn.fail(E, "list systems for user %s" % (rhnuser))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listVirtualGuests(rhn, virthost_sid):
+def listVirtualGuests(rhn, vhostid):
     """
-    API: system.listVirtualGuests
+    API:
+    system.listVirtualGuests
 
-    usage: listVirtualGuests(rhn, virthost_sid)
+    usage:
+    listVirtualGuests(rhn, vhostid)
 
     description:
-    Lists the virtual guests for agiven virtual host 
+    Lists the virtual guests for a given virtual host ID
 
-    returns: list of dict, one per virtual guest
+    returns:
+    list of dict, one per virtual guest
         {
         'id'           : (int) serverid
         'name'         : (str) profilename
         'last_checkin' : (DateTime)
         'uuid'         : (str) VM uuid
-        'guest_name'   : (str) VM name, from the virtual host
+        'guestname'   : (str) VM name, from the virtual host
         }
 
     parameters:
-    rhn                      - an authenticated RHN session
-    virthost_sid(int)        - package ID number
+    rhn                     - an authenticated RHN session
+    vhostid(int)            - Server ID for virtual host system
     """
     try:
-        return rhn.session.system.listVirtualGuests(rhn.key, virthost_sid)
+        return rhn.session.system.listVirtualGuests(rhn.key, vhostid)
     except Exception, E:
-        return rhn.fail(E,'list virtual guests on host with sid %d' % (virthost_sid))
+        return rhn.fail(E,'list virtual guests on host with sid %d' % (vhostid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listVirtualHosts(rhn):
     """
-    API: system.listVirtualHosts
+    API:
+    system.listVirtualHosts
 
-    usage: listVirtualHosts(rhn)
+    usage:
+    listVirtualHosts(rhn)
 
     description:
     Lists the virtual hosts visible to the logged-in user 
 
-    returns: list of dict, one per system
+    returns:
+    list of dict, one per system
         {
         'id'
         'name'
@@ -2096,18 +2462,21 @@ def listVirtualHosts(rhn):
     except Exception, E:
         return rhn.fail(E,'list virtual hosts')
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def obtainReactivationKey(rhn, server_cert_or_id):
     """
-    API: system.obtainReactivationKey
+    API:
+    system.obtainReactivationKey
 
-    usage: obtainReactivationKey(rhn, server_cert_or_id)
+    usage:
+    obtainReactivationKey(rhn, server_cert_or_id)
 
     description:
     obtains a reactivation key for an existing system
     
-    returns: string (the reactivation key)
+    returns:
+    string (the reactivation key)
 
     parameters:
     rhn                      - an authenticated RHN session
@@ -2121,334 +2490,377 @@ def obtainReactivationKey(rhn, server_cert_or_id):
         else:
             return rhn.fail(E, "Get a reactivation key for server %d" % (server_cert_or_id))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def provisionSystem(rhn, server_id, kslabel, earliest_start=None):
+def provisionSystem(rhn, serverid, kslabel, earliest_start = None):
     """
-    API: system.provisionSystem
+    API:
+    system.provisionSystem
     
-    usage: provisionSystem(rhn, server_id, kslabel, *earliest_start)
+    usage:
+    provisionSystem(rhn, serverid, kslabel, *earliest_start)
 
     description:
     provision the given system using the specified kickstart profile
     The optional 'earliest_start' parameter can specify a time after which the
     provisioning will take place.
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)          - server id
+    serverid(int)          - server id
     kslabel(str)            - kickstart profile label
     earliest_start(str)     - earliest occurence. This is a string in iso8601 format
                               "%Y%m%dT%H:%M:%S", e.g. 20110401T11:12:35
     """
     try:
         if earliest_start is not None:
-            return isinstance(rhn.session.system.provisionSystem(rhn.key, server_id, kslabel, earliest_start), int)
+            return isinstance(rhn.session.system.provisionSystem(rhn.key, serverid, kslabel, earliest_start), int)
         else:
-            return isinstance(rhn.session.system.provisionSystem(rhn.key, server_id, kslabel), int)
+            return isinstance(rhn.session.system.provisionSystem(rhn.key, serverid, kslabel), int)
     except Exception, E:
-        return rhn.fail(E, 'provision system id %d (%s)' % ( server_id, getServerName(rhn, server_id) ))
-    pass
+        return rhn.fail(E, 'provision system id %d (%s)' % ( serverid, getServerName(rhn, serverid) ))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def provisionVirtualGuest(rhn, server_id, guest_name, kslabel, **kwargs):
+def provisionVirtualGuest(rhn, serverid, guestname, kslabel, **kwargs):
     """
-    API: system.provisionVirtualGuest
+    API:
+    system.provisionVirtualGuest
 
-    usage: provisionVirtualGuest(rhn, server_id, guest_name, kslabel, **kwargs)
+    usage:
+    provisionVirtualGuest(rhn, serverid, guestname, kslabel, **kwargs)
 
     description:
-    Provision a guest on the host specified. Defaults to: memory=256MB, vcpu=1, storage=2048MB
+    Provision a guest on the host specified. Defaults to:
+    memory=256MB, vcpu=1, storage=2048MB
     This schedules the guest for creation and will begin the provisioning process when
     the host checks in or if OSAD is enabled will begin immediately.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    server_id(int)           - server ID number
-    guest_name(str)          - profile name for the new guest
-    kslabel(str)             - kickstart profile to use for the new guest
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID number
+    guestname(str)         - profile name for the new guest
+    kslabel(str)            - kickstart profile to use for the new guest
+
     plus one or more of the following keyword arguments (defaults below)
-    *memoryMb(int)           - RAM in Mb for the new guest (default 256)
-    *vcpus(int)              - number of vcpus (default 1)
-    *storageMb(int)          - Amount of storage to assign (default 2048)
+
+    *memoryMb(int)          - RAM in Mb for the new guest (default 256)
+    *vcpus(int)             - number of vcpus (default 1)
+    *storageMb(int)         - Amount of storage to assign (default 2048)
     """
-    vmsettings = { 'memoryMb' : 256, 'vcpus' : 1, 'storageMb' : 2048 }
+    vmsettings = { 'memoryMb' :
+    256, 'vcpus' : 1, 'storageMb' : 2048 }
     try:
         vmsettings.update(kwargs)
-        return rhn.session.system.provisionVirtualGuest(rhn.key, server_id, guest_name, kslabel, **vmsettings) == 1
+        return rhn.session.system.provisionVirtualGuest(rhn.key, serverid, guestname, kslabel, **vmsettings) == 1
     except Exception, E:
-        return rhn.fail(E, "provision new VM %s on server %s" %(guest_name, getServerName(server_id)))
+        return rhn.fail(E, "provision new VM %s on server %s" %(guestname, getServerName(serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def removeEntitlements(rhn, server_id, ents_list):
+def removeEntitlements(rhn, serverid, entslist):
     """
-    API: system.removeEntitlements
+    API:
+    system.removeEntitlements
 
-    usage: removeEntitlements(rhn, server_id, ents_list)
+    usage:
+    removeEntitlements(rhn, serverid, entslist)
     
     description:
-    downloads the server_id file (/etc/sysconfig/rhn/systemid) for a given server_id.
+    downloads the serverid file (/etc/sysconfig/rhn/systemid) for a given serverid.
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)           - server ID number
-    ents_list([str])         - list of entitlement labels to remove
+    serverid(int)           - server ID number
+    entslist([str])         - list of entitlement labels to remove
     """
     try:
-        return rhn.session.system.removeEntitlements(rhn.key, server_id, entitlementList) == 1
+        return rhn.session.system.removeEntitlements(rhn.key, serverid, entitlementList) == 1
     except Exception, E:
-        return rhn.fail(E, "remove entitlements from server_id %d" % (server_id))
+        return rhn.fail(E, "remove entitlements from serverid %d" % (serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def scheduleApplyErrata(rhn, server_ids, errata_ids, apply_after=None):
+def scheduleApplyErrata(rhn, serverids, errataids, runafter = None):
     """
-    API: system.schedeluApplyErrata
+    API:
+    system.schedeluApplyErrata
 
-    usage: scheduleApplyErrata(rhn, server_ids, errata_ids, apply_after=None)
+    usage:
+    scheduleApplyErrata(rhn, serverids, errataids, runafter = None)
 
     description:
     schedule the an 'apply errata' action for the given system or list of systems
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
-    parameters: (* = optinal)
-    rhn                             - rhnsession object
-    server_id(int or list of)       - the server (or servers) to apply the action to
-    errata_ids(list of int)         - list or errata IDs to apply
-    *apply_after(DateTime.iso8601)   - earliest date this can occur
+    parameters: (* = optional)
+    rhn                           - rhnsession object
+    serverid(int or list of)      - the server (or servers) to apply the action to
+    errataids(list of int)        - list or errata IDs to apply
+    *runafter(DateTime.iso8601)   - earliest date this can occur
     """
     # handle the multiple parameter combinations
     try:
-        if not isinstance(server_ids, list):
-            server_ids = [ server_ids ]
-        if apply_after is None:
-            return rhn.session.system.scheduleApplyErrata(rhn.key, server_ids, errata_ids) == 1
+        if not isinstance(serverids, list):
+            serverids = [ serverids ]
+        if runafter is None:
+            return rhn.session.system.scheduleApplyErrata(rhn.key, serverids, errataids) == 1
         else:
-            return rhn.session.system.scheduleApplyErrata(rhn.key, server_ids, errata_ids, apply_after) == 1
+            return rhn.session.system.scheduleApplyErrata(rhn.key, serverids, errataids, runafter) == 1
     except Exception, E:
-        return rhn.fail(E, 'schedule application of errata [%s] for server id(s) [%s]' %(','.join(errata_ids), ''.join(map(str,server_ids))))
+        return rhn.fail(E, 'schedule application of errata [%s] for server id(s) [%s]' %(','.join(errataids), ''.join(map(str,serverids))))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def scheduleGuestAction(rhn, guest_id, guest_state, apply_date):
+def scheduleGuestAction(rhn, guestid, guestaction, runafter = None):
     """
-    API: system.scheduleGuestAction
+    API:
+    system.scheduleGuestAction
 
-    usage: scheduleGuestAction(rhn, guest_id, guest_state, apply_date)
+    usage:
+    scheduleGuestAction(rhn, guestid, guestaction, runafter)
 
     description:
     Schedules a guest action for the specified virtual guest for a given date/time.
     If the date/time is omitted, action is scheduled ASAP
 
-    returns: bool, or throws Exception
+    returns:
+    bool, or throws Exception
 
     parameters:
-    rhn                             - an authenticated RHN session
-    guest_id(int)                   - System id of virtual guest
-    guest_state(str)                - state of guest, one of ['start', 'suspend', 'resume', 'restart', 'shutdown']
-    *apply_date(DateTime iso8601)   - time to schedule the action (imeediately, if not specified)
+    rhn                         - an authenticated RHN session
+    guestid(int)                - System id of virtual guest
+    guestaction(str)            - state of guest, one of ['start', 'suspend', 'resume', 'restart', 'shutdown']
+    *runafter(DateTime iso8601) - time to schedule the action (imeediately, if not specified)
     """
     try:
-        if apply_date is not None:
-            return isinstance(rhn.session.system.scheduleGuestAction(rhn.key, guest_id, guest_state, apply_date), int)
+        if runafter is not None:
+            return isinstance(rhn.session.system.scheduleGuestAction(rhn.key, guestid, guestaction, runafter), int)
         else:
-            return isinstance(rhn.session.system.scheduleGuestAction(rhn.key, guest_id, guest_state), int)
+            return isinstance(rhn.session.system.scheduleGuestAction(rhn.key, guestid, guestaction), int)
     except Exception, E:
-        return rhn.fail(E, 'schedule guest %s for guest id %s' %(guest_state, str(guest_id)))
+        return rhn.fail(E, 'schedule guest %s for guest id %s' %(guestaction, str(guestid)))
             
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def scheduleHardwareRefresh(rhn, server_id, apply_after):
+def scheduleHardwareRefresh(rhn, serverid, runafter):
     """
-    API: system.scheduleHardwareRefresh
+    API:
+    system.scheduleHardwareRefresh
 
-    usage: scheduleHardwareRefresh(rhn, server_id, apply_after)
+    usage:
+    scheduleHardwareRefresh(rhn, serverid, runafter)
     
     description:
-    downloads the server_id file (/etc/sysconfig/rhn/systemid) for a given server_id.
+    schedule a hardware refresh for the given server id
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
-    rhn                      - an authenticated RHN session
-    server_id(int)           - server ID number
-    apply_after(DateTime)    - earliest date for update (iso 8601 format)
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID number
+    runafter(DateTime)      - earliest date for update (iso 8601 format)
     """
     try:
-        return rhn.session.system.scheduleHardwareRefresh(rhn.key, server_id, apply_after) == 1
+        return rhn.session.system.scheduleHardwareRefresh(rhn.key, serverid, runafter) == 1
     except Exception, E:
-        return rhn.fail(E, "schedule hardware refresh for server id %d (%s)" % (server_id, getServerName(rhn, server_id)))
+        return rhn.fail(E, "schedule hardware refresh for server id %d (%s)" % (serverid, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def schedulePackageInstall(rhn, server_id, package_ids, apply_after):
+def schedulePackageInstall(rhn, serverid, pkgids, runafter):
     """
-    API: system. schedulePackageInstall
+    API:
+    system. schedulePackageInstall
 
-    usage: schedulePackageInstall(rhn, server_id, apply_after)
+    usage:
+    schedulePackageInstall(rhn, serverid, runafter)
     
     description:
     Schedule package installation for a system
     
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
-    rhn                       - an authenticated RHN session
-    server_id(int)            - server ID number
-    package_ids([int])        - list of package IDs to install
-    apply_after(dateTime)     - earliest date for installation.
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server ID number
+    pkgids([int])           - list of package IDs to install
+    runafter(dateTime)      - earliest date for installation.
     """
     try:
-        return rhn.session.system.schedulePackageInstall(rhn.key, server_id, package_ids, apply_after) == 1
+        return rhn.session.system.schedulePackageInstall(rhn.key, serverid, pkgids, runafter) == 1
     except Exception, E:
-        return rhn.fail(E, " install packages [%s] on server %d (%s)" % (''.join(map(str, package_ids)),
-                                                                         server_id,
-                                                                         getServerName(rhn, server_id)) )
+        return rhn.fail(E, "Schedule the installation of packages [%s] on server %d (%s)" % (','.join(map(str, pkgids)),
+                                                                         serverid,
+                                                                         getServerName(rhn, serverid)) )
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def schedulePackageRefresh(rhn, server_id, apply_after):
+def schedulePackageRefresh(rhn, serverid, runafter):
     """
-    API: system schedulePackageRefresh
+    API:
+    system schedulePackageRefresh
 
-    usage: schedulePackageRefresh(rhn, server_id, apply_after)
+    usage:
+    schedulePackageRefresh(rhn, serverid, runafter)
     
     description:
     schedules  a package profile refresh for the given server id
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
-    apply_after(dateTime)     - earliest date this will occur
+    serverid(int)            - server ID number
+    runafter(dateTime)     - earliest date this will occur
     """
     try:
-        return isinstance(rhn.session.system.schedulePackageRefresh(rhn.key, server_id, apply_after), int)
+        return isinstance(rhn.session.system.schedulePackageRefresh(rhn.key, serverid, runafter), int)
     except Exception, E:
-        return rhn.fail(E, "remove entitlements for server %d (%s)" % (server_id))
+        return rhn.fail(E, "remove entitlements for server %d (%s)" % (serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def schedulePackageRemove(rhn, server_id, package_ids, apply_after):
+def schedulePackageRemove(rhn, serverid, pkgids, runafter):
     """
-    API: system.schedulePackageRemove
+    API:
+    system.schedulePackageRemove
 
-    usage: schedulePackageRemove(rhn, server_id, apply_after)
+    usage:
+    schedulePackageRemove(rhn, serverid, runafter)
     
     description:
     schedule the removal of a (list of) packages from the given system
     
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                       - an authenticated RHN session
-    server_id(int)            - server ID number
-    package_ids([int])        - list of package ids to remove
-    apply_after(dateTime)     - earliest date this will occur
+    serverid(int)            - server ID number
+    pkgids([int])        - list of package ids to remove
+    runafter(dateTime)     - earliest date this will occur
     """
     try:
-        if not isinstance(package_ids, list):
-            package_ids = [ package_ids ]
-        return rhn.session.system.schedulePackageRemove(rhn.key, server_id, package_ids, apply_after) == 1
+        if not isinstance(pkgids, list):
+            pkgids = [ pkgids ]
+        return rhn.session.system.schedulePackageRemove(rhn.key, serverid, pkgids, runafter) == 1
     except Exception, E:
-        return rhn.fail(E, "remove package ids [%s] from server %d (%s)" % ( ','.join(map(str, package_ids),
-                                                                            server_id,
-                                                                            getServerName(rhn, server_id))))
+        return rhn.fail(E, "Schedule the removal of package ids [%s] from server %d (%s)" % ( ','.join(map(str, pkgids),
+                                                                            serverid,
+                                                                            getServerName(rhn, serverid))))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def scheduleReboot(rhn, server_id, apply_after):
+def scheduleReboot(rhn, serverid, runafter):
     """
-    usage: scheduleReboot(rhn, server_id, apply_after)    
+    API:
+    system.scheduleReboot
 
-    schedule a reboot for the given server_id
+    usage:
+    scheduleReboot(rhn, serverid, runafter)    
+
+    description:
+    schedule a reboot for the given serverid
 
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
-    apply_after(dateTime)     - earliest date for installation.
+    serverid(int)            - server ID number
+    runafter(dateTime)      - earliest date for reboot to occur
     """
     try:
-        rhn.session.system.scheduleReboot(rhn.key, int(server_id), apply_after)
+        rhn.session.system.scheduleReboot(rhn.key, int(serverid), runafter)
     except Exception, E:
-        return rhn.fail(E, "schedule a reboot for server ID %d" % (server_id))
+        return rhn.fail(E, "schedule a reboot for server ID %d" % (serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def scheduleScriptRun(rhn, server_ids, user_name, group_name, timeout, script, apply_after=None):
+def scheduleScriptRun(rhn, serverids, username, grpname, timeout, script, runafter = None):
     """
-    API: system.scheduleScriptRun
+    API:
+    system.scheduleScriptRun
     
-    usage: scheduleScriptRun(rhn, system_ids, user_name, group_name, timeout, script, apply_after=None)
+    usage:
+    scheduleScriptRun(rhn, serverids, username, grpname, timeout, script, runafter = None)
 
     description:
     Schedule a script to run on the given server id (or list of).
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_ids([int])       - server id (or list of)
-    user_name(str)          - username that script should use
-    group_name(str)         - group name that script should use
+    serverids([int])        - server id (or list of)
+    username(str)           - username that script should use
+    grpname(str)            - group name that script should use
     timeout(int)            - timeout in seconds
     script(str)             - script content
-    apply_after(DateTime)   - earliest date/time for script run (ios8601 format)
+    runafter(DateTime)      - earliest date/time for script run (ios8601 format)
     """
-    if not isinstance(server_ids, list):
-        server_ids = [ server_ids ]
-    args = [ server_ids, user_name, group_name, timeout, script ]
-    if apply_after is not None:
-        args.append(apply_after)
+    if not isinstance(serverids, list):
+        serverids = [ serverids ]
+    args = [ serverids, username, grpname, timeout, script ]
+    if runafter is not None:
+        args.append(runafter)
     try:
         return isinstance(rhn.session.system.scheduleScriptRun(rhn.key, *args), int)
 
     except Exception, E:
-        return rhn.fail(E,'' % ())
+        return rhn.fail(E,'schedule script run on servers [%s]' % (','.join(serverids))
 
-# --------------------------------------------------------------------------------- #
-def scheduleSyncPackagesWithSystem(rhn, target_sid, source_sid, package_ids, apply_after):
+# ---------------------------------------------------------------------------- #
+
+def scheduleSyncPackagesWithSystem(rhn, serverid, sourceid, pkgids, runafter):
     """
-    API: system.scheduleSyncPackagesWithSystem
+    API:
+    system.scheduleSyncPackagesWithSystem
 
-    usage: scheduleSyncPackagesWithSystem(rhn, target_sid, source_sid, package_ids, apply_after)
+    usage:
+    scheduleSyncPackagesWithSystem(rhn, serverid, sourceid, pkgids, runafter)
 
     description:
-    schedules a package synchronisation from a source server to a target, for the given list
+    Schedules a package synchronisation from a source server to a target, for the given list
     of package ids
     
     returns:
+    bool, or throws exception
    
     parameters:
     rhn                     - an authenticated RHN session
-    target_sid(int)         - the server ID to synchronise
-    source_sid(int)         - the source server ID
-    package_id([int])       - list of package IDs to synchronise
-    apply_after(DateTime)   - when to perform the sync
+    serverid(int)           - the server ID to synchronise
+    sourceid(int)           - the source server ID
+    pkgids([int])           - list of package IDs to synchronise
+    runafter(DateTime)      - when to perform the sync
     """
     try:
-        return rhn.session.system.scheduleSyncPackagesWithSystem(rhn.key, target_sid, source_sid, package_ids, apply_after) == 1
+        return rhn.session.system.scheduleSyncPackagesWithSystem(rhn.key, serverid, sourceid, pkgids, runafter) == 1
     except Exception, E:
-        return rhn.fail(E,'schedule package sync from server %d to server %d' % (source_sid, target_sid))
+        return rhn.fail(E,'schedule package sync from server %d to server %d' % (sourceid, serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def searchByName(rhn, server_regex):
+def searchByName(rhn, regex):
     """
-    API: system.searchByName
+    API:
+    system.searchByName
 
-    usage: searchByName(rhn, server_regex)
+    usage:
+    searchByName(rhn, regex)
 
     description:
     search for systems whose profile names match the provided regular expression
     http://download.oracle.com/javase/1.4.2/docs/api/java/util/regex/Pattern.html
      - similar to extended regex
 
-    returns: list of dict, one per system
+    returns:
+    list of dict, one per system
         {
         'id'
         'name'
@@ -2457,87 +2869,105 @@ def searchByName(rhn, server_regex):
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_regex(str)       - regular expression to match server names
+    regex(str)       - regular expression to match server names
     """
     try:
-        return rhn.session.system.searchByName(rhn.key, server_regex)
+        return rhn.session.system.searchByName(rhn.key, regex)
     except Exception, E:
-        return rhn.fail(E,'search for servers matching regex "%s"' % (server_regex))
-# --------------------------------------------------------------------------------- #
+        return rhn.fail(E,'search for servers matching regex "%s"' % (regex))
 
-def setBaseChannel(rhn, server_id, chan_label):
+# ---------------------------------------------------------------------------- #
+
+def setBaseChannel(rhn, serverid, chanlabel):
     """
-    API: system.setBaseChannel
+    API:
+    system.setBaseChannel
 
-    usage: setBaseChannel(rhn, server_id, chan_label)
+    usage:
+    setBaseChannel(rhn, serverid, chanlabel)
 
     description:
     changes the specified system's subscribed base channel
+    if a blank channel label is provided, the system is unsubscribed from all current channels
 
-    returns: bool, or throws exceptions
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)          - server id to change
-    chan_label(str)         - new base channel label
+    serverid(int)           - server id to change
+    chanlabel(str)          - new base channel label
     """
     try:
-        return rhn.session.system.setBaseChannel(rhn.key, server_id, chan_label) == 1
+        return rhn.session.system.setBaseChannel(rhn.key, serverid, chanlabel) == 1
     except Exception, E:
-        return rhn.fail(E,'set base channel for server ID %d to %s' % (server_id, chan_label))
+        return rhn.fail(E,'set base channel for server ID %d to %s' % (serverid, chanlabel))
 
-# --------------------------------------------------------------------------------- #
-def setChildChannels(rhn, server_id, chan_list):
+# ---------------------------------------------------------------------------- #
+
+def setChildChannels(rhn, serverid, chanlist):
     """
-    API: system.setChildChannels
+    API:
+    system.setChildChannels
 
-    usage: setChildChannels(rhn, server_id, chan_list)
+    usage:
+    setChildChannels(rhn, serverid, chanlist)
 
     description:
     set the list of subscribed base channels for the given system
     the labels provided must be children of the system's subscribed base channel.
 
-    returns: bool, or thows exception
+    returns:
+    bool, or thows exception
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)          - server ID to change
-    chan_list([str])        - list of child channel labels
+    serverid(int)          - server ID to change
+    chanlist([str])        - list of child channel labels
     """
     try:
-        return rhn.session.setChildChannels(rhn.key, server_id, chan_list) == 1
+        return rhn.session.setChildChannels(rhn.key, serverid, chanlist) == 1
     except Exception, E:
-        return rhn.fail(E,'subscribe system %d to child channels [%s]' % (server_id, ','.join(chan_list)))
+        return rhn.fail(E,'subscribe system %d to child channels [%s]' % (serverid, ','.join(chanlist)))
 
-def setCustomValues(rhn, server_id, details):
+# ---------------------------------------------------------------------------- #
+
+def setCustomValues(rhn, serverid, details):
     """
-    API: system.setCustomValues
+    API:
+    system.setCustomValues
 
-    usage: setCustomValues(rhn, server_id, details)
-    where details is a a dict... { 'varname' : value,...}
+    usage:
+    setCustomValues(rhn, serverid, details)
+    where details is a a dict... { 'varname' :
+    value,...}
 
     description:
     set custom details for a server
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server ID number
+    serverid(int)            - server ID number
     details(dict)             - dict of keys and values to set.
     """
     try:
-        return rhn.session.system.setCustomValues(rhn.key, server_id, details) == 1
+        return rhn.session.system.setCustomValues(rhn.key, serverid, details) == 1
     except Exception, E:
-        return rhn.fail(E, "set custom details for server ID %d" % (server_id) )
+        return rhn.fail(E, "set custom details for server ID %d" % (serverid) )
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def setCustomValues2(rhn, server_id, **kwargs):
+def setCustomValuesByArg(rhn, serverid, **kwargs):
     """
-    API: system.setCustomValues
+    API:
+    none, special case of 
+    system.setCustomValues
 
-    usage: setCustomValues(rhn, server_id, **kwargs)
+    usage:
+    setCustomIndValues(rhn, serverid, **kwargs)
     where kwargs is a list of key=value pairs
     e.g. test=wibble,hostname=bob.example.com
     
@@ -2545,26 +2975,73 @@ def setCustomValues2(rhn, server_id, **kwargs):
     (but then you shouldn't be putting spaces in there anyway!)
     
     description:
-    set custom details for a server
+    set custom details for a server using key=value parameters.
+    simplifies the setting of one or two variables at a time.
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)           - server ID number
+    serverid(int)           - server ID number
     **kwargs                 - list of key=value pairs
     """
     try:
-        return rhn.session.system.setCustomValues(rhn.key, server_id, kwargs) == 1
+        return rhn.session.system.setCustomValues(rhn.key, serverid, kwargs) == 1
     except Exception, E:
-        return rhn.fail(E, "set custom details for server %s" % (getServerName(rhn, server_id)) )
+        return rhn.fail(E, "set custom details for server %s" % (getServerName(rhn, serverid)) )
 
-# --------------------------------------------------------------------------------- #
-def setDetails(rhn, server_id, **kwargs):
+# ---------------------------------------------------------------------------- #
+
+def setDetails(rhn, serverid, serverdetails):
     """
-    API: system.setDetails
+    API:
+    system.setDetails
 
-    usage: setDetails(rhn, name=val, name=val, name=val...)
+    usage:
+    setDetails(rhn, serverid, serverdetails)
+
+    description:
+    set the details for an existing RHN system profile
+
+    returns:
+    bool, or throws exception
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    serverid(int)           - the server to change
+    serverdetails(dict)     - dictionary of name : value pairs as above
+
+    where serverdetails is of the form:
+    {
+    "profile_name" (str)        : System's profile name,
+    "base_entitlement" (str)    : 'enterprise_entitled' or 'sw_mgr_entitled',
+    "auto_errata_update" (bool) : True if system has auto errata updates enabled,
+    "description" (str)         : System description,
+    "address1" (str)            : System's address line 1,
+    "address2" (str)            : System's address line 2,
+    "city" (str)                : city
+    "state" (str)               : state
+    "country" (str)             : country
+    "building" (str)            : building
+    "room" (str)                : room
+    "rack" (str)                : rack
+    }
+    """
+    try:
+        return rhn.session.system.setDetails(rhn.key, serverid, serverdetails) == 1
+    except Exception, E:
+        return rhn.fail(E,'set details for server id %d' % (serverid))
+
+# ---------------------------------------------------------------------------- #
+
+def setDetailsByArg(rhn, serverid, **kwargs):
+    """
+    API:
+    system.setDetails
+
+    usage:
+    setDetailsByArg(rhn, name=val, name=val, name=val...)
     where only the required values are needed, but must be provided as NAME=value pairs
     string "profile_name" - System's profile name
     string "base_entitlement" - System's base entitlement label. (enterprise_entitled or sw_mgr_entitled)
@@ -2582,219 +3059,306 @@ def setDetails(rhn, server_id, **kwargs):
     description:
     set the details for an existing RHN system profile
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)          - the server to change
+    serverid(int)          - the server to change
     plus a list of name=value pairs
     kwargs will be created as a dict of the name=value pairs
     """
     try:
-        return rhn.session.system.setDetails(rhn.key, server_id, kwargs)
+        return rhn.session.system.setDetails(rhn.key, serverid, kwargs) == 1
     except Exception, E:
-        return rhn.fail(E,'set details for server id %d' % (server_id))
+        return rhn.fail(E,'set details for server id %d' % (serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def setGroupMembership(rhn, server_id, group_id, is_member=1):
+def setGroupMembership(rhn, serverid, grpid, grpmember = 1):
     """
-    API: system.setGroupMembership
+    API:
+    system.setGroupMembership
 
-    usage: setGroupMembership(rhn, server_id, group_id, is_member=1)
+    usage:
+    setGroupMembership(rhn, serverid, grpid, grpmember = 1)
 
     description:
     adds or removes the given server id to/from the given groupid
     
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
     
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)          - server to manage
-    group_id(int)           - server group id
-    is_member(int)          - whether the server should be a member of the
+    serverid(int)           - server to manage
+    grpid(int)              - server group id
+    grpmember(int)          - whether the server should be a member of the
                               group or not. 1=yes, 0=no. default is 1(yes)
     """
     try:
-        return rhn.session.system.setGroupMembership(rhn.key, server_id, group_id, is_member) == 1
+        return rhn.session.system.setGroupMembership(rhn.key, serverid, grpid, grpmember) == 1
     except Exception, E:
-        return rhn.fail(E,'set group membership for server id %d' % (server_id))
+        return rhn.fail(E,'set group membership for server id %d' % (serverid))
 
-# --------------------------------------------------------------------------------- #
-def setGuestCpus(rhn, guest_id, num_cpus):
+# ---------------------------------------------------------------------------- #
+
+def setGuestCpus(rhn, guestid, cpucount):
     """
-    API: system.setGuestCpus
+    API:
+    system.setGuestCpus
 
-    usage: setGuestCpus(rhn, guest_id, num_cpus)
+    usage:
+    setGuestCpus(rhn, guestid, cpucount)
 
     description:
     set the number of virtual CPUs for the given virtual guest
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                     - an authenticated RHN session
-    guest_id(int)           - server ID for virtual guest
-    num_cpus(int)           - number of virtual CPUs to assign
+    guestid(int)            - server ID for virtual guest
+    cpucount(int)           - number of virtual CPUs to assign
     """
     try:
-        return isinstance(rhn.session.system.setGuestCpus(rhn.key, guest_id, num_cpus), int)
+        return isinstance(rhn.session.system.setGuestCpus(rhn.key, guestid, cpucount), int)
     except Exception, E:
-        return rhn.fail(E,'set CPUs to %d for virtual guest id %d' % (num_cpus, guest_id))
+        return rhn.fail(E,'set CPUs to %d for virtual guest id %d' % (cpucount, guestid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def setGuestMemory(rhn, guest_id, memory_mb):
+def setGuestMemory(rhn, guestid, memqty):
     """
-    API: system.getGuestMemory
+    API:
+    system.getGuestMemory
 
-    usage: setGuestMemory(rhn, guest_id, memory_mb)
+    usage:
+    setGuestMemory(rhn, guestid, memqty)
 
     description:
     set the amount of memory for the given virtual server
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                     - an authenticated RHN session
-
+    guestid(int)            - ID of guest system 
+    memqty(int)             - quantity of RAM in Mb
     """
     try:
-        return isinstance(rhn.session.system.setGuestMemory(rhn.key, guest_id, memory_mb), int)
+        return isinstance(rhn.session.system.setGuestMemory(rhn.key, guestid, memqty), int)
     except Exception, E:
-        return rhn.fail(E,'set memory for virtual guest %d to %d Mb' % (guest_id, memory_mb))
+        return rhn.fail(E,'set memory for virtual guest %d to %d Mb' % (guestid, memqty))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def setLockStatus(rhn, server_id, lock_status):
+def setLockStatus(rhn, serverid, islocked):
     """
-    API: system.setLockStatus
+    API:
+    system.setLockStatus
 
-    usage: setLockStatus(rhn, server_id, lock_status)
+    usage:
+    setLockStatus(rhn, serverid, islocked)
 
     description:
     locks or unlocks a given system ID
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)          - server ID
-    lock_status(int)        - whether system is locked (0=no, 1=yes)
+    serverid(int)           - server ID
+    islocked(bool)          - whether system is locked
     """
     try:
-        return rhn.session.system.setlockStatus(rhn.key, server_id, lock_status) == 1
+        return rhn.session.system.setlockStatus(rhn.key, serverid, islocked) == 1
     except Exception, E:
-        return rhn.fail(E,'lock or unlock server %d ' % (server_id))
+        return rhn.fail(E,'lock or unlock server %d ' % (serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def setProfileName(rhn, server_id, server_name):
+def setProfileName(rhn, serverid, servername):
     """
-    API: system.setProfileName
+    API:
+    system.setProfileName
 
-    usage: setProfileName(rhn, server_id, server_name)
+    usage:
+    setProfileName(rhn, serverid, servername)
 
     description:
     renames a system profile
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)          - server ID
-    server_name(str)        - new profile name
+    serverid(int)          - server ID
+    servername(str)        - new profile name
     """
     try:
-        return rhn.session.system.setProfileName(rhn.key, server_id, server_name) == 1
+        return rhn.session.system.setProfileName(rhn.key, serverid, servername) == 1
     except Exception, E:
-        return rhn.fail(E,'rename server id %d to %s' % (server_id, server_name))
+        return rhn.fail(E,'rename server id %d to %s' % (serverid, servername))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def setVariables(rhn, server_id, netboot_enabled, var_list):
+def setVariables(rhn, serverid, netboot, ksvars):
     """
-    API: system.setVariables
+    API:
+    system.setVariables
 
-    usage: setVariables(rhn, server_id, netboot_enabled, var_list)
+    usage:
+    setVariables(rhn, serverid, netboot, ksvars)
 
     description:
     Sets a list of kickstart variables in the cobbler system record for the specified server. 
-    Note: This call assumes that a system record exists in cobbler for the given system
+    Note:
+    This call assumes that a system record exists in cobbler for the given system
     and will raise an XMLRPC fault if that is not the case.
     To create a system record over xmlrpc use system.createSystemRecord
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)          - server id
-    netboot_enabled(bool)   - is PXE boot enabled for this server?
-    var_list([dict])        - list of dicts, one per name : value pair
+    serverid(int)           - server id
+    netboot(bool)           - is PXE boot enabled for this server?
+    ksvars([dict])          - list of dicts, one per name :
+    value pair
     """
     try:
-        return rhn.session.system.setVariables (rhn.key, server_id, netboot_enabled, var_list) == 1
+        return rhn.session.system.setVariables (rhn.key, serverid, netboot, ksvars) == 1
     except Exception, E:
-        return rhn.fail(E,'set variables for server %d' % (server_id))
-# --------------------------------------------------------------------------------- #
+        return rhn.fail(E,'set variables for server %d' % (serverid))
 
-def upgradeEntitlement(rhn, server_id, ent_name):
+# ---------------------------------------------------------------------------- #
+
+def setVariablesByArg(rhn, serverid, netboot, **kwargs):
     """
-    API: system.upgradeEntitlement
+    API:
+    none, special case of 
+    system.setVariables
 
-    usage: upgradeEntitlement(rhn, server_id, ent_name
+    usage:
+    setVariablesByArg(rhn, serverid, netboot, key=value, key2=value2, ...)
+
+    description:
+    Sets a list of kickstart variables in the cobbler system record for the specified server. 
+
+    Note:
+    This call assumes that a system record exists in cobbler for the given system
+    and will raise an XMLRPC fault if that is not the case.
+    To create a system record over xmlrpc use system.createSystemRecord
+    This does not support variable names with spaces in them.
+
+
+    returns:
+    bool, or throws exception
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server id
+    netboot(bool)           - is PXE boot enabled for this server?
+    plus key=value pairs for each variable you wish to set.
+    """
+    try:
+        return rhn.session.system.setVariables (rhn.key, serverid, netboot, kwargs) == 1
+    except Exception, E:
+        return rhn.fail(E,'set variables for server %d' % (serverid))
+
+# ---------------------------------------------------------------------------- #
+
+def tagLatestSnapshot(rhn, serverid, tagname):
+    """
+    API:
+    system.tagLatestSnapshot
+
+    usage:
+    tagLatestSnapshot(rhn, serverid, tagname)
+
+    description:
+    applies the given tag to the latest snapshot of a system
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server id
+    tagname(str)            - the tag to apply
+    """
+    try:
+        return rhn.session.system.tagLatestSnapshot(rhn.key, serverid, tagname) == 1
+    except Exception, E:
+        return rhn.fail(E, 'apply tag  %s to latest snapshot of system %d (%s)' % (tagname, serverid, getServerName(rhn, serverid)))
+
+# ---------------------------------------------------------------------------- #
+
+def upgradeEntitlement(rhn, serverid, entlabel):
+    """
+    API:
+    system.upgradeEntitlement
+
+    usage:
+    upgradeEntitlement(rhn, serverid, entlabel
 
     description:
     Adds an entitlement to a given server. 
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)         - server ID number
-    ent_name(str)          - entitlement name to add. one of [ 'enterprise_entitled',
+    serverid(int)           - server ID number
+    entlabel(str)           - entitlement name to add. one of [ 'enterprise_entitled',
                              'provisioning_entitled', 'monitoring_entitled',
                              'nonlinux_entitled', 'virtualization_host',
                              'virtualization_host_platform']
     """
     try:
-        return rhn.session.system.upgradeEntitlement(rhn.key, server_id, ent_name) == 1
+        return rhn.session.system.upgradeEntitlement(rhn.key, serverid, entlabel) == 1
     except Exception, E:
-        return rhn.fail(E,'add entitlement %s to server id %d' % (ent_name, server_id))
+        return rhn.fail(E,'add entitlement %s to server id %d' % (entlabel, serverid))
         
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def whoRegistered(rhn, server_id):
+def whoRegistered(rhn, serverid):
     """
-    API: system.whoRegistered
+    API:
+    system.whoRegistered
 
-    usage: whoRegistered(rhn, server_id)
+    usage:
+    whoRegistered(rhn, serverid)
 
     description:
     Returns information about the user who registered the system
 
-    returns: dict
+    returns:
+    dict
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)         - server ID number
+    serverid(int)           - server ID number
     """
     try:
-        return rhn.session.system.whoRegistered(rhn.key, server_id)
+        return rhn.session.system.whoRegistered(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E,'discover user who registered server id %d' % (server_id))
+        return rhn.fail(E,'discover user who registered server id %d' % (serverid))
 
-# --------------------------------------------------------------------------------- #
 
-# system.config namespace
+# ------------------------- system.config namespace -------------------------- #
 
-# --------------------------------------------------------------------------------- #
-
-def addConfigChannels(rhn, server_ids, config_channels, add_to_top):        
+def addConfigChannels(rhn, serverids, chanlabels, prepend):        
     """
-    API: system.config.addChannels
+    API:
+    system.config.addChannels
 
-    usage: addConfigChannels(rhn, server_ids, config_channels, add_to_top)
+    usage:
+    addConfigChannels(rhn, serverids, chanlabels, prepend)
 
     description:
     Given a list of servers and configuration channels, appends the configuration channels
@@ -2803,38 +3367,84 @@ def addConfigChannels(rhn, server_ids, config_channels, add_to_top):
     If one of the configuration channels in the 'add' list has been previously subscribed
     by a server, the subscribed channel will be re-ranked to the appropriate place. 
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
-    rhn                         - an authenticated RHN session
-    server_ids(list/int)        - list of server IDs
-    config_channels(list/str)   - list of channel labels
-    add_to_top(bool)            - whether to add the channels in order to the top or bottom
-                                  of the subscribed channel list.
+    rhn                     - an authenticated RHN session
+    serverids(list/int)     - list of server IDs
+    chanlabels(list/str)    - list of channel labels
+    prepend(bool)           - whether to add the channels in order to the top or bottom
+                              of the subscribed channel list.
     """
-    if not isinstance(server_ids, list):
-        server_ids = [ server_ids ]
-    if not isinstance(config_channels, list):
-        config_channels = [ config_channels ]
+    if not isinstance(serverids, list):
+        serverids = [ serverids ]
+    if not isinstance(chanlabels, list):
+        chanlabels = [ chanlabels ]
     try:
-        return rhn.session.system.config.addChannels(rhn.key, server_ids, config_channels, add_to_top) == 1
+        return rhn.session.system.config.addChannels(rhn.key, serverids, chanlabels, prepend) == 1
     except Exception, E:
-        return rhn.fail(E, 'add config channel(s) [%s] to server(s) [%s]'%(','.join(config_channels),
-            ','.join([getServerName(rhn, x) for x in server_ids ])))
+        return rhn.fail(E, 'add config channel(s) [%s] to server(s) [%s]'%(','.join(chanlabels),
+            ','.join([getServerName(rhn, x) for x in serverids ])))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def createOrUpdatePath(rhn, server_id, path, isdir = False, local = 1, **kwargs):
+def createOrUpdatePath(rhn, serverid, path, isdir = False, local, pathobj):
     """
-    API: system.config.createOrUpdatePath
+    API:
+    system.config.createOrUpdatePath
 
-    usage: createOrUpdatePath(rhn, server_id, path, directory = False, local = 0, **kwargs)
+    usage:
+    createOrUpdatePath(rhn, serverid, path, directory = False, local, pathobj)
+
+    description:
+    create or update a configuration file either in a system's local override channel or sandbox
+
+    returns:
+    bool, or throws exception (depends on RHN debug setting)
+
+    parameters 
+    rhn                         - an authenticated RHN session.
+    path(str)                   - the absolute path on the target system, including filename.
+    isdir(bool)                 - this is a directory, not a file
+    local(int)                  - commit this file to the local override channel (1) or sandbox(0)
+    pathobj(dict)               - a dict representing the path to update or create,
+                                  with the following keys (* = optional):
+    owner(str)                      - the owner of the file once deployed.
+    group(str)                      - the group associated with the file once deployed.
+    permissions(str)                - octal permissions for the deployed file (e.g. 0644)
+    * contents(str)                 - the contents of the file (ignored for directories)
+                                      while this will work without content, it's not the best idea.
+    * contents_enc64(bool)          - contents are base64 encoded (for binary files)
+    * selinux_ctx(str)              - SELinux context
+    * macro_start_delimiter(str)    - string used to indicate beginning of macro expressions. Leave empty for default
+    * macro_end_delimiter(str)      - string used to indicate the end of macro expressions. Leave empty for default.
+    * revision(int)                 - revison of updated file (auto-incremented)
+    """
+    try:
+        return isinstance(rhn.session.system.config.createOrUpdatePath(rhn.key, serverid, path, isdir, pathobj, local), dict)
+    except Exception, E:
+        if local == 1:
+            return rhn.fail(E, 'update path %s in system %s local override channel' %(path, getServerName(serverid)))
+        else:
+            return rhn.fail(E, 'update path %s in system %s sandbox' %(path, getServerName(serverid)))
+            
+# ---------------------------------------------------------------------------- #
+
+def createOrUpdatePathByArg(rhn, serverid, path, isdir = False, local = 1, **kwargs):
+    """
+    API:
+    none, special adaptation of system.config.createOrUpdatePath to use kwargs
+
+    usage:
+    createOrUpdatePath(rhn, serverid, path, directory = False, local = 0, **kwargs)
     where kwargs is a list of key=value pairs (see parameters below)
 
     description:
     create or update a configuration file either in a system's local override channel or sandbox
 
-    returns: bool, or throws exception (depends on RHN debug setting)
+    returns:
+    bool, or throws exception (depends on RHN debug setting)
 
     parameters (* = optional)
     rhn                         - an authenticated RHN session.
@@ -2855,234 +3465,308 @@ def createOrUpdatePath(rhn, server_id, path, isdir = False, local = 1, **kwargs)
     * revision(int)                 - revison of updated file (auto-incremented)
     """
     try:
-        return isinstance(rhn.session.system.config.createOrUpdatePath(rhn.key, server_id, path, isdir, kwargs, local), dict)
+        return isinstance(rhn.session.system.config.createOrUpdatePath(rhn.key, serverid, path, isdir, kwargs, local), dict)
     except Exception, E:
         if local == 1:
-            return rhn.fail(E, 'update path %s in system %s local override channel' %(path, getServerName(server_id)))
+            return rhn.fail(E, 'update path %s in system %s local override channel' %(path, getServerName(serverid)))
         else:
-            return rhn.fail(E, 'update path %s in system %s sandbox' %(path, getServerName(server_id)))
+            return rhn.fail(E, 'update path %s in system %s sandbox' %(path, getServerName(serverid)))
             
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def createOrUpdateSymlink(rhn, server_id, path, local = 1, **kwargs):
+def createOrUpdateSymlink(rhn, serverid, path, local, pathobj):
     """
-    API: system.config.createOrUpdateSymlink
+    API:
+    system.config.createOrUpdateSymlink
 
-    usage: createOrUpdateSymlink(rhn, channel_label, path, **kwargs)
+    usage:
+    createOrUpdateSymlink(rhn, channel_label, path, **kwargs)
     where **kwargs is a list of key=value pairs (see parameters, below)
 
     Creates or Updates a new Symlink (file or directory) in a config channel
 
-    returns: dict showing path information
+    returns:
+    dict showing path information
+
+    parameters (*=optional)
+    rhn                    - an authenticated RHN session.
+    serverid(int)          - server ID
+    path(str)              - path on filesystem
+    local(int)             - commit this file to the local override channel (1) or sandbox(0)
+                             (default is local override channel)
+    pathobj(dict)          - dict representing the symlink and its target
+                             keys as follows (* = optional):
+    target_path(str)        - the absolute path to the symlink's target
+    *selinux_ctx(str)       - SELinux context for the symlink
+    *revision(int)          - revison of updated file 
+    """
+    try:
+        return isinstance(rhn.session.system.config.createOrUpdateSymlink(rhn.key, serverid, path, pathobj, local), dict)
+    except Exception, E:
+        if local == 1:
+            return rhn.fail(E, 'update symlink %s in system %s local override channel' %(path, getServerName(rhn, serverid)))
+        else:
+            return rhn.fail(E, 'update symlink %s in system %s sandbox' %(path, getServerName(rhn, serverid)))
+
+# ---------------------------------------------------------------------------- #
+
+def createOrUpdateSymlinkByArg(rhn, serverid, path, local = 1, **kwargs):
+    """
+    API:
+    none, special case of system.config.createOrUpdateSymlink adapted to use kwargs
+
+    usage:
+    createOrUpdateSymlink(rhn, channel_label, path, **kwargs)
+    where **kwargs is a list of key=value pairs (see parameters, below)
+
+    description:
+    Creates or Updates a new Symlink (file or directory) in a config channel
+
+    returns:
+    dict showing path information
 
     parameters (*=optional)
     rhn                     - an authenticated RHN session.
-    server_id(int)          - server ID
+    serverid(int)          - server ID
     path(str)               - path on filesystem
     *local(int)             - commit this file to the local override channel (1) or sandbox(0)
                               (default is local override channel)
 
-    plus one or more key-value pairs as follows (*=optional)
+    plus one or more key-value pairs as follows (* = optional)
     target_path(str)        - the absolute path to the symlink's target
     *selinux_ctx(str)       - SELinux context for the symlink
     *revision(int)          - revison of updated file 
     """
     try:
         if rhn.debug:
-            print rhn.key, server_id, path, kwargs, local
-        return isinstance(rhn.session.system.config.createOrUpdateSymlink(rhn.key, server_id, path, kwargs, local), dict)
+            print rhn.key, serverid, path, kwargs, local
+        return isinstance(rhn.session.system.config.createOrUpdateSymlink(rhn.key, serverid, path, kwargs, local), dict)
     except Exception, E:
         if local == 1:
-            return rhn.fail(E, 'update symlink %s in system %s local override channel' %(path, getServerName(rhn, server_id)))
+            return rhn.fail(E, 'update symlink %s in system %s local override channel' %(path, getServerName(rhn, serverid)))
         else:
-            return rhn.fail(E, 'update symlink %s in system %s sandbox' %(path, getServerName(rhn, server_id)))
+            return rhn.fail(E, 'update symlink %s in system %s sandbox' %(path, getServerName(rhn, serverid)))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def deleteConfigFiles(rhn, server_id, path_list, local=False):
+def deleteConfigFiles(rhn, serverid, pathlist, local):
     """
-    API: system.config.deleteFiles
+    API:
+    system.config.deleteFiles
 
-    usage: deleteFiles(rhn, server_id, fileList, localChannel=False)
+    usage:
+    deleteFiles(rhn, serverid, fileList, localChannel=False)
 
+    description:
     Deletes files from a local or sandbox channel of a server
 
-    returns: bool, or throws exception.
+    returns:
+    bool, or throws exception.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    server_id(int)           - server identifier
-    path_list(list/str)      - path (or list of paths) to delete
-    local(bool)              - delete from local channel(true) or sandbox(false).
-                               False by default.
+    rhn                     - an authenticated RHN session
+    serverid(int)           - server identifier
+    pathlist(list/str)      - path (or list of paths) to delete
+    local(bool)             - delete from local channel(true) or sandbox(false).
     """
-    if not isinstance(path_list, list):
-        path_list = [ path_list ]
+    if not isinstance(pathlist, list):
+        pathlist = [ pathlist ]
     try:
-        return rhn.session.system.config.deleteFiles(rhn.key, server_id, path_list, local) == 1
+        return rhn.session.system.config.deleteFiles(rhn.key, serverid, pathlist, local) == 1
     except Exception, E:
         return rhn.fail(E, 'delete files from server')
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def deployAllConfigChannels(rhn, server_ids, date = None):
+def deployAllConfigChannels(rhn, serverids, runafter = None):
     """
-    usage: deployAll(rhn, systemIDList, date)
+    API:
+    system.config.DeployAll
 
+    usage:
+    deployAllConfigChannels(rhn, serverids, runafter)
+
+    description:
     Schedules a deploy action for all config channels on a given list of system IDs
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
-    rhn                      - an authenticated RHN session
-    systemIDList(list/int)   - list of system IDs to work on
-    date(str)                - earliest date for deploy action. in iso8601 format.
-                               e.g. 20110505T11:48:56 (%Y%m%dT%H:%M:%S)
-                               if omitted, defaults to current time/date
+    rhn                     - an authenticated RHN session
+    systemIDList(list/int)  - list of system IDs to work on
+    runafter(str)           - earliest runafter for deploy action. in iso8601 format.
+                              e.g. 20110505T11:48:56 (%Y%m%dT%H:%M:%S)
+                              if omitted, defaults to current time/runafter
     """
     # encode a DateTime instance (defaults to local time)
-    applyafter = rhn.encodeDate(date)
-    if not isinstance(server_ids, list):
-        server_ids = [ server_ids ]
+    applyafter = rhn.encodeDate(runafter)
+    if not isinstance(serverids, list):
+        serverids = [ serverids ]
     try:
-        return rhn.session.system.config.deployAll(rhn.key, server_ids, applyafter) == 1
+        return rhn.session.system.config.deployAll(rhn.key, serverids, applyafter) == 1
     except Exception, E:
         return rhn.fail(E, 'schedule the requested deploy action' )
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listConfigChannels(rhn, server_id):
+def listConfigChannels(rhn, serverid):
     """
-    usage: listChannels(rhn, server_id)
+    API:
+    system.config.listChannels
+
+    usage:
+    listConfigChannels(rhn, serverid)
 
     Lists the config channels for a server order of rank
 
-    returns: list of dicts, one per channel
+    returns:
+    list of dicts, one per channel
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)            - server identifier
+    serverid(int)            - server identifier
     """
     try:
-        return rhn.session.system.config.listChannels(rhn.key, server_id)
+        return rhn.session.system.config.listChannels(rhn.key, serverid)
     except Exception, E:
-        return rhn.fail(E, 'list config channels for server %d' % server_id)
+        return rhn.fail(E, 'list config channels for server %d' % serverid)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listConfigFiles(rhn, server_id, local=1):
+def listConfigFiles(rhn, serverid, local=1):
     """
-    API: system.config.listFiles
+    API:
+    system.config.listFiles
 
-    usage: listFiles(rhn, server_id, listLocal=1)
+    usage:
+    listFiles(rhn, serverid, listLocal=1)
 
     descriptions
     Lists the configuration files for a server, either from config channels
     (including local overrides) or from the system's sandbox.
 
-    returns: list of dicts, one per channel.
+    returns:
+    list of dicts, one per channel.
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)          - RHN Server ID
+    serverid(int)           - RHN Server ID
     local(int)              - list files in system's local override channel (1)
                               or sandbox (0)
     """
     try:
-        return rhn.session.system.config.listFiles(rhn.key, server_id, local)
+        return rhn.session.system.config.listFiles(rhn.key, serverid, local)
     except Exception, E:
-        return rhn.fail(E, 'list files on server id %d' % server_id)
+        return rhn.fail(E, 'list files on server id %d' % serverid)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def lookupConfigFileInfo(rhn, server_id, path_list, local=1):
+def lookupConfigFileInfo(rhn, serverid, pathlist, local=1):
     """
-    usage: lookupFileInfo(rhn, server_id, fileList, searchLocal=1)
+    API:
+    system.config.lookUpFileInfo
 
+    usage:
+    lookupFileInfo(rhn, serverid, fileList, searchLocal=1)
+
+    description:
     Lists the package filenames affected by a given erratum
 
-    returns: list of dicts, one per path.
+    returns:
+    list of dicts, one per path.
 
     parameters:
     rhn                     - an authenticated RHN session
-    server_id(int)          - integer ID of the server to query
-    path_list(list/str)     - a list of paths to query
+    serverid(int)           - integer ID of the server to query
+    pathlist(list/str)      - a list of paths to query
     local(int)              - search config channels + local override (1)
                               search sandbox (0)
     """
-    if not isinstance(path_list, list):
-        path_list = [ path_list ]
+    if not isinstance(pathlist, list):
+        pathlist = [ pathlist ]
     try:
-        return rhn.session.system.config.lookupFileInfo(rhn.key, server_id, path_list, local)
+        return rhn.session.system.config.lookupFileInfo(rhn.key, serverid, pathlist, local)
     except Exception, E:
-        return rhn.fail(E, 'get file revision info for files [%s]' % ','.join(path_list))
+        return rhn.fail(E, 'get file revision info for files [%s]' % ','.join(pathlist))
      
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def removeConfigChannels(rhn, server_ids, config_channels):
+def removeConfigChannels(rhn, serverids, chanlabels):
     """
-    usage: removeChannels(rhn, serverList, channelList)
+    API:
+    system.config.removeChannels
+
+    usage:
+    removeConfigChannels(rhn, serverids, channelList)
 
     Removes the given config channels from a list of servers
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
-    rhn                       - an authenticated RHN session
-    server_ids(list/int)      - list of server IDs
-    config_channels(list/str) - list of channel labels
+    rhn                     - an authenticated RHN session
+    serverids(list/int)     - list of server IDs
+    chanlabels(list/str)    - list of configuration channel labels
     """
-    if not isinstance(server_ids, list):
-        server_ids = [ server_ids ]
-    if not isinstance(config_channels, list):
-        config_channels = [ config_channels ]
+    if not isinstance(serverids, list):
+        serverids = [ serverids ]
+    if not isinstance(chanlabels, list):
+        chanlabels = [ chanlabels ]
     try:
-        return rhn.session.system.config.removeChannels(rhn.key, server_ids, config_channels) == 1
+        return rhn.session.system.config.removeChannels(rhn.key, serverids, chanlabels) == 1
     except Exception, E:
-        return rhn.fail(E, 'remove config channels [%s] from servers [%s]' %( ','.join(config_channels),
-            ','.join([ getServername(x) for x in server_ids ])))
+        return rhn.fail(E, 'remove config channels [%s] from servers [%s]' %( ','.join(chanlabels),
+            ','.join([ getServername(x) for x in serverids ])))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def setConfigChannels(rhn, server_ids, config_channels):
+def setConfigChannels(rhn, serverids, chanlabels):
     """
-    API: system.config.setChannels
+    API:
+    system.config.setChannels
 
-    usage: setConfigChannels(rhn, server_ids, config_channels))
+    usage:
+    setConfigChannels(rhn, serverids, chanlabels))
 
     description:
-    replaces the existing config channels for each of the servers in server_ids
-    config_channels should be in descending ranked order
+    replaces the existing config channels for each of the servers in serverids
+    chanlabels should be in descending ranked order
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_ids(list/int)      - list of server IDs
-    config_channels(list/str) - list of channel labels
+    serverids(list/int)      - list of server IDs
+    chanlabels(list/str) - list of channel labels
     """
-    if not isinstance(server_ids, list):
-        server_ids = [ server_ids ]
-    if not isinstance(config_channels, list):
-        config_channels = [ config_channels ]
+    if not isinstance(serverids, list):
+        serverids = [ serverids ]
+    if not isinstance(chanlabels, list):
+        chanlabels = [ chanlabels ]
     try:
-        return rhn.session.system.config.setChannels(rhn.key, server_ids, config_channels) == 1
+        return rhn.session.system.config.setChannels(rhn.key, serverids, chanlabels) == 1
     except Exception, E:
-        return rhn.fail(E, 'set config channels [%s] for servers [%s]' %( ','.join(config_channels),
-            ','.join([ getServername(x) for x in server_ids ])))
+        return rhn.fail(E, 'set config channels [%s] for servers [%s]' %( ','.join(chanlabels),
+            ','.join([ getServername(x) for x in serverids ])))
 
-# * system.custominfo namespace
+# ----------------------- system.custominfo namespace ------------------------ #
 
 def createCustomInfoKey(rhn, label, description):
     """
-    API: system.custominfo.createKey
+    API:
+    system.custominfo.createKey
 
-    usage: createCustomInfoKey(rhn, label, description)
+    usage:
+    createCustomInfoKey(rhn, label, description)
 
     description:
     create a new key for storing custom information
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                      - an authenticated RHN session
@@ -3094,37 +3778,45 @@ def createCustomInfoKey(rhn, label, description):
     except Exception, E:
         return rhn.fail(E, 'create new custom info key %s' % label)
 
+# ---------------------------------------------------------------------------- #
+
 def deleteCustomInfoKey(rhn, label):
     """
-    API: system.custominfo.deleteKey
+    API:
+    system.custominfo.deleteKey
 
-    usage: deleteCustomInfoKey(rhn, label)
+    usage:
+    deleteCustomInfoKey(rhn, label)
 
     description:
     deletes a custom system information key.
     This will remove the key and any information stored in it for all systems
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                      - an authenticated RHN session
     label(str)               - label for the new key
     """
     try:
-        return rhn.session.system.custominfo.deleteKey(rhn.key, label)
+        return rhn.session.system.custominfo.deleteKey(rhn.key, label) == 1
     except Exception, E:
         return rhn.fail(E, 'delete custom info key %s' % label)
     
 def listAllCustomInfoKeys(rhn):
     """
-    API: system.custominfo.listAllKeys
+    API:
+    system.custominfo.listAllKeys
 
-    usage: listAllCustomInfoKeys(rhn)
+    usage:
+    listAllCustomInfoKeys(rhn)
 
     description:
     List the custom information keys defined for the user's organization
 
-    returns: list of dict (one per key)
+    returns:
+    list of dict (one per key)
 
     parameters:
     rhn                      - an authenticated RHN session
@@ -3134,53 +3826,110 @@ def listAllCustomInfoKeys(rhn):
     except Exception, E:
         return rhn.fail(E, 'list all custom system information keys')
 
-# --------------------------------------------------------------------------------- #
-    
-# -- system.provisioning.snapshot namespace -- #
+# ---------------------------------------------------------------------------- #
 
-def deleteSnapshot(rhn, snapshot_id):
+def updateCustomInfoKey(rhn, label, description):
     """
-    API: system.provisioning.snapshot
+    API:
+    system.custominfo.updateKey
 
-    usage: deleteSnapshot(rhn, snapshot_id)
+    usage:
+    updateCustomInfoKey(rhn, label, description)
+
+    description:
+    Update description of a custom key
+
+    parameters:
+    rhn                      - an authenticated RHN session
+    label(str)               - Custom info key label
+    description(str)         - Custom Info Key Description
+    """
+    try:
+        return rhn.session.system.custominfo.updateKey(rhn.key, label, description) == 1
+    except Exception, E:
+        return rhn.fail(E, 'update description of custom info key "%s"' % label)
+
+# ---------------------------------------------------------------------------- #
+    
+# ------------------ system.provisioning.snapshot namespace ------------------ #
+
+def addTagToSnapshot(rhn, snapid, tagname):
+    """
+    API:
+    system.provisioning.snapshot.addTagToSnapshot
+
+    usage:
+    addTagToSnapshot(rhn, snapid, tagname)
+
+    description:
+    Adds a tag to the chosen snapshot
+
+    returns:
+    bool, or throws exception
+
+    parameters:
+    rhn                      - an authenticated RHN session
+    snapid(int)              - snapshot id
+    tagname(str)             - the tag name to add to the snapshot
+    """
+    try:
+        return rhn.session.system.provisioning.snapshot.addTagToSnapshot(rhn.key, snapid, tagname) == 1
+    except Exception, E:
+        return rhn.fail(E,'add tag %s to snapshot ID %d' %(tagname, snapid))
+
+# ---------------------------------------------------------------------------- #
+
+def deleteSnapshot(rhn, snapid):
+    """
+    API:
+    system.provisioning.snapshot
+
+    usage:
+    deleteSnapshot(rhn, snapid)
 
     description:
     deletes the snapshot with the given ID
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
-    rhn                      - an authenticated RHN session
-    snapshot_id(int)         - label for the new key
+    rhn                     - an authenticated RHN session
+    snapid(int)             - label for the new key
     """
     try:
-        return rhn.session.system.provisioning.snapshot.deleteSnapshot(rhn.key. snapshot_id) == 1
+        return rhn.session.system.provisioning.snapshot.deleteSnapshot(rhn.key. snapid) == 1
     except Exception, E:
-        return rhn.fail(E, 'delete snapshot ID %d' % snapshot_id)
+        return rhn.fail(E, 'delete snapshot ID %d' % snapid)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def deleteSystemSnapshots(rhn, server_id, **kwargs):
+def deleteSystemSnapshots(rhn, serverid, **kwargs):
     """
-    API: system.provisioning.snapshot.deleteSnapshots
+    API:
+    none, special case of system.provisioning.snapshot.deleteSnapshots
 
-    usage: deleteSnapshots(rhn, **kwargs)
-    possible keyword arguments are:  startDate, endDate
+    usage:
+    deleteSnapshots(rhn, **kwargs)
+    possible keyword arguments are:
+    startDate, endDate
 
     description:
     deletes all snapshots for a given server, optionally between 2 dates.
     If no dates are provided, ALL snapshots for thse given server are deleted.
     if startDate is provided without endDate, evrything after startDate is deleted.
     
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)           - RHN server id
+    serverid(int)           - RHN server id
     optional extra arguments:
-    iso8601 format is %Y%m%dT%H:%M:%S e.g. 20110506T11:12:13
     *startDate(str)          - iso8601 format date string
     *endDate(str)            - iso8601 format date string
+
+    iso8601 format is %Y%m%dT%H:%M:%S e.g. 20110506T11:12:13
     """
     # let's encode our date strings appropriately for XMLRPC
     if kwargs.has_key('startDate'):
@@ -3189,23 +3938,26 @@ def deleteSystemSnapshots(rhn, server_id, **kwargs):
         kwargs['endDate'] = rhn.encodeDate(kwargs['endDate'])
 
     try:
-        return rhn.session.system.provisioning.snapshot.deleteSnapshots(rhn.key, server_id, kwargs) == 1
+        return rhn.session.system.provisioning.snapshot.deleteSnapshots(rhn.key, serverid, kwargs) == 1
     except Exception, E:
-        return rhn.fail(E, 'delete snapshots for system %s' % getServerName(rhn, server_id))
+        return rhn.fail(E, 'delete snapshots for system %s' % getServerName(rhn, serverid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def deleteSnapshots(rhn, **kwargs):
     """
-    API: system.provisioning.deleteSnapshots
+    API:
+    system.provisioning.deleteSnapshots
 
-    usage: deleteSnapshots(rhn, **kwargs)
+    usage:
+    deleteSnapshots(rhn, **kwargs)
 
     description:
     delete all system snaphots, for all servers, optionally between 2 dates.
     
 
-    returns: bool, or throws exception
+    returns:
+    bool, or throws exception
 
     parameters:
     rhn                      - an authenticated RHN session
@@ -3224,72 +3976,81 @@ def deleteSnapshots(rhn, **kwargs):
     except Exception, E:
         return rhn.fail(E,  'delete system snapshots')
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
     
-def listSnapshotConfigFiles(rhn, snapshot_id):    
+def listSnapshotConfigFiles(rhn, snapid):    
     """
-    API: system.provisioning.snapshot.listSnapshotConfigFiles
+    API:
+    system.provisioning.snapshot.listSnapshotConfigFiles
 
-    usage: listSnapshotConfigFiles(rhn, snapshot_id)
+    usage:
+    listSnapshotConfigFiles(rhn, snapid)
 
     description:
     list the config files associated with a snapshot
 
-    returns: list of dict, one per configuration file
+    returns:
+    list of dict, one per configuration file
 
     parameters:
     rhn                      - an authenticated RHN session
-    snapshot_id(int)         - the snapshot ID
+    snapid(int)         - the snapshot ID
     """
     try:
-        return rhn.session.system.provisioning.snapshot.listSnapshotConfigFiles(rhn.key, snapshot_id)
+        return rhn.session.system.provisioning.snapshot.listSnapshotConfigFiles(rhn.key, snapid)
     except Exception, E:
-        return rhn.fail(E, 'list config files for snapshot ID %d' % snapshot_id)
+        return rhn.fail(E, 'list config files for snapshot ID %d' % snapid)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listSnapshotPackages(rhn, snapshot_id):
+def listSnapshotPackages(rhn, snapid):
     """
-    API: system.provisioning.snapshot.listSnapshotPackages
+    API:
+    system.provisioning.snapshot.listSnapshotPackages
 
-    usage: listSnapshotPackags(rhn, snapshot_id)
+    usage:
+    listSnapshotPackags(rhn, snapid)
 
     description:
     list the packages associated with a snapshot
 
-    returns: list of dict, one per package
+    returns:
+    list of dict, one per package
 
     parameters:
     rhn                      - an authenticated RHN session
-    snapshot_id(int)         - snapshot ID
+    snapid(int)         - snapshot ID
     """
     try:
-        return rhn.session.system.provisioning.snapshot.listSnapshotPackages(rhn.key, snapshot_id)
+        return rhn.session.system.provisioning.snapshot.listSnapshotPackages(rhn.key, snapid)
     except Exception, E:
-        return rhn.fail(E, 'list packages associated with snapshot ID %d' % snapshot_id)
+        return rhn.fail(E, 'list packages associated with snapshot ID %d' % snapid)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def listSnapshots(rhn, server_id, **kwargs):
+def listSnapshots(rhn, serverid, **kwargs):
     """
-    API: system.provisioning.snapshot.listSnapshots
+    API:
+    system.provisioning.snapshot.listSnapshots
 
-    usage: listSnapshots(rhn, server_id, **kwargs)
+    usage:
+    listSnapshots(rhn, serverid, **kwargs)
     where optional keyword args are startDate and/or endDate
 
     description:
     list the snapshots associated with the given server ID. Start and end dates are optional.
-    
 
-    returns: list of dict, one per snapshot
+    returns:
+    list of dict, one per snapshot
 
     parameters:
     rhn                      - an authenticated RHN session
-    server_id(int)           - server ID
+    serverid(int)           - server ID
     optional extra arguments:
-    iso8601 format is %Y%m%dT%H:%M:%S e.g. 20110506T11:12:13
     *startDate(str)          - iso8601 format date string
     *endDate(str)            - iso8601 format date string
+
+    iso8601 format is %Y%m%dT%H:%M:%S e.g. 20110506T11:12:13
     """
     # let's encode our date strings appropriately for XMLRPC
     dates = {}
@@ -3298,170 +4059,188 @@ def listSnapshots(rhn, server_id, **kwargs):
     if kwargs.has_key('endDate'):
         dates['endDate'] = rhn.encodeDate(kwargs['endDate'])
     try:
-        return rhn.session.system.provisioning.snapshot.listSnapshots(rhn.key, server_id, dates) == 1
+        return rhn.session.system.provisioning.snapshot.listSnapshots(rhn.key, serverid, dates) == 1
     except Exception, E:
-        return rhn.fail(E,  'list system snapshots for server %s' % getServerName(rhn, server_id))
+        return rhn.fail(E,  'list system snapshots for server %s' % getServerName(rhn, serverid))
 
-# --------------------------------------------------------------------------------- #
+# ------------------------- system.search namespace -------------------------- #
 
-# -- system.search namespace -- #
-
-def searchDeviceDescriptions(rhn, search_string):
+def searchDeviceDescription(rhn, query):
     """
-    API: system.search.deviceDescription
+    API:
+    system.search.deviceDescription
 
-    usage: searchDeviceDescriptions(rhn, search_string)
+    usage:
+    searchDeviceDescriptions(rhn, query)
 
     description:
     list the systems matching the device description
     The search string is not case sensitive
 
-    returns: list of dict, one per server.
+    returns:
+    list of dict, one per server.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    search-string(str)       - string to search for
+    rhn                     - an authenticated RHN session
+    query(str)              - string to search for
     """
     try:
-        return rhn.session.system.search.deviceDescription(rhn.key, search_string)
+        return rhn.session.system.search.deviceDescription(rhn.key, query)
     except Exception, E:
-        return rhn.fail(E, 'search for systems matching device description "%s"' % search_string)
+        return rhn.fail(E, 'search for systems matching device description "%s"' % query)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-
-def searchDeviceDriver(rhn, search_string):
+def searchDeviceDriver(rhn, query):
     """
-    API: system.search.deviceDriver
+    API:
+    system.search.deviceDriver
 
-    usage: searchDeviceDriver(rhn, search_string)
+    usage:
+    searchDeviceDriver(rhn, query)
 
     description:
     list the systems matching the device driver given
     The search string is not case sensitive
 
-    returns: list of dict, one per server.
+    returns:
+    list of dict, one per server.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    search-string(str)       - string to search for
+    rhn                     - an authenticated RHN session
+    query(str)              - string to search for
     """
     try:
-        return rhn.session.system.search.deviceDriver(rhn.key, search_string)
+        return rhn.session.system.search.deviceDriver(rhn.key, query)
     except Exception, E:
-        return rhn.fail(E, 'search for systems matching device driver "%s"' % search_string)
+        return rhn.fail(E, 'search for systems matching device driver "%s"' % query)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def searchDeviceId(rhn, search_string):
+def searchDeviceId(rhn, query):
     """
-    API: system.search.deviceId
+    API:
+    system.search.deviceId
 
-    usage: searchDeviceId(rhn, search_string)
+    usage:
+    searchDeviceId(rhn, query)
 
     description:
     list the systems matching the device Id given
     The search string is not case sensitive
 
-    returns: list of dict, one per server.
+    returns:
+    list of dict, one per server.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    search-string(str)       - string to search for
+    rhn                     - an authenticated RHN session
+    query(str)              - string to search for
     """
     try:
-        return rhn.session.system.search.deviceId(rhn.key, search_string)
+        return rhn.session.system.search.deviceId(rhn.key, query)
     except Exception, E:
-        return rhn.fail(E, 'search for systems matching device Id "%s"' % search_string)
+        return rhn.fail(E, 'search for systems matching device Id "%s"' % query)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def searchDeviceVendorId(rhn, search_string):
+def searchDeviceVendorId(rhn, query):
     """
-    API: system.search.deviceVendorId
+    API:
+    system.search.deviceVendorId
 
-    usage: searchDeviceDescriptions(rhn, search_string)
+    usage:
+    searchDeviceDescriptions(rhn, query)
 
     description:
     list the systems matching the device description
     The search string is not case sensitive
 
-    returns: list of dict, one per server.
+    returns:
+    list of dict, one per server.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    search-string(str)       - string to search for
+    rhn                     - an authenticated RHN session
+    query(str)              - string to search for
     """
     try:
-        return rhn.session.system.search.deviceVendorId(rhn.key, search_string)
+        return rhn.session.system.search.deviceVendorId(rhn.key, query)
     except Exception, E:
-        return rhn.fail(E, 'search for systems matching device VendorId "%s"' % search_string)
+        return rhn.fail(E, 'search for systems matching device VendorId "%s"' % query)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def searchHostname(rhn, search_string):
+def searchHostname(rhn, query):
     """
-    API: system.search.hostname
+    API:
+    system.search.hostname
 
-    usage: searchDeviceDescriptions(rhn, search_string)
+    usage:
+    searchDeviceDescriptions(rhn, query)
 
     description:
     list the systems matching the hostname provided
     The search string is not case sensitive
 
-    returns: list of dict, one per server.
+    returns:
+    list of dict, one per server.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    search-string(str)       - string to search for
+    rhn                     - an authenticated RHN session
+    query(str)              - string to search for
     """
     try:
-        return rhn.session.system.search.hostname(rhn.key, search_string)
+        return rhn.session.system.search.hostname(rhn.key, query)
     except Exception, E:
-        return rhn.fail(E, 'search for systems matching device driver "%s"' % search_string)
+        return rhn.fail(E, 'search for systems matching device driver "%s"' % query)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
         
-def searchIp(rhn, search_string):
+def searchIp(rhn, query):
     """
-    API: system.search.ip
+    API:
+    system.search.ip
 
-    usage: searchip(rhn, search_string)
+    usage:
+    searchip(rhn, query)
 
     description:
     list the systems matching the IP given
     The search string is not case sensitive
 
-    returns: list of dict, one per server.
+    returns:
+    list of dict, one per server.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    search-string(str)       - string to search for
+    rhn                     - an authenticated RHN session
+    query(str)              - string to search for
     """
     try:
-        return rhn.session.system.search.ip(rhn.key, search_string)
+        return rhn.session.system.search.ip(rhn.key, query)
     except Exception, E:
-        return rhn.fail(E, 'search for systems matching IP Address "%s"' % search_string)
+        return rhn.fail(E, 'search for systems matching IP Address "%s"' % query)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def searchNameAndDescription(rhn, search_string):
+def searchNameAndDescription(rhn, query):
     """
-    API: system.search.NameAndDescription
+    API:
+    system.search.NameAndDescription
 
-    usage: searchNameAndDescription(rhn, search_string)
+    usage:
+    searchNameAndDescription(rhn, query)
 
     description:
     list the systems matching the NameAndDescription given
     The search string is not case sensitive
 
-    returns: list of dict, one per server.
+    returns:
+    list of dict, one per server.
 
     parameters:
-    rhn                      - an authenticated RHN session
-    search-string(str)       - string to search for
+    rhn                     - an authenticated RHN session
+    query(str)              - string to search for
     """
     try:
-        return rhn.session.system.search.nameAndDescription(rhn.key, search_string)
+        return rhn.session.system.search.nameAndDescription(rhn.key, query)
     except Exception, E:
-        return rhn.fail(E, 'search for systems whose name or description match "%s"' % search_string)
+        return rhn.fail(E, 'search for systems whose name or description match "%s"' % query)

@@ -1,18 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# a abstraction of the 'packages' namespace in the RHN API for sat 5.1.0
-# import as rhnapi.packages
+# RHN/Spacewalk API Module abstracting the 'packages' namespace
+# and its children / sub-namespaces
+#
+# Copyright 2009-2012 Stuart Sears
+#
+# This file is part of python-rhnapi
+#
+# python-rhnapi is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# python-rhnapi is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with python-rhnapi. If not, see http://www.gnu.org/licenses/.
 
-#  * findByNvrea
-#  * getDetails
-#  * listChangelog
-#  * listDependencies
-#  * listFiles
-#  * listProvidingChannels
-#  * listProvidingErrata
-#  * removePackage
-
-"""
+__doc__ = """
 rhnapi.packages
 
 A python interface to the 'packages' namespace in RHN Satellite 5.4+
@@ -35,45 +43,63 @@ searchChannel -> packages.search.advancedWithChannel
 searchName -> packages.search.name
 searchNameAndDescription -> packages.search.nameAndDescription
 searchNameAndSummary -> packages.search.nameAndSummary
-
 """
-def findByNvrea(rhn, pkgName, pkgVer, pkgRel, pkgArch, pkgEpoch=''):
+__author__ = "Stuart Sears"
+
+# ---------------------------------------------------------------------------- #
+
+def findByNvrea(rhn, pkgname, pkgver, pkgrel, pkgarch, pkgepoch=''):
 	"""
-    API: packages.findByNvrea
+    API:
+    packages.findByNvrea
 
-	usage: findByNvrea(rhn, name, version, release, arch, epoch=None)
+	usage:
+    findByNvrea(rhn, name, version, release, arch, epoch=None)
 
+    description:
 	Find details about a package by Name Version Release (and possibly epoch)
 
-	returns: list of dict, one per matched package
-            { 'name' : str , 'version' : str , 'release' : str, 'epoch' : str,
-              'id' : int, 'arch_label' : str,
-              'path' : str (where the package is on the satellite, under /var/satellite),
-              'provider' : str (determined by GPG signing key),
-              'last_modified' : xmlrpclib.DateTime}
+	returns:
+    list of dict, one per matched package
+        { 'name' : str ,
+          'version' : str ,
+          'release' : str,
+          'epoch' : str,
+          'id' : int,
+          'arch_label' : str,
+          'path' : str (where the package is on the satellite, under /var/satellite),
+          'provider' : str (determined by GPG signing key),
+          'last_modified' : xmlrpclib.DateTime,
+        }
 
 	parameters:
-	rhn                      - an authenticated RHN session
-	pkgname(str)             - the package name
-	pkgVer(str)              - package version
-	pkgRel(str)              - package release
-	pkgArch(str)             - package architecture
-	*pkgEpoch(str)           - package epoch. optional
+	rhn                     - an authenticated RHN session
+	pkgname(str)            - the package name
+	pkgver(str)             - package version
+	pkgrel(str)             - package release
+	pkgarch(str)            - package architecture
+	*pkgepoch(str)          - package epoch. optional
 	"""
 	try:
-		return rhn.session.packages.findByNvrea(rhn.key,pkgName, pkgVer, pkgRel, pkgEpoch, pkgArch)
+		return rhn.session.packages.findByNvrea(rhn.key,pkgname, pkgver, pkgrel, pkgepoch, pkgarch)
 	except Exception, E:
-		return rhn.fail(E, 'find package %s-%s-%s.%s' % (pkgName, pkgVer, pkgRel, pkgArch,))
+		return rhn.fail(E, 'find package %s-%s-%s.%s' % (pkgname, pkgver, pkgrel, pkgarch,))
 
-def getDetails(rhn, package_id):
+# ---------------------------------------------------------------------------- #
+
+def getDetails(rhn, pkgid):
 	"""
-    API: packages.getDetails
+    API:
+    packages.getDetails
 
-	usage: getDetailsByID(RHN, package_id)
+	usage:
+    getDetailsByID(RHN, pkgid)
 
+    description:
 	Retrieves package information based on a package ID
 
-	returns: dict
+	returns:
+    dict
     {'arch_label': str
      'build_date': str
      'build_host': str
@@ -94,196 +120,255 @@ def getDetails(rhn, package_id):
      'size': '928344',
      'summary': 'The GNU Bourne Again shell\n',
      'vendor': 'Red Hat, Inc.',
-     'version': '4.1.2'}
+     'version': '4.1.2'
+    }
 
 	parameters:
 	rhn                      - an authenticated RHN session
-	package_id(int)               - Package ID number
+	pkgid(int)               - Package ID number
 	"""
 	try:
-		return rhn.session.packages.getDetails(rhn.key, package_id)
+		return rhn.session.packages.getDetails(rhn.key, pkgid)
 	except Exception, E:
-		return rhn.fail(E, 'find package with ID %d' % package_id)
+		return rhn.fail(E, 'find package with ID %d' % pkgid)
 
-def getPackage(rhn, package_id):
+# ---------------------------------------------------------------------------- #
+
+def getPackage(rhn, pkgid):
     """
-    API: packages.getPackage
+    API:
+    packages.getPackage
 
-    usage: getPackage(rhn, package_id)
+    usage:
+    getPackage(rhn, pkgid)
 
+    description:
     Retrieve the package file associated with a package.
 
-    returns: the binary package file, base64 encoded.
+    returns:
+    the binary package file, base64 encoded.
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
-	package_id(int)               - Package ID number
+	pkgid(int)               - Package ID number
     """
     try:
-        return rhn.session.packages.getPackage(rhn.key, package_id)
+        return rhn.session.packages.getPackage(rhn.key, pkgid)
     except Exception, E:
-        return rhn.fail(E, 'fetch package with ID %d' % package_id)
+        return rhn.fail(E, 'fetch package with ID %d' % pkgid)
 
-def getPackageUrl(rhn, package_id):
+# ---------------------------------------------------------------------------- #
+
+def getPackageUrl(rhn, pkgid):
     """
-    API: packages.getPackageUrl
+    API:
+    packages.getPackageUrl
 
-    usage: getPackageUrl(rhn, package_id)
+    usage:
+    getPackageUrl(rhn, pkgid)
 
-    returns: string
+    description:
+    Retrieve the url that can be used to download a package.i
+    This will expire after a certain time period.
+
+    returns:
+    string
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
-	package_id(int)          - Package ID number
+	pkgid(int)          - Package ID number
     """
     try:
-        return rhn.session.packages.getPackageUrl(rhn.key, package_id)
+        return rhn.session.packages.getPackageUrl(rhn.key, pkgid)
     except Exception, E:
-        return rhn.fail(E, 'find download URL for package ID %d' % package_id)
+        return rhn.fail(E, 'find download URL for package ID %d' % pkgid)
 
-def listChangelog(rhn, package_id):
+# ---------------------------------------------------------------------------- #
+
+def listChangelog(rhn, pkgid):
 	"""
-    API: packages.listChangelog
+    API:
+    packages.listChangelog
 
-	usage: listChangelog(rhn, package_id)
+	usage:
+    listChangelog(rhn, pkgid)
 
+    description:
 	Retrieves package changelog for package ID
 
-	returns: list of dicts, one per entry
+	returns:
+    list of dicts, one per entry
             {'author': str
             'date': str
             'text': str }
 
 	parameters:
 	rhn                      - an authenticated RHN session
-	package_id(int)               - Package ID number
+	pkgid(int)               - Package ID number
 	"""
 	try:
-		return rhn.session.packages.listChangelog(rhn.key, package_id)
+		return rhn.session.packages.listChangelog(rhn.key, pkgid)
 	except Exception, E:
-		return rhn.fail(E, 'get changelog for package ID %d' % package_id)
+		return rhn.fail(E, 'get changelog for package ID %d' % pkgid)
 
-def listDependencies(rhn, package_id):
+# ---------------------------------------------------------------------------- #
+
+def listDependencies(rhn, pkgid):
 	"""
-    API: packages.listDependencies
+    API:
+    packages.listDependencies
 
-	usage: listDependencies(rhn, package_id)
+	usage:
+    listDependencies(rhn, pkgid)
 
+    description:
 	Retrieves dependency info for a package ID
 
-	returns: list of dicts, one per dependency
-             {'dependency': '/bin/sh',
-              'dependency_modifier': ' ',
-              'dependency_type': 'requires'},
-
+	returns:
+    list of dicts, one per dependency
+        {
+           'dependency': (str) usually file path or package name,
+           'dependency_modifier': (str),
+           'dependency_type': (str) one of {'requires', 'conflicts', 'obsoletes', 'provides'],
+        }, 
 	parameters:
 	rhn                      - an authenticated RHN session
-	package_id(int)               - Package ID number
+	pkgid(int)               - Package ID number
 	"""
 	try:
-		return rhn.session.packages.listDependencies(rhn.key, package_id)
+		return rhn.session.packages.listDependencies(rhn.key, pkgid)
 	except Exception, E:
-		return rhn.fail(E, 'get changelog for package ID %d' % package_id)
+		return rhn.fail(E, 'get changelog for package ID %d' % pkgid)
 
+# ---------------------------------------------------------------------------- #
 
-def listFiles(rhn, package_id):
+def listFiles(rhn, pkgid):
 	"""
-    API: packages.listFiles
+    API:
+    packages.listFiles
 
-	usage: listFiles(rhn, package_id)
+	usage:
+    listFiles(rhn, pkgid)
 
+    description:
 	Retrieves file listing for package ID
 
-	returns: list of dicts, one per file
-        { 'checksum': '55e10cb00b262abf4a13e91e0bbb6040e1da2e428c9fb844430f4d0650c21ec0',
-          'checksum_type': 'sha256',
-          'last_modified_date': '2010-06-22 20:49:51',
-          'linkto': '',
-          'path': '/usr/share/man/man1/wait.1.gz',
-          'size': 40,
-          'type': 'file'},
+	returns:
+    list of dict, one per file
+        { 'checksum': (str) '55e10cb00b262abf4a13e91e0bbb6040e1da2e428c9fb844430f4d0650c21ec0',
+          'checksum_type': (str) 'sha256',
+          'last_modified_date': (str) '2010-06-22 20:49:51',
+          'linkto': (str) '',
+          'path': (str) '/usr/share/man/man1/wait.1.gz',
+          'size': (int) 40,
+          'type': (str) 'file'
+        },
 
 	parameters:
 	rhn                      - an authenticated RHN session
-	package_id(int)               - Package ID number
+	pkgid(int)               - Package ID number
 	"""
 	try:
-		return rhn.session.packages.listFiles(rhn.key, package_id)
+		return rhn.session.packages.listFiles(rhn.key, pkgid)
 	except Exception, E:
-		return rhn.fail(E, 'get file list for package ID %d' % package_id)
+		return rhn.fail(E, 'get file list for package ID %d' % pkgid)
 
-def listProvidingChannels(rhn, package_id):
+# ---------------------------------------------------------------------------- #
+
+def listProvidingChannels(rhn, pkgid):
 	"""
-    API: packages.listProvidingChannels
+    API:
+    packages.listProvidingChannels
 
-	usage: listProvidingChannels(rhn, package_id)
+	usage:
+    listProvidingChannels(rhn, pkgid)
 
+    description:
 	Lists channels providing a package ID
 
-	returns: list of dicts, one per channel
-        { 'label': 'rhel-x86_64-server-6',
+	returns:
+    list of dicts, one per channel
+        { 
+          'label': 'rhel-x86_64-server-6',
           'name': 'Red Hat Enterprise Linux Server (v. 6 for 64-bit x86_64)',
-          'parent_label': ' '}
+          'parent_label': ' '
+        }
 
 	parameters:
 	rhn                      - an authenticated RHN session
-	package_id(int)               - Package ID number
+	pkgid(int)               - Package ID number
 	"""
 	try:
-		return rhn.session.packages.listProvidingChannels(rhn.key, package_id)
+		return rhn.session.packages.listProvidingChannels(rhn.key, pkgid)
 	except Exception, E:
-		return rhn.fail(E, 'get channel list for package ID %d' % package_id)
+		return rhn.fail(E, 'get channel list for package ID %d' % pkgid)
 
-def listProvidingErrata(rhn, package_id):
+# ---------------------------------------------------------------------------- #
+
+def listProvidingErrata(rhn, pkgid):
 	"""
-    API: packages.listProvidingErrata
+    API:
+    packages.listProvidingErrata
 
-	usage: listProvidingErrata(rhn, package_id)
+	usage:
+    listProvidingErrata(rhn, pkgid)
 
+    description:
 	Displays which Errata provide a given package.
 
-	returns: list of dicts, one per entry
+	returns:
+    list of dicts, one per entry
 
 	parameters:
 	rhn                      - an authenticated RHN session
-	package_id(int)               - Package ID number
+	pkgid(int)               - Package ID number
 	"""
 	try:
-		return rhn.session.packages.listProvidingErrata(rhn.key, package_id)
+		return rhn.session.packages.listProvidingErrata(rhn.key, pkgid)
 	except Exception, E:
-		return rhn.fail(E, 'find errata providing package ID %d' % package_id)
+		return rhn.fail(E, 'find errata providing package ID %d' % pkgid)
 
-def removePackage(rhn, package_id):
+# ---------------------------------------------------------------------------- #
+
+def removePackage(rhn, pkgid):
 	"""
-    API: packages.removePackage
+    API:
+    packages.removePackage
 
-	usage: removePackage(rhn, package_id)
+	usage:
+    removePackage(rhn, pkgid)
 
+    description:
 	Removes a package from the satellite completely, from ALL channels.
 
-	returns: 1 on success (!?)
+	returns:
+    bool, or throws exception
 
 	parameters:
 	rhn                      - an authenticated RHN session
-	package_id(int)               - Package ID number
+	pkgid(int)               - Package ID number
 	"""
 	try:
-		return rhn.session.packages.removePackage(rhn.key, package_id)
+		return rhn.session.packages.removePackage(rhn.key, pkgid) == 1
 	except Exception, E:
-		return rhn.fail(E, 'remove Package ID %d' % package_id)
+		return rhn.fail(E, 'remove Package ID %d' % pkgid)
 
-## --------------- package.provider ------------------- ##
+# ----------------------------- package.provider ----------------------------- #
+
 def associateKey(rhn, provider, key='', keytype='gpg'):
     """
-    API: packages.provider.associateKey
+    API:
+    packages.provider.associateKey
 
-    usage: associateKey(rhn, provider, key, keytype='gpg')
+    usage:
+    associateKey(rhn, provider, key, keytype='gpg')
 
     Associate a package security key and with the package provider.
     *  If the provider or key doesn't exist, it is created.
     *  User executing the request must be a Satellite administrator. 
 
-    returns: True, or throws exception
+    returns:
+    True, or throws exception
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
@@ -292,19 +377,34 @@ def associateKey(rhn, provider, key='', keytype='gpg'):
     keytype(str)             - key type. Currently only understands 'gpg'
     """
     try:
-        return rhn.session.packages.provider.associateKey(rhn.key, provider, key, keytype)
+        return rhn.session.packages.provider.associateKey(rhn.key, provider, key, keytype) == 1
     except Exception, E:
         return rhn.fail(E, 'associate new key with package provider %s' % provider)
 
+# ---------------------------------------------------------------------------- #
+
 def listProviders(rhn):        
     """
-    API: packages.provider.list
+    API:
+    packages.provider.list
 
-    usage: listProviders(rhn)
+    usage:
+    listProviders(rhn)
 
+    description:
     lists all package providers
 
-    returns: list/dict
+    returns:
+    list/dict
+        {
+          'name' : (str),
+          'keys' : [
+                     {
+                        'key'  : (str)
+                        'type' : (str)
+                     }
+                   ]
+        }
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
@@ -314,16 +414,26 @@ def listProviders(rhn):
     except Exception, E:
         return rhn.fail(E, 'list all package providers')
 
+# ---------------------------------------------------------------------------- #
+
 def listKeys(rhn, provider):
     """
-    API: packages.provider.listKeys
+    API:
+    packages.provider.listKeys
 
-    usage: listKeys(rhn, provider)
+    usage:
+    listKeys(rhn, provider)
 
+    description:
     List all security keys associated with a package provider.
     User executing the request must be a Satellite administrator.
 
-    returns: list/dict
+    returns:
+    list/dict
+        {
+            'key'  : (str)
+            'type' : (str)
+        }
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
@@ -334,13 +444,17 @@ def listKeys(rhn, provider):
     except Exception, E:
         return rhn.fail(E, 'get list of package security keys for provider %s' % provider)
 
-## --------------- packages.search ----------------------------- ##
-def search(rhn, luceneQuery):
+# ----------------------------- packages.search ------------------------------ #
+
+def search(rhn, query):
     """
-    API: packages.search.advanced
+    API:
+    packages.search.advanced
 
-    usage: advancedSearch(rhn, luceneQuery)
+    usage:
+    advancedSearch(rhn, query)
 
+    description:
     Advanced method to search lucene indexes with a passed in query written in
     Lucene Query Parser syntax.
     Fields searchable for Packages:
@@ -348,91 +462,138 @@ def search(rhn, luceneQuery):
     Lucene Query Example: "name:kernel AND version:2.6.18 AND -description:devel" 
 
 
-    returns: list of dict, one per matching package
+    returns:
+    list of dict, one per matching package
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
-    luceneQuery(str)         - query string
+    query(str)         - query string
     """
     try:
-        return rhn.session.packages.search.advanced(rhn.key, luceneQuery)
+        return rhn.session.packages.search.advanced(rhn.key, query)
     except Exception, E:
-        return rhn.fail(E, 'search for packages using query "%s"' % luceneQuery)
+        return rhn.fail(E, 'search for packages using query "%s"' % query)
 
-def searchActivationKey(rhn, luceneQuery, actkey):
+def searchAdvanced(rhn, query):
     """
-    API: packages.search.advancedWithActKey
+    wrapper around search to look more like the API :)
+    """
+    return search(rhn, query)
 
-    usage: searchActivationKey(rhn, luceneQuery, actkey)
+# ---------------------------------------------------------------------------- #
 
+def searchActivationKey(rhn, query, actkey):
+    """
+    API:
+    packages.search.advancedWithActKey
+
+    usage:
+    searchActivationKey(rhn, query, actkey)
+
+    description:
     Advanced method to search lucene indexes with a passed in query written in
     Lucene Query Parser syntax, additionally this method will limit results
     to those which are associated with a given activation key.
 
-    returns: list of dict, one per matched package
+    returns:
+    list of dict, one per matched package
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
-    luceneQuery(str)         - query string
+    query(str)         - query string
     actkey(Str)              - activation key (hex id)
     """
     try:
-        return rhn.session.packages.search.advancedWithActKey(rhn.key, luceneQuery, actkey)
+        return rhn.session.packages.search.advancedWithActKey(rhn.key, query, actkey)
     except Exception, E:
-        return rhn.fail(E, 'find packages in activation key "%s" using query "%s"' %(actkey, luceneQuery))
+        return rhn.fail(E, 'find packages in activation key "%s" using query "%s"' %(actkey, query))
 
-def searchChannel(rhn, luceneQuery, chanlabel):        
+# ---------------------------------------------------------------------------- #
+
+def searchAdvancedWithActivationKey(rhn, query, actkey):
     """
-    API: packages.search.advancedWithChannel
+    wrapper around searchActivationKey
+    """
+    return searchActivationKey(rhn, query, actkey)
 
-    usage: searchChannel(rhn, luceneQuery, chanlabel)
+# ---------------------------------------------------------------------------- #
 
+def searchChannel(rhn, query, chanlabel):        
+    """
+    API:
+    packages.search.advancedWithChannel
+
+    usage:
+    searchChannel(rhn, query, chanlabel)
+
+    description:
     Advanced method to search lucene indexes with a passed in query written in
     Lucene Query Parser syntax, additionally this method will limit results
     to those which are in the passed in channel label
 
-    returns: list of dict, one per matched package
+    returns:
+    list of dict, one per matched package
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
-    luceneQuery(str)         - query string
+    query(str)         - query string
     chanlabel(str)           - software channel label
     """
     try:
-        return rhn.session.packages.search.advancedWithChannel(rhn.key, luceneQuery, chanlabel)
+        return rhn.session.packages.search.advancedWithChannel(rhn.key, query, chanlabel)
     except Exception, E:
-        return rhn.fail(E, 'search for packages in channel "%s" using query "%s"' %(chanlabel, luceneQuery))
+        return rhn.fail(E, 'search for packages in channel "%s" using query "%s"' %(chanlabel, query))
 
-def searchName(rhn, package_name):
+# ---------------------------------------------------------------------------- #
+
+def searchAdvancedWithChannel(rhn, query, chanlabel):
     """
-    API: packages.search.name
+    wrapper around searchChannel
+    """
+    return searchChannel(rhn, query, chanlabel)
 
-    usage: searchName(rhn, package_name)
+# ---------------------------------------------------------------------------- #
 
+def searchName(rhn, pkgname):
+    """
+    API:
+    packages.search.name
+
+    usage:
+    searchName(rhn, pkgname)
+
+    description:
     Search the lucene package indexes for all packages which match the given name
 
-    returns: list of dict, one per matched package (or throws exception)
+    returns:
+    list of dict, one per matched package (or throws exception)
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
-    luceneQuery(str)         - query string
-    package_name(str)        - name to search for
+    query(str)         - query string
+    pkgname(str)        - name to search for
     """
     try:
-        return rhn.session.packages.search.name(rhn.key, package_name)
+        return rhn.session.packages.search.name(rhn.key, pkgname)
     except Exception, E:
-        return rhn.fail(E, 'search for packages matching name "%s"' % package_name)
+        return rhn.fail(E, 'search for packages matching name "%s"' % pkgname)
+
+# ---------------------------------------------------------------------------- #
 
 def searchNameAndDescription(rhn, query):
     """
-    API: packages.search.nameAndDescription
+    API:
+    packages.search.nameAndDescription
 
-    usage: searchNameAndDescription(rhn, query)
+    usage:
+    searchNameAndDescription(rhn, query)
 
+    description:
     Search the lucene package indexes for all packages which match the given
     query in name or description
 
-    returns: list of dict, one per matched package (or throws exception)
+    returns:
+    list of dict, one per matched package (or throws exception)
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object
@@ -443,16 +604,22 @@ def searchNameAndDescription(rhn, query):
     except Exception, E:
         return rhn.fail(E, 'search packages names and descriptions using query "%s"' % query)
 
+# ---------------------------------------------------------------------------- #
+
 def searchNameAndSummary(rhn, query):
     """
-    API: packages.search.nameAndSummary
+    API:
+    packages.search.nameAndSummary
 
-    usage: searchNameAndSummary(rhn, query)
+    usage:
+    searchNameAndSummary(rhn, query)
 
+    description:
     Search the lucene package indexes for all packages which match the given
     query in name or summary
 
-    returns: list of dict, one per matched package (or throws exception)
+    returns:
+    list of dict, one per matched package (or throws exception)
 
     parameters:
     rhn                      - authenticated rhnapi.rhnSession() object

@@ -1,6 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
+# RHN/Spacewalk API Module providing additional general utilities
+# primarily for serialisation, csv output etc
+#
+# Copyright 2009-2012 Stuart Sears
+#
+# This file is part of python-rhnapi
+#
+# python-rhnapi is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 2 of the License, or (at your option)
+# any later version.
+#
+# python-rhnapi is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with python-rhnapi. If not, see http://www.gnu.org/licenses/.
+
+__doc__ = """
 rhnapi.utils
 
 utilities to use with rhnapi, to perform common tasks.
@@ -9,6 +29,9 @@ Some of these are generic, just placed here because they are used a lot
 
 Some require an rhnapi.rhnSession object.
 """
+
+__author__ = "Stuart Sears"
+
 # handle the renaming of simplejson -> json in later python versions
 try:
     import json
@@ -28,7 +51,14 @@ from rhnapi.system import listSystems, getBaseChannel
 
 def showEntitlements(rhn):
 	"""
+    usage:
+    showEntitlements(rhn)
+
+    description:
 	print a summary of the entitlement usage on a satellite.
+
+    returns:
+    text output to stdout
 
 	params:
 	rhn                    - an authenticated rhn session
@@ -63,10 +93,18 @@ def showEntitlements(rhn):
 
 def showChannelUsage(rhn):
 	"""
+    usage:
+    showChannelUsage(rhn)
+
+    description:
 	pull system list from RHN/Satellite, look up base channels 
 	count of systems subscribed to each.
 	This can take a long time!
-	params:
+
+    returns:
+    text to stdout
+
+    parameters:
 	rhn - an authenticated RHN session
 	"""
 	# from rhnapi.channel import getEntitlements
@@ -88,12 +126,13 @@ def showChannelUsage(rhn):
 		print "-----------------------"
 		print 'system count: %d' % len(syslist)
 	except Exception, E:
-		rhn.fail(E, "list channel subscriptions" )
+		return rhn.fail(E, "list channel subscriptions and usage" )
         
 # --------------------------------------------------------------------------------- #
 
 class DateTimeEncoder(json.JSONEncoder):
     """
+    description:
     Custom encoder for xmlrpclib.DateTime objects, which are not directly
     serialisable.
     Converts <DateTime 'YYYYMMDDTHH:MM:SS' at memaddr> objects to str
@@ -145,12 +184,13 @@ def dumpJSON(obj, outputfile, indent = 2, verbose = False, customenc = DateTimeE
 
 def loadJSON(inputfile, verbose = False):
     """
-    Loads data from a JSON file (exported with dumpJSON above) and returns it.
+    Loads data from a JSON file (probably but not necessarily 
+    exported with dumpJSON above) and returns it.
 
     returns dataobject, or None
 
     parameters:
-    inputfile(str)      - path to JSON file
+    inputfile(str)          - path to JSON file
     """
     try:
         data = open(inputfile).read()
@@ -166,14 +206,14 @@ def loadJSON(inputfile, verbose = False):
         
 # --------------------------------------------------------------------------------- #
 
-def prompt_missing(promptstr):
+def promptMissing(promptstr):
     """
     prompt for a missing element
     """
     return str(raw_input(promptstr))
 
 # --------------------------------------------------------------------------------- #
-def prompt_confirm(action, default='Y'):
+def promptConfirm(action, default='Y'):
     """
     prompt for a yes/no answer to an action
     """
@@ -189,7 +229,7 @@ def prompt_confirm(action, default='Y'):
         return False
 
 # --------------------------------------------------------------------------------- #
-def csv_report(objectlist, outputfile,  fields = None):
+def csvReport(objectlist, outputfile,  fields = None):
     """
     Creates a CSV report, with a header line from the data provided
     This uses the python stdlib csv.DictWriter class, where each line is constructed from

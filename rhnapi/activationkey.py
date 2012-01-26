@@ -33,7 +33,7 @@ __author__ = "Stuart Sears"
 # additional required imports
 import sys
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def addChildChannels(rhn, keyid, chanlabels):
     """
@@ -47,8 +47,7 @@ def addChildChannels(rhn, keyid, chanlabels):
     Add the specified child channels to an activation key.
 
     returns:
-    bool
-
+    Bool, or throws Exception
     
     parameters:
     rhn                     - an authenticated rhn session
@@ -60,7 +59,7 @@ def addChildChannels(rhn, keyid, chanlabels):
     except Exception, E:
         return rhn.fail(E,'add one or more of child channels %r to %s' % (chanlabels, keyid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def addConfigChannels(rhn, keyids, cfgchans, addToTop = False):
     """
@@ -75,7 +74,7 @@ def addConfigChannels(rhn, keyids, cfgchans, addToTop = False):
     (or list of keys)
     
     returns:
-    bool
+    Bool, or throws Exception
     
     parameters:
     rhn                        - an authenticated rhn session
@@ -88,7 +87,7 @@ def addConfigChannels(rhn, keyids, cfgchans, addToTop = False):
     except Exception, E:
         return rhn.fail(E,'add one or more of %r to keys %r' % (cfgchans, keyids))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def addEntitlements(rhn, keyid, entslabels):
     """
@@ -103,7 +102,7 @@ def addEntitlements(rhn, keyid, entslabels):
     [monitoring_entitled, provisioning_entitled, virtualization_host, virtualization_host_platform]
 
     returns:
-    bool
+    Bool, or throws Exception
     
     params:
     rhn                    - an authenticated rhn session
@@ -118,7 +117,7 @@ def addEntitlements(rhn, keyid, entslabels):
     except Exception, E:
         return rhn.fail(E,'add one or more of  %r to key %s' % (entslabels, keyid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def addGroups(rhn, keyid, groupids):
     """
@@ -132,7 +131,7 @@ def addGroups(rhn, keyid, groupids):
     Adds the given list of server group IDs to the chosen activation key
 
     returns:
-    bool
+    Bool, or throws Exception
 
     shorter name for addServerGroups
     params:
@@ -142,7 +141,7 @@ def addGroups(rhn, keyid, groupids):
     """
     return addServerGroups(rhn, keyid, groupids)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def addServerGroups(rhn, keyid, groupids):
     """
@@ -157,7 +156,7 @@ def addServerGroups(rhn, keyid, groupids):
     The system groups are specified by id, not name.
     
     returns:
-    bool
+    Bool, or throws Exception
 
     parameters:
     rhn                    - an authenticated rhn session
@@ -169,17 +168,20 @@ def addServerGroups(rhn, keyid, groupids):
     except Exception, E:
         return rhn.fail(E,'add one or more of groups %r to key %s' % (groupids, keyid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def addGroupsByName(rhn, keyid, groupnames):
     """
-    API: none, custom method
+    API:
+    none, custom method
 
-    usage: addGroupsByName(rhn, keyid, groupnames)
+    usage:
+    addGroupsByName(rhn, keyid, groupnames)
 
     description:
     Add a list of system groups by name. This involves calling out to rhnapi.systemgroup
     just passes this info to addServerGroups
+    This skips groups that do not exist on the satellite.
 
     parameters:
     rhn                    - an authenticated rhn session
@@ -193,19 +195,21 @@ def addGroupsByName(rhn, keyid, groupnames):
     ids = [ x['id'] for x in allgroups if x['name'] in groupnames ]
     return addServerGroups(rhn, keyid, ids)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def addPackages(rhn, keyid, pkglist):
     """
-    API: activationkey.addPackages
+    API:
+    activationkey.addPackages
 
-    usage: addPackages(rhn, keyid, pkglist)
+    usage:
+    addPackages(rhn, keyid, pkglist)
 
     description:
     Add a list of pkglist (with arch) to a key.
 
     returns:
-    bool
+    Bool, or throws Exception
 
     params
     rhn                    - an authenticated rhn session
@@ -217,17 +221,22 @@ def addPackages(rhn, keyid, pkglist):
     except Exception, E:
         return rhn.fail(E,'add one or more of %r to %s' % ([ x['name'] for x in pkglist ], keyid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def addPackageNames(rhn, keyid, packagenames):
     """
-    API: activationkey.addPackageNames
+    API:
+    activationkey.addPackageNames
 
-    usage: addPackageNames(rhn, keyid, packagenames)
+    usage:
+    addPackageNames(rhn, keyid, packagenames)
 
     description:
     Add a list of package names to a key.
     Deprecated (but still functional) in favour of addPackages. Use that instead.
+
+    returns:
+    Bool, or throws Exception
     
     params:
     rhn                    - an authenticated rhn session
@@ -239,7 +248,7 @@ def addPackageNames(rhn, keyid, packagenames):
     except Exception, E:
         return rhn.fail(E,'add one or more of %r to %s' % (packagenames, keyid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def checkConfigDeployment(rhn, keyid):
     """
@@ -253,7 +262,7 @@ def checkConfigDeployment(rhn, keyid):
     reports whether configuration deployment is enabled for a given key
 
     returns:
-    bool - true if enabled, false if disabled. Or throws an exception.
+    Bool (config deployment status), or throws Exception
 
     params:
     rhn                    - an authenticated rhn session
@@ -266,7 +275,7 @@ def checkConfigDeployment(rhn, keyid):
         return rhn.fail(E,'check config deployment status for key %s' % keyid)
 
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def create(rhn, description, keyid='',  basechannel='', entitlements=[], usagelimit=None, universalDefault=False ):
     """
@@ -304,7 +313,7 @@ def create(rhn, description, keyid='',  basechannel='', entitlements=[], usageli
     except Exception, E:
         return rhn.fail(E,'create activation key %s' % keyid)
     
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def delete(rhn, keyid):
     """
@@ -318,7 +327,7 @@ def delete(rhn, keyid):
     Delete an existing activation key.
 
     returns:
-    bool
+    Bool, or throws Exception
 
     params:
     rhn                    - an authenticated rhn session
@@ -329,7 +338,57 @@ def delete(rhn, keyid):
     except Exception, E:
         return rhn.fail(E,'delete activation key %s' % keyid )
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+
+def disableConfigDeployment(rhn, keyid):
+    """
+    API:
+    activationkey.disableConfigDeployment
+
+    usage:
+    disableConfigDeployment(rhn, keyid) 
+
+    description:
+    Lists the kickstart profiles on the satellite
+
+    returns:
+    Bool, or throws Exception
+
+    parameters:
+    rhn                    - an authenticated RHN session
+    keyid (str)            - the key identifier (long hex or human-readable name)
+    """
+    try:
+        return rhn.session.activationkey.disableConfigDeployment(rhn.key, keyid) == 1
+    except Exception, E:
+        return rhn.fail(E, 'disable config deployment for key %s' % keyid)
+
+# ---------------------------------------------------------------------------- #
+
+def enableConfigDeployment(rhn, keyid):
+    """
+    API:
+    activationkey.enableConfigDeployment
+
+    usage:
+    enableConfigDeployment(rhn, keyid) 
+
+    description:
+    enables config file deployment for the chosen key
+
+    returns:
+    Bool, or throws Exception
+
+    parameters:
+    rhn                      - an authenticated RHN session
+    keyid (str)            - the key identifier (long hex or human-readable name)
+    """
+    try:
+        return rhn.session.activationkey.enableConfigDeployment(rhn.key, keyid) == 1
+    except Exception, E:
+        return rhn.fail(E, 'enable config deployment for key %s' % keyid)
+
+# ---------------------------------------------------------------------------- #
 
 def getDetails(rhn, keyid):
     """
@@ -343,7 +402,21 @@ def getDetails(rhn, keyid):
     show information about an activation key.
     
     returns:
-    dict
+    dict (activation key information)
+        {
+        'key' (str) :
+        'description' (str) :
+        'usage_limit' (int) :
+        'base_channel_label' (str) :
+        'child_channel_labels' (list of str) :
+        'entitlements' (list of str) :
+        'server_group_ids' (list of str) :
+        'package_names' (list of str) :
+            str packageName - (deprecated by packages)
+        'packages' (list of dict) : { 'name' (str) : - packageName 'arch' (str) : - archLabel - optional }
+        'universal_default' (bool) :
+        'disabled' (bool) :
+        }
 
     params:
     rhn                    - an authenticated rhn session
@@ -354,46 +427,15 @@ def getDetails(rhn, keyid):
     except Exception, E:
         return rhn.fail(E,'retrieve details for activation key %s' % keyid)
 
-# --------------------------------------------------------------------------------- #
-
-def list(rhn):
-    """
-    Calls the more-longwinded ListActivationKeys
-    """
-    return listActivationKeys(rhn)
-
-# --------------------------------------------------------------------------------- #
-
-def listActivatedSystems(rhn, keyid):
-    """
-    API:
-    actiationkey.listActivatedSystems
-
-    usage:
-    listActivatedSystems(rhn, keyid)
-
-    description:
-    lists systems registered using a given activation key
-
-    returns:
-    list/dict { id, hostname, last checkin }
-
-    params:
-    rhn                    - an authenticated rhn session
-    keyid (str)            - the key identifier (long hex or human-readable name)
-    """
-    try:
-        return rhn.session.activationkey.listActivatedSystems(rhn.key, keyid)
-    except Exception, E:
-        return rhn.fail(E, 'list activated systems for key %s' % keyid)
-
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listActivationKeys(rhn):
     """
-    API: activationkey.listActivationKeys
+    API:
+    activationkey.listActivationKeys
 
-    usage: listActivationKeys(rhn)
+    usage:
+    listActivationKeys(rhn)
 
     description:
     List the Activation Keys available to the current logged-in user
@@ -409,7 +451,7 @@ def listActivationKeys(rhn):
     except Exception, E:
         return rhn.fail(E,'list activation keys for logged-in user %s' % rhn.login )
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def listActivationKeyNames(rhn):
     """
@@ -434,7 +476,40 @@ def listActivationKeyNames(rhn):
     except Exception, E:
         return rhn.fail(E,'list activation keys for logged-in user %s' % rhn.login )
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+
+def listActivatedSystems(rhn, keyid):
+    """
+    API:
+    actiationkey.listActivatedSystems
+
+    usage:
+    listActivatedSystems(rhn, keyid)
+
+    description:
+    lists systems registered using a given activation key
+
+    returns:
+    list/dict { id, hostname, last checkin }
+
+    params:
+    rhn                    - an authenticated rhn session
+    keyid (str)            - the key identifier (long hex or human-readable name)
+    """
+    try:
+        return rhn.session.activationkey.listActivatedSystems(rhn.key, keyid)
+    except Exception, E:
+        return rhn.fail(E, 'list activated systems for key %s' % keyid)
+
+# ---------------------------------------------------------------------------- #
+
+def list(rhn):
+    """
+    Calls the more-longwinded ListActivationKeys
+    """
+    return listActivationKeys(rhn)
+
+# ---------------------------------------------------------------------------- #
 
 def listConfigChannels(rhn, keyid):
     """
@@ -460,15 +535,15 @@ def listConfigChannels(rhn, keyid):
         return rhn.fail(E, 'list config channels for key %s' % keyid)
 
         
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def removeChildChannels(rhn, keyid, chanlabels):
     """
     API:
     activationkey.removeChildChannels
 
-
-    usage: removeChildChannels(rhn, keyid, chanlabels)
+    usage:
+    removeChildChannels(rhn, keyid, chanlabels)
 
     description:
     Removes the specified child chanlabels from an activation key.
@@ -486,7 +561,7 @@ def removeChildChannels(rhn, keyid, chanlabels):
     except Exception, E:
         return rhn.fail(E,'remove one or more of child channels %r from key %s' % (chanlabels, keyid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def removeConfigChannels(rhn, keyids, cfgchans):
     """
@@ -512,7 +587,7 @@ def removeConfigChannels(rhn, keyids, cfgchans):
     except Exception, E:
         return rhn.fail(E,'remove one or more of config channels %r from key %s' % (cfgchans, keyid))
     
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def removeEntitlements(rhn, keyid, entlabels):
     """
@@ -527,7 +602,7 @@ def removeEntitlements(rhn, keyid, entlabels):
     [monitoring_entitled, provisioning_entitled, virtualization_host, virtualization_host_platform]
 
     returns:
-    bool
+    Bool, or throws Exception
 
     params:
     rhn                    - an authenticated rhn session
@@ -539,7 +614,7 @@ def removeEntitlements(rhn, keyid, entlabels):
     except Exception, E:
         return rhn.fail(E,'remove one or more of  %r from key %s' % (entlabels, keyid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def removePackageNames(rhn, keyid, packagenames):
     """
@@ -563,7 +638,7 @@ def removePackageNames(rhn, keyid, packagenames):
     except Exception, E:
         return rhn.fail(E,'remove one or more of %r from key %s' % (packagenames, keyid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def removePackages(rhn, keyid, packagelist):
     """
@@ -588,7 +663,7 @@ def removePackages(rhn, keyid, packagelist):
     except Exception, E:
         return rhn.fail(E,'remove one or more of %r from key %s' % (packagenames, keyid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def removeGroups(rhn, keyid, groupids):
     """
@@ -596,7 +671,7 @@ def removeGroups(rhn, keyid, groupids):
     """
     return removeServerGroups(rhn, keyid, groupids)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def removeServerGroups(rhn, keyid, groupids):
     """
@@ -611,7 +686,7 @@ def removeServerGroups(rhn, keyid, groupids):
     except Exception, E:
         return rhn.fail(E,'remove one or more of %r from key %s' % (groupids, keyid))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def removeGroupsByName(rhn, keyid, groupnames):
     """
@@ -634,7 +709,7 @@ def removeGroupsByName(rhn, keyid, groupnames):
     ids = [ x['id'] for x in groupinfo if x['name'] in groupnames ]
     return removeServerGroups(rhn, keyid, ids)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def setConfigChannels(rhn, keyids, cfgchans):
     """
@@ -650,7 +725,7 @@ def setConfigChannels(rhn, keyids, cfgchans):
 
 
     returns:
-    bool
+    Bool, or throws Exception
 
     params:
     rhn                    - an authenticated rhn session
@@ -662,7 +737,7 @@ def setConfigChannels(rhn, keyids, cfgchans):
     except Exception, E:
         return rhn.fail(E, 'set config channels %r for keys %r' %(cfgchans, keyids))
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
 def setDetails(rhn, keyid, keyobj):
     """
@@ -676,7 +751,7 @@ def setDetails(rhn, keyid, keyobj):
     replaces the settings for an existing activation key
 
     returns:
-    bool
+    Bool, or throws Exception
 
     params:
     rhn                    - an authenticated rhn session
@@ -690,52 +765,5 @@ def setDetails(rhn, keyid, keyobj):
         
         return rhn.fail(E,'retrieve details for activation key %s' % keyid)
 
-# --------------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-def enableConfigDeployment(rhn, keyid):
-    """
-    API:
-    activationkey.enableConfigDeployment
-
-    usage:
-    enableConfigDeployment(rhn, keyid) 
-
-    description:
-    enables config file deployment for the chosen key
-
-    returns:
-    bool
-
-    parameters:
-    rhn                      - an authenticated RHN session
-    keyid (str)            - the key identifier (long hex or human-readable name)
-    """
-    try:
-        return rhn.session.activationkey.enableConfigDeployment(rhn.key, keyid) == 1
-    except Exception, E:
-        return rhn.fail(E, 'enable config deployment for key %s' % keyid)
-
-# --------------------------------------------------------------------------------- #
-
-def disableConfigDeployment(rhn, keyid):
-    """
-    API:
-    activationkey.disableConfigDeployment
-
-    usage:
-    disableConfigDeployment(rhn, keyid) 
-
-    description:
-    Lists the kickstart profiles on the satellite
-
-    returns:
-    bool
-
-    parameters:
-    rhn                    - an authenticated RHN session
-    keyid (str)            - the key identifier (long hex or human-readable name)
-    """
-    try:
-        return rhn.session.activationkey.disableConfigDeployment(rhn.key, keyid) == 1
-    except Exception, E:
-        return rhn.fail(E, 'disable config deployment for key %s' % keyid)

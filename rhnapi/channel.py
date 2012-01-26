@@ -253,7 +253,7 @@ def disableUserRestrictions(rhn, chanlabel):
     If disabled, all users within the organization may subscribe to the channel.
 
     returns:
-    bool
+    Bool, or throws Exception
 
     parameters:
     rhn                     - an authenticated RHN session.
@@ -279,7 +279,7 @@ def enableUserRestrictions(rhn, chanlabel):
     If enabled, only selected users within the organization may subscribe to the channel. 
 
     returns:
-    bool
+    Bool, or throws Exception
 
     parameters:
     rhn                     - an authenticated RHN session.
@@ -329,7 +329,7 @@ def setOrgSharing(rhn, chanlabel, accesslevel):
     Set organization sharing access control. 
 
     returns:
-    bool
+    Bool, or throws Exception
 
     parameters:
     rhn                     - an authenticated RHN session.
@@ -360,7 +360,7 @@ def disableAccess(rhn, chanlabel, orgid):
     disables access to the channel for the given organization.
 
     returns:
-    bool
+    Bool, or throws Exception
 
     parameters:
     rhn                     - an authenticated RHN session.
@@ -466,7 +466,7 @@ def create(rhn, chanlabel, channame, summary, arch, parent='', checksum=None, gp
     Creates a new software channel with the supplied information.
 
     returns:
-    bool, or throws exception.
+    Bool, or throws Exception
 
     parameters:
     rhn                     - an authenticated RHN session.
@@ -509,7 +509,7 @@ def createChannel(rhn, chanlabel, channame, summary, arch, **kwargs):
     This is a reworking of channel.create using optional parameters passed as key=value pairs
 
     returns:
-    bool, or throws exception.
+    Bool, or throws Exception.
 
     parameters:
     rhn                     - an authenticated RHN session.
@@ -543,7 +543,7 @@ def clone(rhn, source_channel, name, label, summary, parent_label=None, arch_lab
     Clones an existing channel
 
     returns:
-    bool, or throws exception
+    Bool, or throws Exception
     
     For optional args, give the variable name as well to avoid specifying all of them.
     cloneChannel(rhn,source_channel,name,label,summary, parent_label='rhel-i386-server-5')
@@ -726,7 +726,7 @@ def addPackages(rhn, chanlabel, packagelist):
     Add packages to a channel using their package IDs
     
     returns:
-    bool
+    Bool, or throws Exception
 
     parameters:
     rhn                     - an authenticated RHN session.
@@ -777,7 +777,7 @@ def isGloballySubscribable(rhn, chanlabel):
     Checks if a channel is globally subscribable (by all users).
 
     returns:
-    bool
+    Bool, or throws Exception
 
     parameters:
     rhn                     - an authenticated RHN session.
@@ -1246,7 +1246,7 @@ def regenerateYumCache(rhn, chanlabel):
     Regenerates the yum cache for the specified channel
 
     returns:
-    bool
+    Bool, or throws Exception
 
     parameters:
     rhn(rhnapi.rhnSession) - authenticated session
@@ -1271,7 +1271,7 @@ def removePackages(rhn, chanlabel, package_ids):
     Removes a list of packages from a channel
     
     returns:
-    bool
+    Bool, or throws Exception
 
     parameters:
     rhn                     - an authenticated RHN session.
@@ -1297,7 +1297,7 @@ def setContactDetails(rhn, chanlabel, name, email, phone, policy):
     Sets the administrative contact/support information for a channel
 
     returns:
-    bool
+    Bool, or throws Exception
 
     parameters:
     rhn(rhnapi.rhnSession)  - authenticated RHN session object
@@ -1418,7 +1418,7 @@ def hasChildren(rhn, chanlabel):
     check if the given channel label has child channels.
 
     returns:
-    bool
+    Bool, or throws Exception
 
     params:
     rhn                - authentication rhnapi.rhnSession
@@ -1442,7 +1442,7 @@ def deleteRecursive(rhn, chanlabel):
     This could cause utter mayhem, be careful.
 
     returns:
-    bool
+    Bool, or throws Exception
 
     params:
     rhn                 - authenticated rhnapi.rhnSession 

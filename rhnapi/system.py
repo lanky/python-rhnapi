@@ -2813,7 +2813,7 @@ def scheduleScriptRun(rhn, serverids, username, grpname, timeout, script, runaft
         return isinstance(rhn.session.system.scheduleScriptRun(rhn.key, *args), int)
 
     except Exception, E:
-        return rhn.fail(E,'schedule script run on servers [%s]' % (','.join(serverids))
+        return rhn.fail(E,'schedule script run on servers [%s]' % (','.join(serverids)))
 
 # ---------------------------------------------------------------------------- #
 
@@ -3389,7 +3389,7 @@ def addConfigChannels(rhn, serverids, chanlabels, prepend):
 
 # ---------------------------------------------------------------------------- #
 
-def createOrUpdatePath(rhn, serverid, path, isdir = False, local, pathobj):
+def createOrUpdatePath(rhn, serverid, path, local, pathobj, isdir = False):
     """
     API:
     system.config.createOrUpdatePath

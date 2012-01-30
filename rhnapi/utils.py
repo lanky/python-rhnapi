@@ -42,6 +42,7 @@ from operator import itemgetter
 import time
 from  xmlrpclib import DateTime as xmlrpcDateTime
 import csv
+import sys
 
 # presumes the existence of the rhnapi module on your PYTHONPATH
 from rhnapi.satellite import listEntitlements
@@ -247,9 +248,14 @@ def csvReport(objectlist, outputfile,  fields = None):
     """
     try:
         # attempt to open the output file for writing
-        fd = open(outputfile, 'wb')
+        try:
+            fd = open(outputfile, 'wb')
+        except:
+            fd = outputfile
+
         if fields is None:
-            # assume 
+            # assume we want all the possible fields in the input dict
+            # and that all entries match the first one.
             fields = objectlist[0].keys()
 
         headerline = {}
@@ -260,8 +266,12 @@ def csvReport(objectlist, outputfile,  fields = None):
         mywriter = csv.DictWriter(fd, fields, restval='', extrasaction = 'ignore')
         mywriter.writerow(headerline)
         mywriter.writerows(objectlist)
-        fd.close()
+        try:
+            fd.close()
+        except:
+            pass
         return True
+
     except Exception, E:
         raise E
         return False

@@ -183,7 +183,7 @@ def dumpJSON(obj, outputfile, indent = 2, verbose = False, customenc = DateTimeE
         
 # --------------------------------------------------------------------------------- #
 
-def loadJSON(inputfile, verbose = False):
+def loadJSON(inputfile, verbose = False, logger = None):
     """
     Loads data from a JSON file (probably but not necessarily 
     exported with dumpJSON above) and returns it.
@@ -198,11 +198,14 @@ def loadJSON(inputfile, verbose = False):
         try:
             jsondata = json.loads(data)
             return jsondata
-        except:
-            print "could not read in data from %s" % inputfile
+        except ValueError, E:
+            if logger is not None:
+                logger.warn("ERROR: exception raised, '%s'" % E.__str__())
+                logger.exception("could not read in data from %s" % inputfile)
     except IOError, E:
-        if verbose:
-            print "could not open file %s for reading. Check permissions?" % inputfile
+        if logger is not None:
+            logger.warn(E.__str__())
+            logger.exception("could not open file %s for reading. Check permissions?" % inputfile)
         return None
         
 # --------------------------------------------------------------------------------- #
@@ -246,12 +249,16 @@ def csvReport(objectlist, outputfile,  fields = None):
                   in each object. 
 
     """
+    fd = None
     try:
         # attempt to open the output file for writing
-        try:
-            fd = open(outputfile, 'wb')
-        except:
+        if isinstance(outputfile, file):
             fd = outputfile
+        else:
+            try:
+                fd = open(outputfile, 'wb')
+            except:
+                raise
 
         if fields is None:
             # assume we want all the possible fields in the input dict
@@ -266,14 +273,15 @@ def csvReport(objectlist, outputfile,  fields = None):
         mywriter = csv.DictWriter(fd, fields, restval='', extrasaction = 'ignore')
         mywriter.writerow(headerline)
         mywriter.writerows(objectlist)
+
         try:
-            fd.close()
-        except:
+            print "------------------------"
+            if not fd.isatty():
+                fd.close()
+        except ValueError:
             pass
+        
         return True
 
-    except Exception, E:
-        raise E
-        return False
-
-
+    except:
+        raise

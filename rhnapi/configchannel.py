@@ -379,6 +379,8 @@ def createOrUpdateSymlink(rhn, chanlabel, path, **kwargs):
     except Exception, E:
         return rhn.fail(E, 'create or update symlink %s in channel %s with parameters %s' %(path, chanlabel, str(kwargs)))
 
+# ---------------------------------------------------------------------------- #
+
 def deleteFiles(rhn, chanlabel, pathlist):
     """
     API:
@@ -402,6 +404,8 @@ def deleteFiles(rhn, chanlabel, pathlist):
         return rhn.session.configchannel.deleteFiles(rhn.key, chanlabel, pathlist) == 1
     except Exception, E:
         return rhn.fail(E, 'delete files from configuration channel %s' %(chanlabel))
+
+# ---------------------------------------------------------------------------- #
 
 def deleteFile(rhn, chanlabel, path):
     """
@@ -453,7 +457,7 @@ def lookupFileInfo(rhn, chanlabel, pathlist):
         
 # --------------------------------------------------------------------------------- #
 
-def getFileInfo(rhn, chanlabel, pathlist)        
+def getFileInfo(rhn, chanlabel, pathlist):       
     """
     special case of lookupFileInfo for the sake of commonsense naming.
     """

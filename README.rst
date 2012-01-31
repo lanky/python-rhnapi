@@ -91,15 +91,11 @@ No regex or protocol bits or any other funny business.
 sample ~/.rhninfo::
 
   [DEFAULTS]
-  
   login=None
-  
   password=None
   
   [your.satellite.hostname]
-  
   login=xxxxx
-  
   password=xxxx
 
 if you miss the password=xxxxx bit (or leave it set to None), you'll be prompted for it.

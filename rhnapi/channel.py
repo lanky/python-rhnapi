@@ -290,6 +290,22 @@ def enableUserRestrictions(rhn, chanlabel):
     except Exception, E:
         return rhn.fail(E,'enable user access restrictions for channel %s' % chanlabel)
         
+# ---------------------------------------------------------------------------- #
+
+def getDetails(rhn, chanspec):
+    """
+    API:
+    channel.software.getDetails
+
+    calls detailsByLabel or detailsByID depending on information passed
+    """
+    if isinstance(chanspec, int):
+        return detailsByID(rhn, chanspec)
+    elif isinstance(chanspec, str):
+        return detailsByLabel(rhn, chanspec)
+    else:
+        return rhn.fail(E, 'get details for channel %s' % str(chanspec))
+
 # --------------------------------------------------------------------------------- #
 
 def getOrgSharing(rhn, chanlabel):
@@ -1367,7 +1383,7 @@ def listBaseChannels(rhn, regex=None):
         basechannels = list()
         for channel in allchannels:
             chdetails = rhn.session.channel.software.getDetails(rhn.key, channel['id'])
-            if len(chdetails['parent_chanlabel']) == 0:
+            if len(chdetails['parent_channel_label']) == 0:
                 basechannels.append(channel['label'])
         if regex is not None:
             pattern = re.compile(r'%s' % str(regex))

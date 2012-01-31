@@ -1352,7 +1352,7 @@ def listChildChannels(rhn, chanlabel):
     try:
         return sorted([ x['label'] for x in rhn.session.channel.software.listChildren(rhn.key, chanlabel)])
     except Exception, E:
-        rhn.fail(E, 'list children of channel %s' % ( chanlabel ) )
+        return rhn.fail(E, 'list children of channel %s' % ( channel_label ) )
     
 # --------------------------------------------------------------------------------- #
 
@@ -1391,7 +1391,7 @@ def listBaseChannels(rhn, regex=None):
         else:
             return basechannels
     except Exception, E:
-        rhn.fail(E, 'list base channels on your satellite')
+        return rhn.fail(E, 'list base channels on your satellite')
     
 def channelsByArch(rhn, archlabel):
     """
@@ -1416,7 +1416,7 @@ def channelsByArch(rhn, archlabel):
         chanlist = rhn.session.channel.listSoftwareChannels(rhn.key)
         return [ x['label'] for x in chanlist if x['arch'] == archlabel ]
     except Exception, E:
-        rhn.fail(E, "find channels with archlabel %s" % (archlabel))
+        return rhn.fail(E, "find channels with arch %s" % (arch))
 
 # --------------------------------------------------------------------------------- #
 # Methods under here are not technically part of the API, just utility functions I added
@@ -1443,7 +1443,7 @@ def hasChildren(rhn, chanlabel):
     try:
         return len(rhn.session.channel.software.listChildren(rhn.key, chanlabel)) != 0
     except Exception, E:
-        rhn.fail(E, 'check for children of channel %s' % chanlabel)
+        return rhn.fail(E, 'check for children of channel %s' % channel_label)
 
 def deleteRecursive(rhn, chanlabel):
     """
@@ -1473,7 +1473,7 @@ def deleteRecursive(rhn, chanlabel):
         # handily, this will fail if any of the child channels could not be deleted:
         return rhn.session.channel.software.delete(rhn.key, chanlabel) == 1
     except Exception, E:
-        rhn.fail(E, 'recursively delete channel %s and all its child channels' % chanlabel)
+        return rhn.fail(E, 'recursively delete channel %s and all its child channels' % channel_label)
 
 def cloneRecursive(rhn, chanlabel, prefix=None, suffix=None):
     """
@@ -1501,6 +1501,26 @@ def cloneRecursive(rhn, chanlabel, prefix=None, suffix=None):
     because source and target labels will be identical.
     """
     return 'Not Implemented Yet'
+    
+# --------------------------------------------------------------------------------- #
+def channelExists(rhn, channel_label):
+    """
+    CUSTOM METHOD
+    Custom RHN API method to confirm the existence of a channel label on your satellite.
+
+    returns: bool
+
+    params:
+    rhn                 - authenticated rhnapi.rhnSession object
+    channel_label(str)  - label of channel to look for
+    """
+    try:
+        chanlist = [ x['label'] for x in listSoftwareChannels(rhn) ]
+        if channel_label in chanlist:
+            return True
+        else:
+            return False
+    except Exception, E:
+        return rhn.fail(E, 'check channel existence')
 
 
-        

@@ -224,7 +224,7 @@ def saveCreds(filename, servername, logger, login = None, password = None, debug
     # handle being given '~/' as part of a filename
     dstfile = os.path.expanduser(filename)
     if debug:
-        logger.log(logging.DEBUG, "saving credentials to %s", dstfile) 
+        logger.debug("saving credentials to %s", dstfile) 
 
     # existing defaults will replace these, but just in case we're setting
     # up a new config file from scratch...
@@ -305,7 +305,9 @@ class rhnSession(object):
     a base RHN class. You'll need one of the other submodules for it to do anything useful.
     """
 
-    def __init__(self, url='rhn.redhat.com', rhnlogin = None, rhnpassword = None, proxyserver = None, config = None, savecreds=False, debug = False, logfile = None):
+    def __init__(self, url='rhn.redhat.com', rhnlogin = None, rhnpassword = None,
+                 proxyserver = None, config = None, savecreds=False, debug = False,
+                 logenable = True, logfile = None, loglevel = 20, logname = 'RHN API'):
         """
         Initialize a connection to RHN (or a satellite) using the provided information.
         proxy server should be local https proxy, if available. IPaddress/Hostname:port.
@@ -314,38 +316,55 @@ class rhnSession(object):
         returns rhnSession object
 
         parameters: (* = optional)
-        url(str)              - hostname or ip address of the RHN server
-        rhnlogin(str)         - username (prompted if omitted)
-        rhnpassword(str)      - password (prompted if omitted)
-        *proxyserver(str)     - HTTP proxy betweeen you and the satellite (IP or hostname only)
-        *config(str)          - local configuration file, in .ini format for username and password
-        *savecreds(bool)      - should we save username and passwords to our ~/.rhninfo file?
-        *debug(bool)          - print out lots of horribly (and possibly insecure) information for testing.
-        *logfile(fd)          - destination for log output (default if not specified: stdout)
+        url(str)            - hostname or ip address of the RHN server
+        rhnlogin(str)       - username (prompted if omitted)
+        rhnpassword(str)    - password (prompted if omitted)
+        *proxyserver(str)   - HTTP proxy betweeen you and the satellite (IP or hostname only)
+        *config(str)        - local configuration file, in .ini format for username and password
+        *savecreds(bool)    - should we save username and passwords to our ~/.rhninfo file?
+        *debug(bool)        - print out lots of horribly (and possibly insecure) information for testing.
+        *logenable(bool)    - whether to enable RHN Session logging [True]
+        *logfile(str)       - destination for log output [None].
+                              if not specified and logging is enabled, uses stderr
+        *loglevel(int)      - loglevel to set [20(INFO)]
+                              (10 = debug, 20 = info, 30 = warn, 40 = error, 50 = crit/fatal)
+        *logname(str)       - name to use in log messages. Defaults to 'RHN API'. Can be any string.                              
+                              (for example, your script name)
         """
         # for config passing we require the hostname, let's clean up whatever we've been given:
         self.hostname = getHostname(url)
         self.rhnurl = rhnifyURL(url)
         self.login = rhnlogin
+        # passwords are private variables. Cached, but not exposed
         self._password = rhnpassword
 
         self.debug = debug
         # in case we need it:
         self.configfile = config
         # logdestination
-        self.logfile = logfile
 
-        # just so it's an existing property
+        # logging configuration
         self.logger = None
+        self.logenable = logenable
+        self.logfile = logfile
+        if self.debug:
+            self.loglevel = 10
+        else:            
+            self.loglevel = loglevel
 
-        if self.logfile is not None:
-            self.addLogger("RHN API", self.logfile)
-        else:
-            self.addLogger("RHN API", sys.stdout)
+        if self.logenable:
+            if self.logfile is not None:
+                self.addLogger(logname, self.logfile, self.loglevel)
+            else:
+                self.addLogger(logname, None, self.loglevel)
 
-        # If login and password are specified explicitly they override the config file
-        # otherwise we read credentials from the config file, unless none was specified
+        # authentication config (order of precedence)
+        # 1. login and password as args
+        # 2. login and password from config file
+        # 3. prompt for missing information
+        # If login and/or password are specified explicitly they override the config file
         if self.login == None and self._password == None and self.configfile != None:
+            self.logInfo("looking up config info in %s" % self.configfile)
             self.login, self._password = fetchCreds(self.configfile, self.hostname, self.logger, self.debug)
 
         # see what we got back and prompt if required:
@@ -368,6 +387,8 @@ class rhnSession(object):
 
             # now we login
             self.key = self.session.auth.login(self.login, self._password)
+            if isinstance(self.key, str):
+                self.logDebug("initalised RHN Session, key: %s" % self.key)
 
             # set some version info for debug, really.
             self.sat_version = self.session.api.systemVersion()
@@ -377,21 +398,25 @@ class rhnSession(object):
                 if self.configfile is not None:
                     res = saveCreds(self.configfile, self.hostname, self.logger, self.login, self._password)
                     if res:
-                        if self.debug:
-                            print "saved credentials to %s" % self.configfile
+                        self.logDebug("saved credentials to %s" % self.configfile)
                     else:
-                        print "failed to save credentials to %s" % self.configfile
+                        self.logWarn("failed to save credentials to %s" % self.configfile)
 
 
         except xmlrpclib.Fault, E:
             self.fail(E, 'login to RHN server %s' % self.rhnurl )
 
-    def addLogger(self, logname, logdest, loglevel = 10, logfmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'):
+# ---------------------------------------------------------------------------- #
+
+    def addLogger(self, logname, logdest, loglevel, logfmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'):
         """
         Generates self.logger, a logging.Logger instance.
 
         returns a logging.logger instance, with appropriate configuration
         supports logging to streams (sys.stdout, sys.stderr) and files.
+
+        The assumption here is that if given a filename, we use that, otherwise we use a StreamHandler and log to
+        stderr
 
         parameters:
         logname(str)    - name of log instance (appears in log messages). Your script name is a good choice.
@@ -422,109 +447,103 @@ class rhnSession(object):
         # with python 2.4 we have to wrap the try...except block in another
         # block to use the 'finally' statement for cleanup.
         try:
-            # handle the special case of stdout/stderr first
-            # unfortunately there's no simple test for this
-            if logdest in [ sys.stdout, sys.stderr ]:
-                lh = logging.StreamHandler(logdest)
-                logerror = False
-            else:
-            # otherwise, assume it's a file and attempt to use it
+            if logdest is not None:
+            # we were actually given a filename or path to log to
+            # try and open it
                 try:
                     lh = logging.FileHandler(logdest)
                     logerror = False
                 except:
+                    # if we can't open the file, fall back to stderr
                     lh = logging.StreamHandler()
                     logerror = True
+            else:
+                lh = logging.StreamHandler()
+                logerror = False
         finally:
         # this should run once the outer 'try' block has completed
         # whether an exception was raised or not.
             lh.setFormatter(formatter)
             lh.setLevel(loglevel)
-            self.logger.addHandler(lh)
+            if len(self.logger.handlers) == 0:
+                self.logger.addHandler(lh)
             if logerror:
-                self.logErr("unable to open/access log file %s, falling back to stdout" % logdest)
+                self.logErr("unable to open/access log file %s, falling back to stderr" % logdest)
+            if self.logger is None:
+                raise RuntimeError("failed to instantiate logger")
+            self.logger.debug("Logger initiated")
+        
 
+    def setLogLevel(self, loglevel = 10):
+        """
+        sets loglevel for the RHN logger
+        """
+        if self.logger is not None:
+            self.logger.setLevel(loglevel)
 
-        # handle stdout and stderr first
-#        if logdest in [ sys.stdout , sys.stderr ]:
-#            ch = logging.StreamHandler()
-#            ch.setFormatter(formatter)
-##            ch.setLevel(logging.INFO)
-#            self.logger.addHandler(ch)
-#        else:
-        # failing that we must have specified a file...
-#            try:
-#                lf = logging.FileHandler(logdest)
-#            except IOError:
-#                lf = logging.StreamHandler()
-#                broken_log = True
-#
-#            lf.setFormatter(formatter)
-#            lf.setLevel(logging.DEBUG)
-#            self.logger.addHandler(lf)
-
-
-        # if we increase verbosity and aren't already using a streamhandler to stdout...
- #       if broken_log:
- #           self.logger.error("Cannot open logfile %s. Falling back to standard output" % logdest)
-
+    # ---------------------------------------------------------------------------- #
 
     def logMessage(self, loglevel, message):
         """
         Write a log message
 
-        passes if this failes, as failed logging should not fail everything else.
+        passes if this fails, as failed logging should not fail everything else.
 
         parameters
         loglevel(int)       - log priority. Can be logging.INFO (etc) or numeric
         message(str)        - the actual message to send.
         """
-        try:
+        if self.logger is not None:
             self.logger.log(loglevel, message)
-        except:
-            pass
     
     def logInfo(self, message):
         """
         logs at INFO priority
         """
-        return self.logMessage(logging.INFO, message)
+        if self.logger is not None:
+            self.logger.info(message)
 
     def logDebug(self, message):
         """
         Shortcut for DEBUG level logging
         """
-        return self.logMessage(logging.DEBUG, message)
+        if self.logger is not None:
+            self.logger.debug(message)
 
     def logCrit(self, message):
         """
         Shortcut for CRITICAL level logging
         """
-        return self.logMessage(logging.CRITICAL, message)
+        if self.logger is not None:
+            self.logger.critical(message)
 
     def logWarn(self, message):
         """
         logs a message at WARN priority
         """
-        return self.logMessage(logging.WARNING, message)
+        if self.logger is not None:
+            self.logger.warn(message)
 
     def logFatal(self, message):
         """
         shortcut to FATAL (emerg-ish) level logging
         """
-        return self.logMessage(logging.FATAL, message)
+        if self.logger is not None:
+            self.logger.fatal(message)
 
     def logErr(self, message):
         """
         ERROR level logging
         """
-        return self.logMessage(logging.ERROR, message)
+        if self.logger is not None:
+            self.logger.error(message)
 
     def logError(self, message):
         """
         ERROR level logging
         """
-        return self.logMessage(logging.ERROR, message)
+        if self.logger is not None:
+            self.logger.error(message)
 
     def fail(self, exptn, message):
         """
@@ -541,24 +560,6 @@ class rhnSession(object):
             self.logErr(str(E))
         # raise
         return False
-#        if isinstance(exptn, xmlrpclib.Fault):
-#            self.logger.exception(str(exptn)
-#            self.logErr("Error: %s" % str(exptn.faultCode).strip())
-#            self.logErr("Message: %s" % str(exptn.faultString).strip())
-#            return False
-#        # this catches pretty much everything else, which can be a BAD thing
-#        else:
-#            return False
-            
-
-        # self.logger
-        # if self.debug:
-        #    print "failed to %s" % message
-        #    if isinstance (exptn, xmlrpclib.Fault):
-        #        print "Code: %s" % Exception.faultCode
-        #        print "Message: %s" % Exception.faultString
-        # else:
-        #    return False
 
     def close(self):
         """
@@ -592,12 +593,33 @@ class rhnSession(object):
         enable debug output
         """
         self.debug = True
+        if self.logger is not None:
+            self.logger.setLevel(logging.DEBUG)
 
     def disableDebug(self):
         """
         disable debug output
         """
         self.debug = False
+        # go back to Info Logging
+        if self.logger is not None:
+            self.logger.setLevel(logging.WARN)
+            
+    def enableVerbose(self):
+        """
+        Verbose Logging
+        """
+        self.verbose = True
+        if self.logger is not None:
+            self.logger.setLevel(logging.INFO)
+
+    def disableVerbose(self):
+        """
+        disable verbose logging
+        """
+        self.verbose = False
+        if self.logger is not None:
+            self.logger.setLevel(logging.WARN)
 
     def renewSession(self):
         """

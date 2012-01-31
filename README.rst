@@ -87,14 +87,15 @@ How to use the module in your own scripts.
 3. to ease typing, the module supports the use of a config file in .ini format, defaulting to '~/.rhninfo'
 this should look like this (you can include sections for different satellites if you wish. Each [] section should contain only one hostname.
 No regex or protocol bits or any other funny business.
-# sample ~/.rhninfo
-    [DEFAULTS]
-    login=None
-    password=None
 
-    [your.satellite.hostname]
-    login=xxxxx
-    password=xxxx
+sample ~/.rhninfo::
+  [DEFAULTS]
+  login=None
+  password=None
+
+  [your.satellite.hostname]
+  login=xxxxx
+  password=xxxx
 
 if you miss the password=xxxxx bit (or leave it set to None), you'll be prompted for it.
 

@@ -1185,7 +1185,7 @@ def setCustomOptions(rhn, kslabel, optslist):
     optionslist              - list of strings, each representing a line in the kickstart.
     """
     try:
-        return rhn.session.kickstart.profile.setCustomOptions(rhn.key, kslabel, optionslist) == 1
+        return rhn.session.kickstart.profile.setCustomOptions(rhn.key, kslabel, optslist) == 1
     except Exception, E:
         return rhn.fail(E, 'set custom opts for kickstart %s' % kslabel)
 

@@ -319,7 +319,8 @@ def getMaxLen(dictlist):
             curval = maxlen.get(k, 0)
             try:
                 mylen = len(v)
-            except TypeError:
+# for objects that don't support len():
+            except:
                 mylen = len(str(v))
 
             if mylen > curval:

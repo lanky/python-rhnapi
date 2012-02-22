@@ -144,7 +144,7 @@ def promptPass(username):
 
 # ---------------------------------------------------------------------------- #
 
-def fetchCreds(filename, servername, logger, debug=False):
+def fetchCreds(filename, servername, logger=None, debug=False):
     """
     usage:
     fetchCreds(filename, servername, logger, debug=False)
@@ -176,7 +176,7 @@ def fetchCreds(filename, servername, logger, debug=False):
     # harmless, so just for sanity:
     srcfile = os.path.expanduser(filename)
 
-    if debug:
+    if logger:
         logger.debug("attempting to load credentials from %s", srcfile)
 
     confparse = SafeConfigParser()
@@ -184,20 +184,21 @@ def fetchCreds(filename, servername, logger, debug=False):
     if os.path.isfile(srcfile):
         confparse.read(srcfile)
         if confparse.has_section(servername):
-            if debug:
-                logger.debug("found section for server %s", servername)
+            if logger:
+               logger.debug("found section for server %s", servername)
             mylogin = confparse.get(servername, 'login')
             mypass  = confparse.get(servername, 'password')
         else:
-            logger.info("No section found for server %s, using defaults", servername)
-    if debug:
+            if logger:
+                logger.info("No section found for server %s, using defaults", servername)
+    if debug and logger:
         logger.debug("using username %s from config file", mylogin)
 
     return str(mylogin).strip(), str(mypass).strip()
 
 # ---------------------------------------------------------------------------- #
 
-def saveCreds(filename, servername, logger, login = None, password = None, debug = False):
+def saveCreds(filename, servername, logger = None, login = None, password = None):
     """
     description:
     Attempts to save login and password information to the given configfile
@@ -223,7 +224,7 @@ def saveCreds(filename, servername, logger, login = None, password = None, debug
     """
     # handle being given '~/' as part of a filename
     dstfile = os.path.expanduser(filename)
-    if debug:
+    if logger:
         logger.debug("saving credentials to %s", dstfile) 
 
     # existing defaults will replace these, but just in case we're setting
@@ -239,11 +240,13 @@ def saveCreds(filename, servername, logger, login = None, password = None, debug
     try:
         fd = open(dstfile, 'w')
     except IOError:
-        logger.exception("unable to open file %s for writing", dstfile)
+        if logger:
+            logger.exception("unable to open file %s for writing", dstfile)
         
     # add a section for our hostname, if missing
     if not confparse.has_section(servername):
-        logger.debug("Adding section for %s", servername)
+        if logger:
+            logger.debug("Adding section for %s", servername)
         confparse.add_section(servername)
 
     # now make settings as appropriate. Existing settings will be replaced
@@ -255,10 +258,12 @@ def saveCreds(filename, servername, logger, login = None, password = None, debug
         # write out our in-memory config to disk
         confparse.write(fd)
         fd.close()
-        logger.info("successfully saved credentials to %s", dstfile)
+        if logger:
+            logger.info("successfully saved credentials to %s", dstfile)
         return True
     except:
-        logger.log(logging.ERROR, "Failed to save configuration information", exc_info = 1)
+        if logger:
+            logger.log(logging.ERROR, "Failed to save configuration information", exc_info = 1)
         return False
     
 # -------------------------- Class Definitions     --------------------------- #
@@ -388,11 +393,13 @@ class rhnSession(object):
             # now we login
             self.key = self.session.auth.login(self.login, self._password)
             if isinstance(self.key, str):
-                self.logDebug("initalised RHN Session, key: %s" % self.key)
+                self.logDebug("initialised RHN Session, key: %s" % self.key)
 
             # set some version info for debug, really.
             self.sat_version = self.session.api.systemVersion()
             self.api_version = self.session.api.getVersion()
+            # org ID for the currently logged-in user
+            self.org_number = self.session.user.getDetails(self.key, self.login).get('org_id', None)
 
             if savecreds:
                 if self.configfile is not None:
@@ -402,9 +409,12 @@ class rhnSession(object):
                     else:
                         self.logWarn("failed to save credentials to %s" % self.configfile)
 
+            
+
 
         except xmlrpclib.Fault, E:
             self.fail(E, 'login to RHN server %s' % self.rhnurl )
+            raise
 
 # ---------------------------------------------------------------------------- #
 
@@ -612,6 +622,7 @@ class rhnSession(object):
         self.verbose = True
         if self.logger is not None:
             self.logger.setLevel(logging.INFO)
+            self.logger.info("loglevel set to INFO")
 
     def disableVerbose(self):
         """
@@ -668,6 +679,9 @@ class rhnSession(object):
 class rhnException(Exception):
     """
     An attempt to customise the exception handling
+    current known codes:
+    -1  : no such session (expiry)
+    2905: username/password fail
     """
 
     def __init__(self, value, *args, **kwargs):

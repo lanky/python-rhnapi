@@ -1,2 +1,7 @@
 # ignore all vim swap files
 *.swp
+# ignore disttools artifacts
+build/
+dist/
+MANIFEST
+localtest.py

@@ -510,6 +510,7 @@ def create(rhn, chanlabel, channame, summary, arch, parent='', checksum=None, gp
     except Exception, E:
         return rhn.fail(E, 'create software channel %s' % channame)
 
+# ---------------------------------------------------------------------------- #
 
 def createChannel(rhn, chanlabel, channame, summary, arch, **kwargs):
     """

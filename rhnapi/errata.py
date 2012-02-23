@@ -660,3 +660,5 @@ def modifyDetails(rhn, erratum, **kwargs):
     except Exception, E:
         return rhn.fail(E, 'modify details for erratum %s' % erratum)
         
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

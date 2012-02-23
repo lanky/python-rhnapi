@@ -2285,3 +2285,6 @@ def updateTree(rhn, treelabel, treepath, chanlabel, insttype):
         return rhn.session.kickstart.tree.update(rhn.key,treelabel, treepath, chanlabel, insttype) == 1
     except Exception, E:
         return rhn.fail(E, 'update kickstart distribution %s' % treelabel)
+        
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

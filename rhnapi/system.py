@@ -4244,3 +4244,6 @@ def searchNameAndDescription(rhn, query):
         return rhn.session.system.search.nameAndDescription(rhn.key, query)
     except Exception, E:
         return rhn.fail(E, 'search for systems whose name or description match "%s"' % query)
+        
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

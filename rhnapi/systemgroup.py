@@ -626,3 +626,6 @@ def update(rhn, sysgroup, grpdesc):
         return rhn.session.systemgroup.update(rhn.key, sysgroup, grpdesc)
     except Exception, E:
         return rhn.fail(E, 'update system group %s' % sysgroup )
+
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

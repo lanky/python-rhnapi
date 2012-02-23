@@ -327,3 +327,6 @@ def getMaxLen(dictlist):
                 maxlen[k] = mylen
 
     return maxlen
+
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

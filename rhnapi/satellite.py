@@ -122,3 +122,6 @@ def getCertificateExpirationDate(rhn):
         return rhn.session.satellite.getCertificateExpirationDate(rhn.key)
     except Exception, E:
         return rhn.fail(E, 'get cert expiry date for satellite %s' % rhn.hostname)
+
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

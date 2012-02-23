@@ -578,7 +578,7 @@ class rhnSession(object):
         try:
             self.session.auth.logout(self.key)
         except Exception, E:
-            self.failure(E, 'logout user %s' % self.login)
+            self.fail(E, 'logout user %s' % self.login)
 
     def getSatelliteVersion(self):
         """
@@ -681,6 +681,7 @@ class rhnException(Exception):
     An attempt to customise the exception handling
     current known codes:
     -1  : no such session (expiry)
+    -210: channel does not exist
     2905: username/password fail
     """
 

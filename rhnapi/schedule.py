@@ -339,3 +339,6 @@ def rescheduleActions(rhn, actionids, failedonly = True):
         return rhn.session.schedule.rescheduleActions(rhn.key, actionids, failedonly) == 1
     except Exception, E:
         return rhn.fail(E, 'reschedule actions')
+
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

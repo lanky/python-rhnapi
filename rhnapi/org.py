@@ -602,3 +602,6 @@ def removeTrust(rhn, orgid, trustedorgid):
         return rhn.session.org.trusts.removeTrust(rhn.key, orgid, trustedorgid) == 1
     except Exception, E:
         return rhn.fail(E, 'remove the trust between org %d and %d' %(orgid, trustedorgid))
+
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

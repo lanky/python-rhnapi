@@ -510,6 +510,7 @@ def create(rhn, chanlabel, channame, summary, arch, parent='', checksum=None, gp
     except Exception, E:
         return rhn.fail(E, 'create software channel %s' % channame)
 
+# ---------------------------------------------------------------------------- #
 
 def createChannel(rhn, chanlabel, channame, summary, arch, **kwargs):
     """
@@ -1524,3 +1525,5 @@ def channelExists(rhn, channel_label):
         return rhn.fail(E, 'check channel existence')
 
 
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

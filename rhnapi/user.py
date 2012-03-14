@@ -714,3 +714,6 @@ def usePamAuthentication(rhn, rhnuser, enablepam):
         return rhn.session.user.usePamAuthentication(rhn.key, rhnuser, enablepam) == 1
     except Exception, E:
         return rhn.fail(E,'%s PAM Authentication for user %s' %( task, rhnuser))
+
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

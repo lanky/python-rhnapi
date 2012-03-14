@@ -1185,7 +1185,7 @@ def setCustomOptions(rhn, kslabel, optslist):
     optionslist              - list of strings, each representing a line in the kickstart.
     """
     try:
-        return rhn.session.kickstart.profile.setCustomOptions(rhn.key, kslabel, optionslist) == 1
+        return rhn.session.kickstart.profile.setCustomOptions(rhn.key, kslabel, optslist) == 1
     except Exception, E:
         return rhn.fail(E, 'set custom opts for kickstart %s' % kslabel)
 
@@ -2285,3 +2285,6 @@ def updateTree(rhn, treelabel, treepath, chanlabel, insttype):
         return rhn.session.kickstart.tree.update(rhn.key,treelabel, treepath, chanlabel, insttype) == 1
     except Exception, E:
         return rhn.fail(E, 'update kickstart distribution %s' % treelabel)
+        
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

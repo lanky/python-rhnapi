@@ -47,7 +47,7 @@ import sys
 # presumes the existence of the rhnapi module on your PYTHONPATH
 from rhnapi.satellite import listEntitlements
 from rhnapi.system import listSystems, getBaseChannel
-        
+
 # --------------------------------------------------------------------------------- #
 
 def showEntitlements(rhn):
@@ -131,13 +131,18 @@ def showChannelUsage(rhn):
         
 # --------------------------------------------------------------------------------- #
 
-class DateTimeEncoder(json.JSONEncoder):
+class RhnJSONEncoder(json.JSONEncoder):
     """
     description:
-    Custom encoder for xmlrpclib.DateTime objects, which are not directly
-    serialisable.
+    Custom JSON encoder class, to handle python objects that do not serialise cleanly
+    by default.
+
+    Currently supported elements:
+    * xmlrpclib.DateTime objects : serialised as str - obj.value
     Converts <DateTime 'YYYYMMDDTHH:MM:SS' at memaddr> objects to str
     (which handily returns the quoted string above)
+
+    * python sets                : converted to lists - list(obj)
     """
     def default(self, obj):
         """
@@ -145,11 +150,15 @@ class DateTimeEncoder(json.JSONEncoder):
         """
         if isinstance(obj, xmlrpcDateTime):
             return obj.value
+
+        if isinstance(obj, set):
+            return list(obj)
+
         return simplejson.JSONEncoder.default(self, obj)
         
 # --------------------------------------------------------------------------------- #
 
-def dumpJSON(obj, outputfile, indent = 2, verbose = False, customenc = DateTimeEncoder):
+def dumpJSON(obj, outputfile, indent = 2, verbose = False, customenc = RhnJSONEncoder):
     """
     Serialises the chosen object as JSON.
     
@@ -175,6 +184,7 @@ def dumpJSON(obj, outputfile, indent = 2, verbose = False, customenc = DateTimeE
             return False
         fd.write(data)
         fd.close()
+        return True
     except IOError, E:
         if verbose:
             print "Could not open file %s for writing. Check permissions"
@@ -285,3 +295,38 @@ def csvReport(objectlist, outputfile,  fields = None):
 
     except:
         raise
+
+# ---------------------------------------------------------------------------- #
+
+def getMaxLen(dictlist):
+    """
+    parses a list of dict (common output from RHN API) and calculates the longest
+    entry for each key it finds.
+    Currently does not do recursion, so dicts of dicts are not supported.
+    TODO: add this in future release.
+
+    This is useful for formatting output
+
+    returns:
+    dict { 'key' : maxlength(int) }
+
+    parameters:
+    dictlist(list of dict)  - list of dictionary structures.
+    """
+    maxlen = {}
+    for d in dictlist:
+        for k, v in d.iteritems():
+            curval = maxlen.get(k, 0)
+            try:
+                mylen = len(v)
+# for objects that don't support len():
+            except:
+                mylen = len(str(v))
+
+            if mylen > curval:
+                maxlen[k] = mylen
+
+    return maxlen
+
+# footer - do not edit below here
+# vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

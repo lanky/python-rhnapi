@@ -1,3 +1,5 @@
 # exclude README
 recursive-include rhnapi *.py
 graft rhnapi/docs
+include README.rst
+include GPL.txt

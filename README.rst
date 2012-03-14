@@ -4,19 +4,16 @@ README
 
 Introduction
 ------------
-This directory contains a number of python scripts that together make up an
-(almost) complete abstraction of the RHN (Hosted and Satellite) XMLRPC API and by extension, that of the Spacewalk project.
+This directory contains a number of python scripts that together make up an (almost) complete abstraction of the RHN (Hosted and Satellite) XMLRPC API and by extension, that of the Spacewalk project.
 
-Due to the divergence of the 2 codebases, there are no guarantees that this
-will work at all for RHN Hosted without a little TLC in some places.
+Due to the divergence of the 2 codebases, there are no guarantees that this will work at all for RHN Hosted without a little TLC in some places.
 
-This is under fairly heavy development and is currently being updated to
-work with RHN satellite 5.4 (which added a huge number of new API calls)
+This is under fairly heavy development but is more or less up to date with the published API for RHN Satellite 5.4.1
 
 The module is designed around a single class and lots of submodules, essentially one per major namespace of the API
 
 There is a companion repository to this one that contains a lot of scripts to automate manual tasks (or those missing from the RHN Satellite web gui or API)
-You'll find that in the *spw-api-scripts* repository
+You'll find that in the *spw-api-scripts* repository, also on my github.
 
 License
 -------
@@ -28,7 +25,7 @@ The API module is split into multiple files (see module contents below).
 
 The main RHN API session class (rhnapi.rhnSession) is in the __init__.py file.
 
-An instance of this is used by all the other methods defined in the various files. See the USAGE part later
+An instance of this is used by all the other methods defined in the various files. See the *USAGE* part later
 
 Building RPMs
 -------------
@@ -53,7 +50,7 @@ Each of the following files provides one of the major namespaces in the API.
 Where possible I have collapsed the namespaces as they were extremely (and to my mind overly) complicated.
 i.e. channel includes channel.software etc.
 
-Doing this has naturally involved renaming a few calls as otherwise the names would clash.
+Doing this has naturally involved renaming a few calls as otherwise the names would clash. All the calls are documented  - *pydoc modulename* is your friend here. Or a good old text editor, of course.
 
 Some of the namespaces also include custom methods which are not part of the normal API.
 
@@ -86,13 +83,14 @@ How to use the module in your own scripts.
 #. Make sure it is on your PYTHONPATH.
    This can be accomplished in one of 2 ways:
 
-   i. put the contained ``rhnapi`` directory in /usr/lib/python<VERSION>/site-packages.
+   i. Build the module into am RPM package (see *Building RPMS* above) and install that, which should put everything into the right place for you.
 
-   ii. Build the module into am rpm (see *Building RPMS*) and install that, which will do the above step for you.
+   ii. put the contained *rhnapi* directory in /usr/lib/python<VERSION>/site-packages.
 
-   ii. put it in another directory (e.g. /usr/local/lib/python/site-packages) and add that to your search path in your scripts, like this:
+   iii. put it in another directory (e.g. /usr/local/lib/python/site-packages) and add that to your search path in your scripts, like this:
 
 ::
+
   #!/usr/bin/env/python
   import sys
   sys.path.append('/usr/local/lib/python/site-packages')
@@ -100,17 +98,19 @@ How to use the module in your own scripts.
 or
 
 ::
+
   export PYTHONPATH=/usr/local/lib/python/site-packages
 
 
 #. Before you can do anything, you'll need to import the module
 
 ::
+
   import rhnapi
 
-#. To ease typing, the module supports the use of a config file in .ini format, defaulting to '~/.rhninfo'
-   This should look like the example below (you can include sections for different satellites if you wish. Each [] section should contain only one hostname.
-   No regexes, URLS, protocols or any other funny business are supported. Just hostnames.
+#. To ease typing, the module supports the use of a config file in .ini format, defaulting to '~/.rhninfo'.
+This should look like the example below (you can include sections for different satellites if you wish. Each [] section should contain only one hostname.
+No regexes, URLS, protocols or any other funny business are supported. Just hostnames. Although I may add some of that in the end, if I get around to it. (Who *really* has so many satellite/spacewalk servers that they can't handle one section each?)
 
 sample ~/.rhninfo::
 
@@ -122,22 +122,18 @@ sample ~/.rhninfo::
   login=xxxxx
   password=xxxx
 
-if you miss the password=xxxxx bit (or leave it set to None), you'll be prompted for it.
+If you miss out the password=xxxxx bit (or leave it set to None), you'll be prompted for it.
 
-4. create an instance of the rhnSession class
+4. create an instance of the rhnSession class::
 
-::
   RHN = rhnapi.rhnSession(server, config='~/.rhninfo')
 
-5. Import the other bits you want
+5. Import the other bits you want ::
 
-::
    from rhnapi import system
 
-6. Each of the different methods requires an rhnSession to be given to it (made it easier to split everything up)
-   so
+6. Each of the different methods requires an rhnSession to be given to it (made it easier to split everything up), so ::
 
-::
   system.listSystems(RHN)
 
 Should do what it says on the tin.

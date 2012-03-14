@@ -20,25 +20,34 @@ You'll find that in the *spw-api-scripts* repository
 
 License
 -------
-All of the module is released under the terms of the GNU General Public License (GPL) v.2 or greater. Should any files be missing this information.
+All of the module is released under the terms of the GNU General Public License (GPL) v.2 or greater (should any files be missing this information).
 
 Design
 ------
+The API module is split into multiple files (see module contents below). 
 
-The API module is split into multiple files (see module contents below).
 The main RHN API session class (rhnapi.rhnSession) is in the __init__.py file.
-An instance of this is used by all the other methods defined in the various files.
-see the USAGE part later
+
+An instance of this is used by all the other methods defined in the various files. See the USAGE part later
+
+Building RPMs
+-------------
+The repository contains configuration that uses the internal python *distutils* module to build RPMs. These will deploy the API to your python site-packages directory, so it's instantly available to python scripts, if wanted.
+
+The RPM building process is thus:
+
+1. Edit the ``setup.cfg`` file to update the RPM release tag (or simply pass ``--release RELEASENUMBER`` in the next command)
+2. ``python setup.py bdist_rpm``
+3. Find your newly build RPM in the ``dist`` directory.
 
 
 Module Contents
 ---------------
 
 * __init__.py
-  The main rhnSession class defnition with helper functions
-  from the parent directory of this one,
-  pydoc rhnapi
-  should give you the lowdown.
+
+The main rhnSession class defnition with helper functions from the parent directory of this one.
+``pydoc rhnapi`` should show its internal documentation.
 
 Each of the following files provides one of the major namespaces in the API.
 Where possible I have collapsed the namespaces as they were extremely (and to my mind overly) complicated.
@@ -66,27 +75,42 @@ Some of the namespaces also include custom methods which are not part of the nor
 
 
 * utils.py
-  The utils submodule was intended to allow me to add custom functionality to the module
+
+The *utils* submodule contains additional functions that are used in the scripts, to avoid too much repetition
 
 Usage 
 -----
 
 How to use the module in your own scripts.
 
-1. Make sure it is on your PYTHONPATH.
-    - accomplish this in one of 2 ways:
-    a) put it in /usr/lib(64)/python$VERSION/site-packages
-    b) put it in another directory (e.g. /usr/local/lib/python/site-packages) and add that to your search path in your scripts, like this:
-    #!/usr/bin/env/python
-    import sys
-    sys.path.append('/usr/local/lib/python/site-packages')
+#. Make sure it is on your PYTHONPATH.
+   This can be accomplished in one of 2 ways:
 
-2. Before you can do anything, you'll need to import the module
-    import rhnapi
+   i. put the contained ``rhnapi`` directory in /usr/lib/python<VERSION>/site-packages.
 
-3. to ease typing, the module supports the use of a config file in .ini format, defaulting to '~/.rhninfo'
-this should look like this (you can include sections for different satellites if you wish. Each [] section should contain only one hostname.
-No regex or protocol bits or any other funny business.
+   ii. Build the module into am rpm (see *Building RPMS*) and install that, which will do the above step for you.
+
+   ii. put it in another directory (e.g. /usr/local/lib/python/site-packages) and add that to your search path in your scripts, like this:
+
+::
+  #!/usr/bin/env/python
+  import sys
+  sys.path.append('/usr/local/lib/python/site-packages')
+
+or
+
+::
+  export PYTHONPATH=/usr/local/lib/python/site-packages
+
+
+#. Before you can do anything, you'll need to import the module
+
+::
+  import rhnapi
+
+#. To ease typing, the module supports the use of a config file in .ini format, defaulting to '~/.rhninfo'
+   This should look like the example below (you can include sections for different satellites if you wish. Each [] section should contain only one hostname.
+   No regexes, URLS, protocols or any other funny business are supported. Just hostnames.
 
 sample ~/.rhninfo::
 
@@ -100,19 +124,23 @@ sample ~/.rhninfo::
 
 if you miss the password=xxxxx bit (or leave it set to None), you'll be prompted for it.
 
-4. create an instance of the rhnSession class:
-    RHN = rhnapi.rhnSession(server, config='~/.rhninfo')
+4. create an instance of the rhnSession class
+
+::
+  RHN = rhnapi.rhnSession(server, config='~/.rhninfo')
 
 5. Import the other bits you want
-    e.g.
-    from rhnapi import system
+
+::
+   from rhnapi import system
 
 6. Each of the different methods requires an rhnSession to be given to it (made it easier to split everything up)
+   so
 
-    so:
-        system.listSystems(RHN)
+::
+  system.listSystems(RHN)
 
-    should do what it says on the tin
+Should do what it says on the tin.
 
 
 Happy Scripting

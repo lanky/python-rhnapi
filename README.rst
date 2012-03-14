@@ -95,9 +95,7 @@ How to use the module in your own scripts.
   import sys
   sys.path.append('/usr/local/lib/python/site-packages')
 
-or
-
-::
+or ::
 
   export PYTHONPATH=/usr/local/lib/python/site-packages
 
@@ -124,15 +122,21 @@ sample ~/.rhninfo::
 
 If you miss out the password=xxxxx bit (or leave it set to None), you'll be prompted for it.
 
-4. create an instance of the rhnSession class::
+4. create an instance of the rhnSession class
+
+::
 
   RHN = rhnapi.rhnSession(server, config='~/.rhninfo')
 
-5. Import the other bits you want ::
+5. Import the other bits you want
+
+::
 
    from rhnapi import system
 
-6. Each of the different methods requires an rhnSession to be given to it (made it easier to split everything up), so ::
+6. Each of the different methods requires an rhnSession to be given to it (made it easier to split everything up), so
+
+::
 
   system.listSystems(RHN)
 

@@ -231,7 +231,7 @@ def promptConfirm(action, default='Y'):
     """
     prompt for a yes/no answer to an action
     """
-    ans = raw_input('Really %s [%s]? ' %(action, default))
+    ans = raw_input('Really %s (y/n) [%s]? ' %(action, default))
     # if we type in the default answer, then return True
     if str(ans).lower() == default.lower():
         return True

@@ -470,7 +470,7 @@ def downloadSystemId(rhn, serverid):
     serverid(int)           - server ID number
     """
     try:
-        rhn.session.system.downloadSystemId(rhn.key, ServerID)
+        return rhn.session.system.downloadSystemId(rhn.key, serverid)
     except Exception, E:
         return rhn.fail(E, "download the serverid for server ID %d (%s)" % (serverid, getServerName(rhn, serverid)))
 

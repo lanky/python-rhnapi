@@ -91,7 +91,7 @@ How to use the module in your own scripts.
 
 ::
 
-  #!/usr/bin/env/python
+  #!/usr/bin/env python
   import sys
   sys.path.append('/usr/local/lib/python/site-packages')
 
@@ -134,7 +134,7 @@ If you miss out the password=xxxxx bit (or leave it set to None), you'll be prom
 
    from rhnapi import system
 
-6. Each of the different methods requires an rhnSession to be given to it (made it easier to split everything up), so
+6. Each of the different methods requires an rhnSession to be given to it (made it easier to split everything up - I'm quite open to suggestions for a better method), so
 
 ::
 

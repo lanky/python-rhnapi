@@ -424,7 +424,7 @@ def listDefaultSystemGroups(rhn, rhnuser):
     rhnuser(str)            - RHN user account
     """
     try:
-        return rhn.session.user.listDefaultSystemGroups(rhn.key) 
+        return rhn.session.user.listDefaultSystemGroups(rhn.key, rhnuser) 
     except Exception, E:
         return rhn.fail(E,'list default system groups for user %s' % rhnuser)
 

@@ -1,0 +1,120 @@
+2012-11-05 11:20:13,390 - RHN API - DEBUG - Logger initiated
+2012-11-05 11:20:13,390 - RHN API - INFO - looking up config info in ~/.rhninfo
+2012-11-05 11:20:13,390 - RHN API - DEBUG - attempting to load credentials from /users/is/ssears/.rhninfo
+2012-11-05 11:20:13,391 - RHN API - DEBUG - found section for server localhost
+2012-11-05 11:20:13,609 - RHN API - DEBUG - initialised RHN Session, key: 275646x21dbc02e02a14ac296ca33e15d1a2f9d
+2012-11-05 11:20:36,106 - RHN API - ERROR - Failed to list errata in channel lgb-40-base-x86_64-dev
+Traceback (most recent call last):
+  File "/home/ssears/scripts/newscripts/python-rhnapi/rhnapi/channel.py", line 997, in listErrata
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1096, in __call__
+    return self.__send(self.__name, args)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1383, in __request
+    verbose=self.__verbose
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1147, in request
+    return self._parse_response(h.getfile(), sock)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1286, in _parse_response
+    return u.close()
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 744, in close
+    raise Fault(**self._stack[0])
+Fault: <Fault -210: 'redstone.xmlrpc.XmlRpcFault: No such channel: lgb-40-base-x86_64-dev'>
+2012-11-05 11:20:52,784 - RHN API - ERROR - Failed to list errata in channel lgb-40-base-x86_64-dev
+Traceback (most recent call last):
+  File "/home/ssears/scripts/newscripts/python-rhnapi/rhnapi/channel.py", line 997, in listErrata
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1096, in __call__
+    return self.__send(self.__name, args)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1383, in __request
+    verbose=self.__verbose
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1147, in request
+    return self._parse_response(h.getfile(), sock)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1286, in _parse_response
+    return u.close()
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 744, in close
+    raise Fault(**self._stack[0])
+Fault: <Fault -210: 'redstone.xmlrpc.XmlRpcFault: No such channel: lgb-40-base-x86_64-dev'>
+2012-11-05 13:32:52,661 - RHN API - DEBUG - Logger initiated
+2012-11-05 13:32:52,662 - RHN API - INFO - looking up config info in ~/.rhninfo
+2012-11-05 13:32:52,662 - RHN API - DEBUG - attempting to load credentials from /users/is/ssears/.rhninfo
+2012-11-05 13:32:52,662 - RHN API - DEBUG - found section for server localhost
+2012-11-05 13:32:52,858 - RHN API - DEBUG - initialised RHN Session, key: 275651xce7f4c01ff03ddac9aaff06b16b93f17
+2012-11-05 14:02:31,288 - RHN API - DEBUG - Logger initiated
+2012-11-05 14:02:31,288 - RHN API - INFO - looking up config info in ~/.rhninfo
+2012-11-05 14:02:31,288 - RHN API - DEBUG - attempting to load credentials from /users/is/ssears/.rhninfo
+2012-11-05 14:02:31,288 - RHN API - DEBUG - found section for server localhost
+2012-11-05 14:02:31,378 - RHN API - DEBUG - initialised RHN Session, key: 275658x09ad571404bb531f7438f4f658782bed
+2012-11-06 15:47:29,875 - RHN API - DEBUG - Logger initiated
+2012-11-06 15:47:29,895 - RHN API - INFO - looking up config info in ~/.rhninfo
+2012-11-06 15:47:29,895 - RHN API - DEBUG - attempting to load credentials from /users/is/ssears/.rhninfo
+2012-11-06 15:47:29,914 - RHN API - DEBUG - found section for server localhost
+2012-11-06 15:47:30,023 - RHN API - DEBUG - initialised RHN Session, key: 276790xc7fc08a496e2f53beecbce05bd68ddef
+2012-11-07 10:42:12,366 - RHN API - ERROR - Failed to clone errata RHSA-2012:1366,CLA-2012:1338 into channel lgb-4.0-base-x86_64-dev
+Traceback (most recent call last):
+  File "/home/ssears/scripts/newscripts/python-rhnapi/rhnapi/errata.py", line 124, in clone
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1096, in __call__
+    return self.__send(self.__name, args)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1383, in __request
+    verbose=self.__verbose
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1147, in request
+    return self._parse_response(h.getfile(), sock)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1286, in _parse_response
+    return u.close()
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 744, in close
+    raise Fault(**self._stack[0])
+Fault: <Fault -211: 'redstone.xmlrpc.XmlRpcFault: Cloned channel expected: lgb-4.0-base-x86_64-dev'>
+2012-11-07 10:44:07,195 - RHN API - ERROR - Failed to clone errata RHSA-2012:1366,CLA-2012:1338 into channel lgb-4.0-base-x86_64-dev
+Traceback (most recent call last):
+  File "/home/ssears/scripts/newscripts/python-rhnapi/rhnapi/errata.py", line 124, in clone
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1096, in __call__
+    return self.__send(self.__name, args)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1383, in __request
+    verbose=self.__verbose
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1147, in request
+    return self._parse_response(h.getfile(), sock)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1286, in _parse_response
+    return u.close()
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 744, in close
+    raise Fault(**self._stack[0])
+Fault: <Fault -211: 'redstone.xmlrpc.XmlRpcFault: Cloned channel expected: lgb-4.0-base-x86_64-dev'>
+2012-11-07 10:44:23,863 - RHN API - ERROR - Failed to clone errata CLA-2012:1338 into channel lgb-4.0-base-x86_64-dev
+Traceback (most recent call last):
+  File "/home/ssears/scripts/newscripts/python-rhnapi/rhnapi/errata.py", line 124, in clone
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1096, in __call__
+    return self.__send(self.__name, args)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1383, in __request
+    verbose=self.__verbose
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1147, in request
+    return self._parse_response(h.getfile(), sock)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1286, in _parse_response
+    return u.close()
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 744, in close
+    raise Fault(**self._stack[0])
+Fault: <Fault -211: 'redstone.xmlrpc.XmlRpcFault: Cloned channel expected: lgb-4.0-base-x86_64-dev'>
+2012-11-12 10:28:59,691 - RHN API - ERROR - Failed to get details for kickstart distribution lgb-4.0-base-distro-wibble
+Traceback (most recent call last):
+  File "/users/is/ssears/dev/scripts/python-rhnapi/rhnapi/kickstart.py", line 2178, in getTreeDetails
+    return rhn.session.kickstart.tree.getDetails(rhn.key,treelabel)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1096, in __call__
+    return self.__send(self.__name, args)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1383, in __request
+    verbose=self.__verbose
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1147, in request
+    return self._parse_response(h.getfile(), sock)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1286, in _parse_response
+    return u.close()
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 744, in close
+    raise Fault(**self._stack[0])
+Fault: <Fault 1201: 'redstone.xmlrpc.XmlRpcFault: Invalid channel label'>
+2012-11-12 10:42:52,354 - RHN API - ERROR - Failed to get details for kickstart distribution lgb-4.0-base-distro-wibble
+Traceback (most recent call last):
+  File "/users/is/ssears/dev/scripts/python-rhnapi/rhnapi/kickstart.py", line 2178, in getTreeDetails
+    return rhn.session.kickstart.tree.getDetails(rhn.key,treelabel)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1096, in __call__
+    return self.__send(self.__name, args)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1383, in __request
+    verbose=self.__verbose
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1147, in request
+    return self._parse_response(h.getfile(), sock)
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 1286, in _parse_response
+    return u.close()
+  File "/usr/lib64/python2.4/xmlrpclib.py", line 744, in close
+    raise Fault(**self._stack[0])
+Fault: <Fault 1201: 'redstone.xmlrpc.XmlRpcFault: Invalid channel label'>

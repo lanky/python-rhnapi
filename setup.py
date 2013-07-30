@@ -9,7 +9,8 @@ setup(name = 'python-rhnapi',
       author = 'Stuart Sears',
       author_email = 'sjs@redhat.com',
       packages = [ 'rhnapi' ],
-      license = 'GPL v2+'
+      license = 'GPL v2+',
+      url = "http://github.com/lanky/python-rhnapi"
       )
 
 

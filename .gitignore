@@ -6,3 +6,5 @@ dist/
 MANIFEST
 localtest.py
 ChangeLog
+diffs/
+python_rhnapi.egg-info/

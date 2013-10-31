@@ -127,6 +127,32 @@ def clone(rhn, chanlabel, errlist):
 
 # ---------------------------------------------------------------------------------- #
 
+def cloneAsync(rhn, chanlabel, errlist):
+    """
+    API:
+    errata.cloneAsync
+
+    usage:
+    clone(rhn, chanlabel, errlist)
+    
+    description:
+    Clones errata from into a given channel
+
+    returns:
+    bool
+
+    parameters:
+    rhn                     - an authenticated RHN session
+    chanlabel(str)          - the target channel
+    errlist(list/str)       - list of erratum advisory names
+    """
+    try:
+        return rhn.session.errata.cloneAsync(rhn.key, chanlabel, errlist) == 1
+    except Exception, E:
+        return rhn.fail(E, 'clone errata %s into channel %s' % (','.join(errlist), chanlabel))
+
+# ---------------------------------------------------------------------------------- #
+
 def cloneAsOriginal(rhn, chanlabel, errlist):
     """
     API:
@@ -154,6 +180,32 @@ def cloneAsOriginal(rhn, chanlabel, errlist):
         return rhn.session.errata.cloneAsOriginal(rhn.key, chanlabel, errlist)
     except Exception, E:
         return rhn.fail(E, 'clone errata into channel %s' % chanlabel)
+
+# ---------------------------------------------------------------------------- #
+
+def cloneAsOriginalAsync(rhn, chanlabel, errlist):
+    """
+    API:
+    errata.cloneAsOriginalAsync
+
+    usage:
+    cloneAsOriginalAsync(rhn, chanlabel errlist)
+
+    description:
+    Asynchronously clones a list of errata into a cloned channel with
+    reference to the original source channel, pushing only packages that
+    are relevant to the target channel.
+
+    e.g.
+    if an erratum contains packages affecting multiple RH channels and it is
+    cloned into a channel that was cloned from RHEL5, this call only pushes
+    *relevant* packages to the destination channel, not ALL of them.
+    """
+    try:
+        return rhn.session.errata.cloneAsOriginalAsync(rhn.key, chanlabel, errlist) == 1
+    except Exception, E:
+        return rhn.fail(E, 'Asynchronously clone errata into channel %s', chanlabel)
+
 
 # ---------------------------------------------------------------------------------- #
 

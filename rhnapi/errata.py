@@ -199,11 +199,11 @@ def create(rhn, errobj, bugs = [], keywords = [] , packages = [], publish = Fals
     try:
         return rhn.session.errata.create(rhn.key, errobj, bugs, keywords, packages, channels)
     except Exception, E:
-        return rhn.fail(E, 'create new erratum %(erratum_name)s' % errata_info)
+        return rhn.fail(E, 'create new erratum %(erratum_name)s' % errobj)
 
 # ---------------------------------------------------------------------------------- #
 
-def createErratum(rhn, synopsis, name, release, erratatype, product = '', topic = '' , description = '', references = '' , notes = '', solution = ''):
+def createErratum(rhn, synopsis, name, release, errtype, product = '', topic = '' , description = '', references = '' , notes = '', solution = ''):
     """
     API:
     none, special simplified case of errata.create
@@ -226,7 +226,7 @@ def createErratum(rhn, synopsis, name, release, erratatype, product = '', topic 
     synopsis(str)                   - short summary of the erratum
     name(str)                       - name of the erratum
     release(int)                    - release of the erratum
-    erratumtype(str)                - one of ['Security Advisory',
+    errtype(str)                    - one of ['Security Advisory',
                                               'Product Enhancement Advisory',
                                               'Bug Fix Advisory'],
     product(str)                    - what does this erratum affect? (RPM name, OS etc)
@@ -237,7 +237,7 @@ def createErratum(rhn, synopsis, name, release, erratatype, product = '', topic 
     solutionn(str)                  - how the 'bug' was fixed (i.e. what the erratum does)
     """
     return create(rhn, { 'synopsis' : synopsis, 'erratum_name' : name, 'erratum_release' : release,
-                         'erratum_type' : erratumtype, 'product' : product, 'topic' : topic,
+                         'erratum_type' : errtype, 'product' : product, 'topic' : topic,
                          'description' : description, 'references' : references, 'solution' : solution} )
 
 # ---------------------------------------------------------------------------------- #
@@ -570,7 +570,7 @@ def publishAsOriginal(rhn, erratum, chanlist):
 
 # ---------------------------------------------------------------------------------- #
 
-def removePackages(rhn, erratum, pkglist):        
+def removePackages(rhn, erratum, packageids):        
     """
     API:
     errata.removePackages
@@ -591,7 +591,7 @@ def removePackages(rhn, erratum, pkglist):
     pkglist(list of int)    - list of package IDs to remove.
     """
     try:
-        return rhn.session.errata.removePackages(rhn.key, erratum, packages)
+        return rhn.session.errata.removePackages(rhn.key, erratum, packageids)
     except Exception, E:
         return rhn.fail(E, 'remove packages from erratum %s' % erratum)
 

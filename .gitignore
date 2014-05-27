@@ -5,3 +5,4 @@ build/
 dist/
 MANIFEST
 localtest.py
+ChangeLog

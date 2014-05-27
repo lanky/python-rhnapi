@@ -1504,7 +1504,7 @@ def addCryptoKeys(rhn, kslabel, cryptokeys):
     if not isinstance(cryptokeys, list):
         cryptokeys = [cryptokeys]
     try:
-        return rhn.session.kickstart.profile.system.addKeys(rhn.key, kslabel, cryptokeys)
+        return rhn.session.kickstart.profile.system.addKeys(rhn.key, kslabel, cryptokeys) == 1
     except Exception, E:
         return rhn.fail(E, 'add GPG/SSL keys %s to kickstart %s' % (','.join(cryptokeys), kslabel))
 

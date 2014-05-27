@@ -578,14 +578,16 @@ def removeConfigChannels(rhn, keyids, cfgchans):
     True if successful, exception otherwise
 
     params:
-    rhn                   - an authenticated rhn session
-    keyid (list(str))     - the key identifier (long hex or human-readable name)
-    cfgchans (list(str))  - a list of config channel labels to remove from the key.
+    rhn                           - an authenticated rhn session
+    keyids ( str OR list of str)) - the key identifier (long hex or human-readable name)
+    cfgchans (list(str))          - a list of config channel labels to remove from the key.
     """
+    if isinstance(keyids, str):
+        keyids = [ keyids ]
     try:
-        return rhn.session.activationkey.removeConfigChannels(rhn.key, keyid, cfgchans) == 1
+        return rhn.session.activationkey.removeConfigChannels(rhn.key, keyids, cfgchans) == 1
     except Exception, E:
-        return rhn.fail(E,'remove one or more of config channels %r from key %s' % (cfgchans, keyid))
+        return rhn.fail(E,'remove one or more of config channels %r from key %s' % (cfgchans, keyids))
     
 # ---------------------------------------------------------------------------- #
 
@@ -610,7 +612,7 @@ def removeEntitlements(rhn, keyid, entlabels):
     entlabels (list)       - a list of entitlement labels to remove
     """
     try:
-        return rhn.session.activationkey.removeEntitlements(rhn.key, keyid, channels) == 1
+        return rhn.session.activationkey.removeEntitlements(rhn.key, keyid, entlabels) == 1
     except Exception, E:
         return rhn.fail(E,'remove one or more of  %r from key %s' % (entlabels, keyid))
 
@@ -634,13 +636,14 @@ def removePackageNames(rhn, keyid, packagenames):
     packagenames (list)    - a list of packagenames
     """
     try:
+        rhn.logInfo("removePackageNames is deprecated, please use removePackages instead")
         return rhn.session.activationkey.removePackageNames(rhn.key, keyid, packagenames) == 1
     except Exception, E:
         return rhn.fail(E,'remove one or more of %r from key %s' % (packagenames, keyid))
 
 # ---------------------------------------------------------------------------- #
 
-def removePackages(rhn, keyid, packagelist):
+def removePackages(rhn, keyid, packageids):
     """
     API:
     activationkey.removePackages
@@ -659,9 +662,9 @@ def removePackages(rhn, keyid, packagelist):
                                   'arch' is optional
     """
     try:
-        return rhn.session.activationkey.removePackages(rhn.key, keyid, packagelist) == 1
+        return rhn.session.activationkey.removePackages(rhn.key, keyid, packageids) == 1
     except Exception, E:
-        return rhn.fail(E,'remove one or more of %r from key %s' % (packagenames, keyid))
+        return rhn.fail(E,'remove one or more of %r from key %s' % (packageids, keyid))
 
 # ---------------------------------------------------------------------------- #
 

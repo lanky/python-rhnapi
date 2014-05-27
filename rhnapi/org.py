@@ -84,7 +84,7 @@ def create(rhn, orgname, admlogin, admpass, admprefix, admfirst,
     """
     try:
         return rhn.session.org.create(rhn.key, orgname, admlogin, admpass, admprefix,
-                    admfirst, admlast, admmail, pamauth)
+                    admfirst, admlast, admemail, pamauth)
     except Exception, E:
         return rhn.fail(E, 'create organization %s with admin login %s' %(orgname, admlogin))
 
@@ -178,17 +178,20 @@ def listSoftwareEntitlements(rhn, entlabel = None, unentitled = False):
     returns: list/dict
 
     parameters: [* = optional]
-    rhn                      - authenticated rhnapi.rhnSession() object
+    rhn                     - authenticated rhnapi.rhnSession() object
     *entlabel(str)          - software channel/entitlement label
-    *includeUnentitled(bool) - also show orgs without this specific entitlement
+    *unentitled(bool)       - also show orgs without this specific entitlement
                               This can only be specified with 'entlabel' and will
                               be ignored otherwise
     """
     try:
         if entlabel is not None:
-            return rhn.session.org.listEntitlements(rhn.key, entlabel, includeUnentitled)
+            res = rhn.session.org.listEntitlements(rhn.key, entlabel, unentitled)
+            if res == -1:
+                res = "unlimited"
         else:
-            return rhn.session.org.listEntitlements(rhn.key)
+            res = rhn.session.org.listEntitlements(rhn.key)
+        return res
     except Exception, E:
         if entlabel is not None:
             return rhn.fail(E, 'List usage of entitlement %s across all orgs' % entlabel)
@@ -211,7 +214,7 @@ def ListSoftwareEntitlementsForOrg(rhn, orgid):
     try:
         return rhn.session.org.ListSoftwareEntitlementsForOrg(rhn.key, orgid)
     except Exception, E:
-        return rhn.fail(E, 'List software entitlements for org %d (%s)' % (orgid, getDetails(orgid)['name']))
+        return rhn.fail(E, 'List software entitlements for org %(id)d (%(name)s)' % getDetails(rhn, orgid) )
 
 def ListSystemEntitlements(rhn, label = None, unentitled = False):
     """
@@ -231,7 +234,7 @@ def ListSystemEntitlements(rhn, label = None, unentitled = False):
     """
     try:
         if label is not None:
-            return rhn.session.org.ListSystemEntitlements(rhn.key, label, includeUnentitled)
+            return rhn.session.org.ListSystemEntitlements(rhn.key, label, unentitled)
         else:
             return rhn.session.org.ListSystemEntitlements(rhn.key)
     except Exception, E:
@@ -254,7 +257,7 @@ def ListSystemEntitlementsForOrg(rhn, orgid):
     try:
         return rhn.session.org.ListSystemEntitlementsForOrg(rhn.key, orgid)
     except Exception, E:
-        return rhn.fail(E, 'list system entitlement usage for org %d (%s)' %(orgid, getDetails(orgid)['name']) )
+        return rhn.fail(E, 'list system entitlement usage for org %(id)d (%(name)s)' % getDetails(rhn, orgid) )
 
 def listUsers(rhn, orgid):
     """
@@ -271,7 +274,7 @@ def listUsers(rhn, orgid):
     try:
         return rhn.session.org.listUsers(rhn.key, orgid)
     except Exception, E:
-        return rhn.fail(E, 'list users in org %d (%s)' %(orgid, getDetails(orgid)['name']))
+        return rhn.fail(E, 'list users in org %(id)d (%(name)s)' % getDetails(rhn, orgid) )
 
 def migrateSystems(rhn, dest_orgid, systemlist):
     """
@@ -319,8 +322,8 @@ def setSoftwareEntitlements(rhn, orgid, label, allocation):
     try:
         return rhn.session.org.setSoftwareEntitlements(rhn.key, orgid, label, allocation) == 1
     except Exception, E:
-        return rhn.fail(E, 'allocate %d entitlements for %s to org %d (%s)' %(allocation, label,
-                                                                orgid, getDetails(orgid)['name']))
+        orginfo = "%(id)d (%(name)s)" % getDetails(rhn, orgid)
+        return rhn.fail(E, 'allocate %d entitlements for %s to org %s' %(allocation, label, orginfo) )
 
 
 def setSoftwareFlexEntitlements(rhn, orgid, label, allocation):
@@ -344,8 +347,8 @@ def setSoftwareFlexEntitlements(rhn, orgid, label, allocation):
     try:
         return rhn.session.org.setSoftwareFlexEntitlements(rhn.key, orgid, label, allocation) == 1
     except Exception, E:
-        return rhn.fail(E, 'allocate %d entitlements for %s to org %d (%s)' %(allocation, label,
-                                                                orgid, getDetails(orgid)['name']))
+        orginfo = "%(id)d (%(name)s)" % getDetails(rhn, orgid)
+        return rhn.fail(E, 'allocate %d flex entitlements for %s to org %s' %(allocation, label, orginfo))
 
 def setSystemEntitlements(rhn, orgid, label, allocation):
     """
@@ -373,8 +376,8 @@ def setSystemEntitlements(rhn, orgid, label, allocation):
     try:
         return rhn.session.org.setSystemEntitlements(rhn.key, orgid, label, allocation) == 1
     except Exception, E:
-        return rhn.fail(E, 'allocate %d entitlements for %s to org %d (%s)' %(allocation, label,
-                                                                orgid, getDetails(orgid)['name']))
+        orginfo = "%(id)d (%(name)s)" % getDetails(rhn, orgid)
+        return rhn.fail(E, 'allocate %d %s entitlements to org %s' %(allocation, label, orginfo) )
 
 def updateName(rhn, orgid, newname):
     """
@@ -391,7 +394,7 @@ def updateName(rhn, orgid, newname):
     try:
         return rhn.session.org.updateName(rhn.key, orgid, newname)
     except Exception, E:
-        return rhn.fail(E, 'change name for organization %d (%s)' %(orgid, getDetails(orgid)['name']))
+        return rhn.fail(E, 'change name for organization %(id)d (%(name)s)' % getDetails(rhn, orgid) )
 
 # -------------------------------- org.trusts -------------------------------- #
 

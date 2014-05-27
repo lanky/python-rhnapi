@@ -40,7 +40,7 @@ except ImportError:
 
 from operator import itemgetter
 import time
-from  xmlrpclib import DateTime as xmlrpcDateTime
+from xmlrpclib import DateTime as xmlrpcDateTime
 import csv
 import sys
 
@@ -154,7 +154,7 @@ class RhnJSONEncoder(json.JSONEncoder):
         if isinstance(obj, set):
             return list(obj)
 
-        return simplejson.JSONEncoder.default(self, obj)
+        return json.JSONEncoder.default(self, obj)
         
 # --------------------------------------------------------------------------------- #
 

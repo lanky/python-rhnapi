@@ -249,7 +249,7 @@ def detailsByLabel(rhn, chanlabel):
 
 # --------------------------------------------------------------------------------- #
 
-def createOrUpdatePath(rhn, label, path, directory = False, **kwargs):
+def createOrUpdatePath(rhn, chanlabel, path, directory=False, **kwargs):
     """
     API:
     custom implementation of the 

@@ -418,7 +418,10 @@ class rhnSession(object):
 
 # ---------------------------------------------------------------------------- #
 
-    def addLogger(self, logname, logdest, loglevel, logfmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'):
+    # def addLogger(self, logname, logdest, loglevel, logfmt = '%(asctime)s - %(name)s - %(levelname)-8s - %(message)s'):
+    def addLogger(self, logname, logdest, loglevel, 
+            logfmt = '%(asctime)s %(name)s[%(process)d]: %(levelname)-8s - %(message)s',
+            datefmt = '%b %e %H:%M:%S'):
         """
         Generates self.logger, a logging.Logger instance.
 
@@ -450,7 +453,7 @@ class rhnSession(object):
         self.logger.setLevel(loglevel)
 
         # configure the format of log messages
-        formatter = logging.Formatter(logfmt)
+        formatter = logging.Formatter(logfmt, datefmt)
 
         # we should now have a functional logger, so let's configure a destination
         # this is done by adding an appropriate handler:
@@ -561,7 +564,7 @@ class rhnSession(object):
         logs and re-raises the exception passed to it
         """
         try:
-            self.logger.exception("Failed to %s" % message)
+            self.logErr("Failed to %s" % message)
             raise exptn
         except xmlrpclib.Fault, E:
             self.logErr(str(exptn.faultCode).strip())

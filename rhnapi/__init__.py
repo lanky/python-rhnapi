@@ -650,7 +650,7 @@ class rhnSession(object):
             if res == 1:
                 return True
         except Exception, E:
-            return self.fail(E, '%s logout failed!' % self.username)
+            return self.fail(E, '%s logout failed!' % self.login)
 
     def encodeDate(self, datestr = None):
         """

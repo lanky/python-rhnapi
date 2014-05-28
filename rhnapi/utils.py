@@ -392,6 +392,36 @@ def index_dictlist(dictlist, keyfunc):
 
 # ---------------------------------------------------------------------------- #
 
+def batch_iterate(iterable, batchsize):
+    """
+    takes an arbitrary iterable (list, set, string etc) and returns an iterator
+    that yields the input in fixed size batches (e.g. split a list into groups of
+    50 items for batch processing)
+    if there are fewer than 'batchsize' elements remaining, return the incomplete
+    final portion
+
+    Shamelessly based on:
+    http://stackoverflow.com/questions/312443/
+    and the recipes here: (for "grouper")
+    http://docs.python.org/2/library/itertools.html?highlight=itertools#recipes
+    
+    parameters:
+    iterable        - an iterable object, such as a set or list
+    batchsize       - the number of elements to return in each batch
+
+    returns:
+    generator/iterator object, which we can loop over.
+    raises StopIteration at end
+
+    this will not pad the final batch if it is smaller than 'batchsize'
+    """
+    # harmless if already imported
+    import itertools
+
+    it = iter(iterable)
+    while True:
+       yield tuple(itertools.islice(it, batchsize)) or it.next()
+
 
 # footer - do not edit below here
 # vim: set et ai smartindent ts=4 sts=4 sw=4 ft=python:

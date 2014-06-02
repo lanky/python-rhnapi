@@ -5,3 +5,5 @@ include ChangeLog
 include GPL.txt
 recursive-include rhnapi *.py
 graft rhnapi/docs
+include README.rst
+include GPL.txt

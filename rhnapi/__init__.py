@@ -486,7 +486,6 @@ class rhnSession(object):
                 raise RuntimeError("failed to instantiate logger")
             self.logger.debug("Logger initiated")
         
-
     def setLogLevel(self, loglevel = 10):
         """
         sets loglevel for the RHN logger
@@ -550,6 +549,30 @@ class rhnSession(object):
         """
         if self.logger is not None:
             self.logger.error(message)
+
+    def logDebug(self, message):
+        """
+        Special case of logMessage for debug logs
+        """
+        return self.logMessage(logging.DEBUG, message)
+            
+    def logInfo(self, message):
+        """
+        Special case of logMessage for debug logs
+        """
+        return self.logMessage(logging.INFO, message)
+
+    def logWarning(self, message):
+        """
+        Log at 'Warn' level
+        """
+        return self.logMessage(logging.WARN, message)
+
+    def logCritical(self, message):
+        """
+        log at 'Crit' level
+        """
+        return self.logMessage(logging.CRITICAL, message)
 
     def logError(self, message):
         """

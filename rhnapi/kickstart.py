@@ -691,7 +691,7 @@ def addIpRange(rhn, kslabel, minip, maxip):
 
 # ---------------------------------------------------------------------------- #
 
-def addScript(rhn, kslabel, contents, scripttype, chroot = True, interpreter='', template = False):
+def addScript(rhn, kslabel, name, contents, scripttype, chroot = True, interpreter='', template = False):
     """
     API:
     kickstart.profile.addScript
@@ -708,6 +708,7 @@ def addScript(rhn, kslabel, contents, scripttype, chroot = True, interpreter='',
     parameters (* = optional):
     rhn(rhnSession)          - an authenticated RHN session
     kslabel(str)             - The kickstart profile label in RHN satellite
+    name(str)                - The script name.
     contents(str)            - The script content (e.g. from open(script).read())
     scripttype(str)          - 'pre' or 'post'
     *chroot(bool)             - does the script run chrooted (default: True)
@@ -715,7 +716,7 @@ def addScript(rhn, kslabel, contents, scripttype, chroot = True, interpreter='',
     *template(bool)           - enable cobbler templating in this script (default: False)
     """
     try:
-        scriptid = rhn.session.kickstart.profile.addScript(rhn.key, kslabel, contents, interpreter, scripttype, chroot, template)
+        scriptid = rhn.session.kickstart.profile.addScript(rhn.key, kslabel, name, contents, interpreter, scripttype, chroot, template)
         return isinstance(scriptid, int)
     except Exception, E:
         return rhn.fail(E, 'Add kickstart %s script to kickstart %s' % (scripttype, kslabel))

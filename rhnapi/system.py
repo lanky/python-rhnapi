@@ -2884,7 +2884,7 @@ def setChildChannels(rhn, serverid, chanlist):
     chanlist([str])        - list of child channel labels
     """
     try:
-        return rhn.session.setChildChannels(rhn.key, serverid, chanlist) == 1
+        return rhn.session.system.setChildChannels(rhn.key, serverid, chanlist) == 1
     except Exception, E:
         return rhn.fail(E,'subscribe system %d to child channels [%s]' % (serverid, ','.join(chanlist)))
 

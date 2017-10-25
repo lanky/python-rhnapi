@@ -86,7 +86,7 @@ import httplib
 import sys
 import re
 import os
-from ConfigParser import SafeConfigParser
+from ConfigParser import SafeConfigParser, NoOptionError, NoSectionError
 import time
 import logging
 import ssl
@@ -175,6 +175,16 @@ def fetchCreds(filename, servername, logger=None, debug=False):
     mylogin = None
     mypass = None
 
+    def get_item(cfg, section, option, default=None):
+        """
+        Makes configparser.get work like dict.get - returns 'None' (or default given)
+        if the option or section do not exist
+        """
+        try:
+            return cfg.get(section, option)
+        except (NoOptionError, NoSectionError):
+            return default
+
     # harmless, so just for sanity:
     srcfile = os.path.expanduser(filename)
 
@@ -188,8 +198,8 @@ def fetchCreds(filename, servername, logger=None, debug=False):
         if confparse.has_section(servername):
             if logger:
                logger.debug("found section for server %s", servername)
-            mylogin = confparse.get(servername, 'login')
-            mypass  = confparse.get(servername, 'password')
+            mylogin = get_item(confparse, servername, 'login')
+            mypass  = get_item(confparse, servername, 'password')
         else:
             if logger:
                 logger.info("No section found for server %s, using defaults", servername)

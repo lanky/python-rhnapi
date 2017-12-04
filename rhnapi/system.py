@@ -1780,7 +1780,7 @@ def listLatestInstallablePackages(rhn, serverid):
 
 # ---------------------------------------------------------------------------- #
 
-def listLatestUpgradeablePackages(rhn, serverid):
+def listLatestUpgradablePackages(rhn, serverid):
     """
     API:
     system.listLatestUpgradeablePackages
@@ -1810,9 +1810,19 @@ def listLatestUpgradeablePackages(rhn, serverid):
     serverid(int)            - server ID number
     """
     try:
-        return rhn.session.system.listLatestUpgradeablePackages(rhn.key, serverid)
+        return rhn.session.system.listLatestUpgradablePackages(rhn.key, serverid)
     except Exception, E:
         return rhn.fail(E, "list latest Upgradeable packages for serverid %d (%s) " % (serverid, getName(rhn, serverid)))
+
+
+def listLatestUpgradeablePackages(rhn, serverid):
+    """
+    Compatibility layer for listLatestUpgradablePackages
+    :param rhn:
+    :param serverid:
+    :return:
+    """
+    return listLatestUpgradablePackages(rhn, serverid)
 
 # ---------------------------------------------------------------------------- #
 
